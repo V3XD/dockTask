@@ -12,6 +12,8 @@ public class MainMenu : MonoBehaviour {
 	{
 		if (GUI.Button(new Rect((UnityEngine.Screen.width)/4,(3*UnityEngine.Screen.height)/4,100,50),"Phantom"))
 			Application.LoadLevel("phantomGrab");
+		if (GUI.Button(new Rect((UnityEngine.Screen.width)/2,(3*UnityEngine.Screen.height)/4,80,50),"Practice"))
+			Application.LoadLevel("phantomTutorial");
 		if (GUI.Button(new Rect((UnityEngine.Screen.width)/4,(UnityEngine.Screen.height)/4,80,50),"Leap"))
 			Application.LoadLevel("leapCube");
 		if (GUI.Button(new Rect((UnityEngine.Screen.width)/2,(UnityEngine.Screen.height)/4,80,50),"Tutorial"))

@@ -6,6 +6,7 @@ public class Difficulty : Singleton<Difficulty> {
 
 	public float angle;//angle between quaternions
 	public float distance;//distance between target and cursor
+	string level;//level of difficulty
 
 	void Awake () 
 	{
@@ -16,18 +17,26 @@ public class Difficulty : Singleton<Difficulty> {
 	{
 		angle = 20f;
 		distance = 3f;
+		level = "normal";
 	} 
 
 	public void setDifficult()
 	{
 		angle = 15f;
 		distance = 2f;
+		level = "difficult";
 	}
 
 	public void setVeryDifficult()
 	{
 		angle = 5f;
 		distance = 1f;
+		level = "veryDifficult";
+	}
+
+	public string getLevel()
+	{
+		return level;
 	}
 
 }

@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using System.Collections;
 using System.IO;
 
-public class PhantomGrab : MonoBehaviour {
+public class PhantomTutorial : MonoBehaviour {
 	
 	public GameObject cursor;
 	public GameObject target;
@@ -18,7 +18,7 @@ public class PhantomGrab : MonoBehaviour {
 	public AudioSource ambientSource;
 	public Material green;
 	public Material yellow;
-
+	
 	private Vector3 prevPosition;
 	private Vector3 prevOrient;
 	protected bool grab;
@@ -34,7 +34,6 @@ public class PhantomGrab : MonoBehaviour {
 	protected static float yMax = 12.0f;
 	protected static float zMax = 12.0f;
 	protected static float scale = 0.10f;
-	string path;
 	Difficulty difficulty;
 	
 	[DllImport("phantomDll")]
@@ -88,9 +87,9 @@ public class PhantomGrab : MonoBehaviour {
 	
 	void Awake ()
 	{
-		difficulty = Difficulty.Instance;
-		path = @"Log/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+difficulty.getLevel()+"_Phantom.csv";
 		UnityEngine.Screen.showCursor = false;
+		difficulty = Difficulty.Instance;
+		difficulty.setNormal();
 	}
 	
 	void Start()
@@ -109,8 +108,8 @@ public class PhantomGrab : MonoBehaviour {
 			                            (float)getPosY()*scale, 
 			                            -(float)getPosZ()*scale);
 			prevOrient = new Vector3((float)gimbalY()* Mathf.Rad2Deg,
-			                              -(float)gimbalX()* Mathf.Rad2Deg, 
-			                              -(float)gimbalZ()* Mathf.Rad2Deg);
+			                         -(float)gimbalX()* Mathf.Rad2Deg, 
+			                         -(float)gimbalZ()* Mathf.Rad2Deg);
 		}
 	}
 	
@@ -155,14 +154,14 @@ public class PhantomGrab : MonoBehaviour {
 			j2.transform.rotation = rotation;
 			rotation = Quaternion.Euler(joints.z, joints.x, 0f);
 			j3.transform.rotation = rotation;
-
+			
 			Vector3 penOrient = new Vector3(joints2.y, -joints2.x, -joints2.z);
 			rotation = Quaternion.Euler(joints2.y, -joints2.x, -joints2.z);
 			j4.transform.localRotation = rotation;
-
+			
 			Vector3 rotVec = penOrient - prevOrient;
 			prevOrient = penOrient;
-
+			
 			if(isButtonADown() || isButtonBDown())
 			{
 				grab = true;
@@ -175,7 +174,7 @@ public class PhantomGrab : MonoBehaviour {
 				grab = false;
 				info = "not grabbed";
 			}
-
+			
 			if(isDocked && !grab)
 			{
 				popSource.PlayOneShot(popSound);
@@ -211,7 +210,7 @@ public class PhantomGrab : MonoBehaviour {
 		float distance = (targetV - cursorV).magnitude;
 		float angle = Quaternion.Angle(cursorQ, targetQ);
 		ambientSource.volume = 1f-(angle / 180f);
-
+		
 		if ((angle <= difficulty.angle) && (distance < difficulty.distance)) 
 		{	
 			isDocked = true;
@@ -224,7 +223,7 @@ public class PhantomGrab : MonoBehaviour {
 			roomLight.intensity = 1.0f;
 			message= "";
 		}
-
+		
 		if (angle <= difficulty.angle)
 		{	
 			cursor.renderer.material = green;
@@ -247,8 +246,6 @@ public class PhantomGrab : MonoBehaviour {
 		setNewPositionAndOrientation();
 		prevTime = (int)Time.time - prevTotalTime;
 		prevTotalTime = (int)Time.time;
-		//File.AppendAllText(path, prevTime.ToString()+ Environment.NewLine);//save to file
-		File.AppendAllText(path, prevTime.ToString()+ ",");//save to file
 		score++;
 	}
 }

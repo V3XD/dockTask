@@ -51,7 +51,7 @@ public class LeapCube : MonoBehaviour
 	{
 		difficulty = Difficulty.Instance;
 		mController = new Controller();
-		path = @"Log/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_angle"+difficulty.angle.ToString()+"_LeapCube.txt";
+		path = @"Log/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+difficulty.getLevel()+"_Leap.csv";
 		UnityEngine.Screen.showCursor = false;
 	}
 	
@@ -229,7 +229,7 @@ public class LeapCube : MonoBehaviour
 							prevTotalTime = (int)Time.time;
 							pointText.enabled = true;
 							score++;
-							File.AppendAllText(path, prevTime.ToString()+ Environment.NewLine);//save to file
+							File.AppendAllText(path, prevTime.ToString()+ ",");//save to file
 						}
 					}
 
