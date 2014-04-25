@@ -66,6 +66,7 @@ public class LeapTutorial : MonoBehaviour
 	Vector3 transVec;
 	Vector3 targetPos;
 	Sequence behavoirTree;
+	bool isRotating;
 
 	void Awake ()
 	{
@@ -113,6 +114,7 @@ public class LeapTutorial : MonoBehaviour
 		isClose = false;
 		prevTotalTime = (int)Time.time;
 		setNewPositionAndOrientation();
+		isRotating = false;
 
 		if(mController.IsConnected)
 		{
@@ -171,6 +173,11 @@ public class LeapTutorial : MonoBehaviour
 		{
 			if( ((int)Time.time - prevTotalTime) > 1)
 				repeatText.enabled  = false;
+		}
+		if (completeText.enabled ) 
+		{
+			if( ((int)Time.time - prevTotalTime) > 2)
+				completeText.enabled  = false;
 		}
 
 		if(translate)
@@ -312,7 +319,7 @@ public class LeapTutorial : MonoBehaviour
 								message = "Solve with one movement";
 							}
 							moveCount = 0;
-							if(score > 4)
+							if(score == 5)
 								completeText.enabled = true;
 							setNewPositionAndOrientation();
 						}
@@ -488,15 +495,12 @@ public class LeapTutorial : MonoBehaviour
 			cursor.transform.Translate (transVec*scale, Space.World);
 			if(Vector3.Distance(targetPos, cursor.transform.position) < 1f)
 			{
-				inView = true;
 				translate = false;
 				fingerDir = new Vector3(-1f, 0f, 0f);
-				pointHand.renderer.enabled = true;
-				pointHandTrail.renderer.enabled = true;
 				sphere.renderer.enabled = true;
 				rotate = true;
 				pointHand.transform.rotation = Quaternion.LookRotation(fingerDir);
-				pointHand.transform.position = new Vector3(10f,8.5f,0f);
+				pointHand.transform.position = new Vector3(10f,5f,0f);
 				updateCam = true;
 				orientDir = new Vector3 (0f, 0f, 1f);
 				Quaternion targetQ = target.transform.rotation;
@@ -507,6 +511,10 @@ public class LeapTutorial : MonoBehaviour
 				{
 					orientDir.z = -orientDir.z;
 				}
+				pointHand.renderer.enabled = true;
+				pointHandTrail.renderer.enabled = true;
+
+				inView = true;
 			}
 		}
 		else
@@ -527,8 +535,12 @@ public class LeapTutorial : MonoBehaviour
 			
 			transVec = Vector3.Cross(fingerDir, orientDir);
 			transVec.Normalize();
-			pointHand.transform.Translate (transVec* scale, Space.World);
-			cursor.transform.Rotate(orientDir*0.5f, Space.World);
+
+			if(!isRotating)
+			{
+				isRotating = true;
+				StartCoroutine(rotateSlowly());
+			}
 
 			if(!zOrient )
 			{
@@ -548,7 +560,7 @@ public class LeapTutorial : MonoBehaviour
 					fingerDir = new Vector3(0f, 0f, 1f);
 					pointHand.transform.rotation = Quaternion.LookRotation(fingerDir);
 					updateCam = true;
-					pointHand.transform.position = new Vector3(0f,8.5f,-15f);
+					pointHand.transform.position = new Vector3(0f,5f,-15f);
 					orientDir.y = clockDirection(targetQ.eulerAngles.y, cursorQ.eulerAngles.y);
 					isClose = false;
 				}
@@ -573,16 +585,20 @@ public class LeapTutorial : MonoBehaviour
 			
 			transVec = Vector3.Cross(fingerDir, orientDir);
 			transVec.Normalize();
-			pointHand.transform.Translate (transVec* scale, Space.World);
-			cursor.transform.Rotate(orientDir*0.5f, Space.World);
-			
+
+			if(!isRotating)
+			{
+				isRotating = true;
+				StartCoroutine(rotateSlowly());
+			}
+
 			if( !yOrient)
 			{
 				if( cursorQ.eulerAngles.y < (targetQ.eulerAngles.y +3f) || cursorQ.eulerAngles.y > (targetQ.eulerAngles.y+360f -3f))
 				{
 					yOrient = true;
 					orientDir = new Vector3(1f,0f,0f);
-					pointHand.transform.position = new Vector3(0f,8.5f,-15f);
+					pointHand.transform.position = new Vector3(0f,5f,-15f);
 					orientDir.x = clockDirection(targetQ.eulerAngles.x, cursorQ.eulerAngles.x);
 				}
 			}
@@ -606,9 +622,13 @@ public class LeapTutorial : MonoBehaviour
 			
 			transVec = Vector3.Cross(fingerDir, orientDir);
 			transVec.Normalize();
-			pointHand.transform.Translate (transVec* scale, Space.World);
-			cursor.transform.Rotate(orientDir*0.5f, Space.World);
-			
+
+			if(!isRotating)
+			{
+				isRotating = true;
+				StartCoroutine(rotateSlowly());
+			}
+
 			if(!xOrient)
 			{
 				if( cursorQ.eulerAngles.x < (targetQ.eulerAngles.x +3f) || cursorQ.eulerAngles.x > (targetQ.eulerAngles.x+360f -3f))
@@ -664,5 +684,13 @@ public class LeapTutorial : MonoBehaviour
 		else
 			result = false;
 		return result;
+	}
+
+	IEnumerator rotateSlowly() 
+	{
+		pointHand.transform.Translate (transVec* scale, Space.World);
+		cursor.transform.Rotate(orientDir, Space.World);
+		yield return new WaitForSeconds(0.01f);
+		isRotating = false;
 	}
 }
