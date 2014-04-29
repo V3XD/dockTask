@@ -229,7 +229,7 @@ public class LeapCube : MonoBehaviour
 							prevTotalTime = (int)Time.time;
 							pointText.enabled = true;
 							score++;
-							File.AppendAllText(path, prevTime.ToString()+ ",");//save to file
+							File.AppendAllText(path, prevTime.ToString()+ Environment.NewLine);//save to file
 						}
 					}
 

@@ -247,8 +247,7 @@ public class PhantomGrab : MonoBehaviour {
 		setNewPositionAndOrientation();
 		prevTime = (int)Time.time - prevTotalTime;
 		prevTotalTime = (int)Time.time;
-		//File.AppendAllText(path, prevTime.ToString()+ Environment.NewLine);//save to file
-		File.AppendAllText(path, prevTime.ToString()+ ",");//save to file
+		File.AppendAllText(path, prevTime.ToString()+ Environment.NewLine);//save to file
 		score++;
 	}
 }
