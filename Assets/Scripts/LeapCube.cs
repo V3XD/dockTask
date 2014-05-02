@@ -24,6 +24,7 @@ public class LeapCube : MonoBehaviour
 	public AudioClip popSound;
 	public AudioSource popSource;
 	public AudioSource ambientSource;
+	public GUIText keysText;
 
 	private Controller mController;
 	private Frame mLastFrame;
@@ -46,6 +47,7 @@ public class LeapCube : MonoBehaviour
 	bool updateCam;
 	Vector3 fingerDir;
 	Difficulty difficulty;
+	bool locked;
 
 	void Awake ()
 	{
@@ -57,6 +59,7 @@ public class LeapCube : MonoBehaviour
 	
 	void Start ()
 	{
+		locked = false;
 		mLastFrame = new Frame();
 		frame = new Frame();
 		rotate = false;
@@ -109,6 +112,14 @@ public class LeapCube : MonoBehaviour
 			translate = false;
 		}
 
+		if(Input.GetKeyUp (KeyCode.L))
+		{
+			locked = !locked;
+			if(locked)
+				keysText.text = "[CTRL] rotate [S] skip [L] unlock";
+			else			
+				keysText.text = "[CTRL] rotate [S] skip [L] lock";
+		}
 
 		if (pointText.enabled) 
 		{
@@ -183,6 +194,44 @@ public class LeapCube : MonoBehaviour
 								Vector3 swipeVec = new Vector3(direction.x, direction.y, -direction.z);
 								Vector3 axisVec = Vector3.Cross(swipeVec, fingerDir);
 								axisVec.Normalize();
+
+								Vector3 tmpAxis = new Vector3(); 
+								if(locked)
+								{
+									tmpAxis.x = Mathf.Round(axisVec.x);
+									tmpAxis.y = Mathf.Round(axisVec.y);
+									tmpAxis.z = Mathf.Round(axisVec.z);
+									
+									if( (Mathf.Abs(tmpAxis.x) + Mathf.Abs(tmpAxis.y) + Mathf.Abs(tmpAxis.z)) > 1f)
+									{
+										if(Mathf.Abs(tmpAxis.x) == 1f)
+										{
+											if(Mathf.Abs(tmpAxis.y) == 1f)
+											{
+												if(Mathf.Abs(axisVec.x) >= Mathf.Abs(axisVec.y))
+													tmpAxis.y = 0f;
+												else
+													tmpAxis.x = 0f;
+											}
+											else
+											{
+												if(Mathf.Abs(axisVec.x) >= Mathf.Abs(axisVec.z))
+													tmpAxis.z = 0f;
+												else
+													tmpAxis.x = 0f;
+												
+											}
+										}
+										else if(Mathf.Abs(tmpAxis.y) == 1f)
+										{
+											if(Mathf.Abs(axisVec.y) >= Mathf.Abs(axisVec.z))
+												tmpAxis.z = 0f;
+											else
+												tmpAxis.y = 0f;
+										}
+									}
+									axisVec = tmpAxis;
+								}
 
 								cursor.transform.RotateAround(cursor.transform.position, axisVec, direction.Magnitude);
 							}

@@ -30,6 +30,7 @@ public class LeapTutorial : MonoBehaviour
 	public GameObject hand;
 	public GameObject pointHand;
 	public GameObject pointHandTrail;
+	public GUIText keysText;
 	
 	private Controller mController;
 	private Frame mLastFrame;
@@ -67,6 +68,8 @@ public class LeapTutorial : MonoBehaviour
 	Vector3 targetPos;
 	Sequence behavoirTree;
 	bool isRotating;
+	bool mute;
+	bool locked;
 
 	void Awake ()
 	{
@@ -93,6 +96,8 @@ public class LeapTutorial : MonoBehaviour
 	
 	void Start ()
 	{
+		locked = false;
+		mute = false;
 		auto = false;
 		inView = false;
 		isOriented = false;
@@ -162,7 +167,26 @@ public class LeapTutorial : MonoBehaviour
 			}
 			auto = true;
 		}
-		
+
+		if(Input.GetKeyUp (KeyCode.M))
+		{
+			if(!mute)
+			{
+				mute = true;
+				ambientSource.volume = 0f;
+			}
+			else
+				mute = false;
+		}
+
+		if(Input.GetKeyUp (KeyCode.L))
+		{
+			locked = !locked;
+			if(locked)
+				keysText.text = "[CTRL] rotate [S] skip [L] unlock";
+			else			
+				keysText.text = "[CTRL] rotate [S] skip [L] lock";
+		}
 		
 		if (pointText.enabled) 
 		{
@@ -255,9 +279,50 @@ public class LeapTutorial : MonoBehaviour
 							if(frame.TranslationProbability(mLastFrame) > 0.60)
 							{
 								trail.GetComponent<TrailRenderer>().enabled = true;
+								Vector3 axisVec;
+
 								Vector3 swipeVec = new Vector3(direction.x, direction.y, -direction.z);
-								Vector3 axisVec = Vector3.Cross(swipeVec, fingerDir);
+								axisVec = Vector3.Cross(swipeVec, fingerDir);
 								axisVec.Normalize();
+
+								Vector3 tmpAxis = new Vector3(); 
+								if(locked)
+								{
+									tmpAxis.x = Mathf.Round(axisVec.x);
+									tmpAxis.y = Mathf.Round(axisVec.y);
+									tmpAxis.z = Mathf.Round(axisVec.z);
+
+									if( (Mathf.Abs(tmpAxis.x) + Mathf.Abs(tmpAxis.y) + Mathf.Abs(tmpAxis.z)) > 1f)
+									{
+										if(Mathf.Abs(tmpAxis.x) == 1f)
+										{
+											if(Mathf.Abs(tmpAxis.y) == 1f)
+											{
+												if(Mathf.Abs(axisVec.x) >= Mathf.Abs(axisVec.y))
+													tmpAxis.y = 0f;
+												else
+													tmpAxis.x = 0f;
+											}
+											else
+											{
+												if(Mathf.Abs(axisVec.x) >= Mathf.Abs(axisVec.z))
+													tmpAxis.z = 0f;
+												else
+													tmpAxis.x = 0f;
+
+											}
+										}
+										else if(Mathf.Abs(tmpAxis.y) == 1f)
+										{
+											if(Mathf.Abs(axisVec.y) >= Mathf.Abs(axisVec.z))
+												tmpAxis.z = 0f;
+											else
+												tmpAxis.y = 0f;
+										}
+									}
+									axisVec = tmpAxis;
+								}
+
 								cursor.transform.RotateAround(cursor.transform.position, 
 								                              axisVec, 
 								                              direction.Magnitude);
@@ -429,7 +494,8 @@ public class LeapTutorial : MonoBehaviour
 		float distance = (targetV - cursorV).magnitude;
 		float angle = Quaternion.Angle(cursorQ, targetQ);
 		//increase volume as the cursor gets closer(orientation) to the target
-		ambientSource.volume = 1f-(angle / 180f);
+		if(!mute)
+			ambientSource.volume = 1f-(angle / 180f);
 
 		if ((angle <= difficulty.angle) && (distance < difficulty.distance)) 
 		{	
