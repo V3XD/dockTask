@@ -93,6 +93,11 @@ public class LeapCube : MonoBehaviour
 			setNewPositionAndOrientation();
 			prevTotalTime = (int)Time.time;
 		}
+		else if(Input.GetKeyDown (KeyCode.P))
+		{
+			Application.CaptureScreenshot(@"Log/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_Screenshot.png");
+			Debug.Log("print");
+		}
 		else if (Input.GetKeyUp (KeyCode.LeftControl) || Input.GetKeyUp (KeyCode.RightControl))
 		{
 			rotate = false;
@@ -103,11 +108,7 @@ public class LeapCube : MonoBehaviour
 			rotate = true;
 			translate = false;
 		}
-		if(Input.GetKeyDown (KeyCode.P))
-		{
-			Application.CaptureScreenshot(@"Log/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_Screenshot.png");
-			Debug.Log("print");
-		}
+
 
 		if (pointText.enabled) 
 		{
