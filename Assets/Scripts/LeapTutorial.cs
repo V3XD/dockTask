@@ -41,7 +41,6 @@ public class LeapTutorial : MonoBehaviour
 	private int score;
 	private string connectionMessage="not connected";
 	private string message="";
-	private string warning="";
 	private string info="";
 	private int prevTime;
 	private int prevTotalTime;
@@ -96,7 +95,7 @@ public class LeapTutorial : MonoBehaviour
 	
 	void Start ()
 	{
-		locked = false;
+		locked = true;
 		mute = false;
 		auto = false;
 		inView = false;
@@ -130,11 +129,11 @@ public class LeapTutorial : MonoBehaviour
 	
 	void OnGUI()
 	{
-		GUI.Box (new Rect (0,0,100,70), info + "\n" + message + "\n" + warning);
+		GUI.Box (new Rect (0,0,150,60), "<size=20>"+info + "\n" + message + "\n" +"</size>");
 		
-		GUI.Box (new Rect (UnityEngine.Screen.width - 100,0,100,50), "Score: " + score +
-		         "\nTime: " + ((int)Time.time - prevTotalTime) +"\nPrev: " + prevTime);
-		GUI.Box (new Rect (UnityEngine.Screen.width - 100,UnityEngine.Screen.height - 25, 100, 25), connectionMessage);
+		GUI.Box (new Rect (UnityEngine.Screen.width - 120,0,120,80), "<size=20>Score: " + score +
+		         "\nTime: " + ((int)Time.time - prevTotalTime) +"\nPrev: " + prevTime+"</size>");
+		GUI.Box (new Rect (UnityEngine.Screen.width - 150,UnityEngine.Screen.height - 30, 150, 30), "<size=18>"+connectionMessage+"</size>");
 	}
 	
 	void Update ()
@@ -150,6 +149,7 @@ public class LeapTutorial : MonoBehaviour
 		else if (Input.GetKeyUp (KeyCode.LeftControl) || Input.GetKeyUp (KeyCode.RightControl))
 		{
 			rotate = false;
+			info = "hold";
 			moveCount++;
 		}
 		else if(Input.GetKeyDown (KeyCode.LeftControl) || Input.GetKeyDown (KeyCode.RightControl))
@@ -342,7 +342,6 @@ public class LeapTutorial : MonoBehaviour
 							fingerObj.renderer.enabled = false;
 							pointerObj.renderer.enabled = false;
 							info = "translate";
-							warning = "";
 							cursor.transform.Translate (transVec, Space.World);
 							cursor.transform.position = new Vector3 (Mathf.Clamp(cursor.transform.position.x, -xMax, xMax),
 							                                         Mathf.Clamp(cursor.transform.position.y, 2.0f, yMax),
@@ -355,12 +354,10 @@ public class LeapTutorial : MonoBehaviour
 						//check if finger is too close to the screen
 						if(fingerObj.transform.position.z > zMax-3)
 						{
-							warning="too close\nto the screen";
 							info = "";
 						}
 						else
 						{
-							warning = "";
 							info = "hold";
 						}
 						
@@ -554,7 +551,6 @@ public class LeapTutorial : MonoBehaviour
 			fingerObj.renderer.enabled = false;
 			pointerObj.renderer.enabled = false;
 			translate = true;
-			warning = "";
 			targetPos = new Vector3(0f,8.5f,-9f);
 			transVec = targetPos - cursor.transform.position;
 			transVec.Normalize();
@@ -723,7 +719,6 @@ public class LeapTutorial : MonoBehaviour
 		if(!inPos)
 		{
 			translate = true;
-			warning = "";
 			targetPos = target.transform.position;
 			transVec = targetPos - cursor.transform.position;
 			transVec.Normalize();

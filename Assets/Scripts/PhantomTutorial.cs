@@ -27,7 +27,7 @@ public class PhantomTutorial : MonoBehaviour {
 	private int score;
 	private string connectionMessage="";
 	private string message="";
-	private string info="";
+	private string info="not grabbed";
 	private int prevTime;
 	protected int prevTotalTime;
 	protected static float xMax = 12.0f;
@@ -77,12 +77,11 @@ public class PhantomTutorial : MonoBehaviour {
 	{
 		if (isConnected)
 			connectionMessage = "connected";
-		info = "not grabbed";
-		GUI.Box (new Rect (0,0,100,50), info + "\n" + message);
+		GUI.Box (new Rect (0,0,150,70), "<size=20>" +info + "\n" + message+"</size>");
 		
-		GUI.Box (new Rect (UnityEngine.Screen.width - 100,0,100,50), "Score: " + score + 
-		         "\nTime: " + ((int)Time.time - prevTotalTime) +"\nPrev: " + prevTime);
-		GUI.Box (new Rect (UnityEngine.Screen.width - 100,UnityEngine.Screen.height - 25, 100, 25), connectionMessage);
+		GUI.Box (new Rect (UnityEngine.Screen.width - 120,0,120,80), "<size=20>Score: " + score +
+		         "\nTime: " + ((int)Time.time - prevTotalTime) +"\nPrev: " + prevTime+"</size>");
+		GUI.Box (new Rect (UnityEngine.Screen.width - 100,UnityEngine.Screen.height - 25, 100, 25), "<size=18>" +connectionMessage+"</size>");
 	}
 	
 	void Awake ()
