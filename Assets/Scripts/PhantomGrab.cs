@@ -25,7 +25,7 @@ public class PhantomGrab : MonoBehaviour {
 	protected bool isDocked;
 	protected bool isConnected;
 	private int score;
-	private string connectionMessage="";
+	private string connectionMessage="not connected";
 	private string message="";
 	private string info="";
 	private int prevTime;
@@ -82,7 +82,7 @@ public class PhantomGrab : MonoBehaviour {
 		
 		GUI.Box (new Rect (UnityEngine.Screen.width - 120,0,120,80), "<size=20>Score: " + score +
 		         "\nTime: " + ((int)Time.time - prevTotalTime) +"\nPrev: " + prevTime+"</size>");
-		GUI.Box (new Rect (UnityEngine.Screen.width - 100,UnityEngine.Screen.height - 25, 100, 25), "<size=18>" +connectionMessage+"</size>");
+		GUI.Box (new Rect (UnityEngine.Screen.width - 150,UnityEngine.Screen.height - 30, 150, 30), "<size=18>"+connectionMessage+"</size>");
 	}
 	
 	void Awake ()
