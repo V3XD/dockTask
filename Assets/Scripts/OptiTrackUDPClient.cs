@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Collections;
@@ -24,6 +24,7 @@ public class OptiTrackUDPClient
 	public bool bNewData = false;
 	public Skeleton skelTarget = null;
 	public RigidBody[] rigidTargets = new RigidBody[10];
+	public int numTrackables = 0;
 
 	Socket sockData = null;
 	Socket sockCommand = null;
@@ -40,6 +41,9 @@ public class OptiTrackUDPClient
 		MyStateObject so;
 		
 		Debug.Log("[UDPClient] Connecting.");
+		rigidTargets [0] = new RigidBody ();
+		rigidTargets [1] = new RigidBody ();
+		rigidTargets [2] = new RigidBody ();
 		// create data socket
 		sockData = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 		sockData.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
@@ -303,15 +307,18 @@ public class OptiTrackUDPClient
 			int nRigidBodies = iData[0];
 			strFrame += String.Format("Rigid Bodies : {0}\n", iData[0]);
 
+			//trackableList.Clear();
 			for (int i = 0; i < nRigidBodies; i++)
 			{
 				ReadRB(b, ref offset, rb);
+				numTrackables = nRigidBodies;
 				rb.name = trackerNames[i];
-				rigidTargets[i] = new RigidBody();
-				rigidTargets[i].name = rb.name;
-				rigidTargets[i].pos = rb.pos;
-				rigidTargets[i].ori = rb.ori;
-
+				RigidBody trackable = new RigidBody();
+				trackable = new RigidBody();
+				trackable.name = rb.name;
+				trackable.pos = rb.pos;
+				trackable.ori = rb.ori;
+				rigidTargets[i] = trackable;
 			}
 
 			// Skeletons
