@@ -45,6 +45,10 @@ public class OptiTrackBehavoir : MonoBehaviour {
 	Vector3 fingerDir;
 	Difficulty difficulty;
 	bool locked;
+	Vector3 prevPinch;
+	Vector3 thumbPos;
+	Vector3 indexPos;
+	Vector3 pinkyPos;
 
 	void OnGUI()
 	{
@@ -76,6 +80,8 @@ public class OptiTrackBehavoir : MonoBehaviour {
 		prevTime = 0;
 		prevTotalTime = (int)Time.time;
 		setNewPositionAndOrientation();
+		prevPinch = new Vector3 ();
+		fingerObj.renderer.enabled = true;
 
 		if (bSuccess) 
 		{
@@ -129,7 +135,9 @@ public class OptiTrackBehavoir : MonoBehaviour {
 		else
 		{	
 			sphere.renderer.enabled = false;
+			fingerObj.renderer.material = yellow;
 			trail.GetComponent<TrailRenderer>().enabled = false;
+			prevPinch = new Vector3 ();
 		}
 
 		if (pointText.enabled) 
@@ -144,40 +152,75 @@ public class OptiTrackBehavoir : MonoBehaviour {
 
 			if(udpClient.rigidTargets[0] != null && udpClient.rigidTargets[1]!= null && udpClient.rigidTargets[2]!= null)
 			{
-				Vector3 currentPos = new Vector3(udpClient.rigidTargets[0].pos.x, udpClient.rigidTargets[0].pos.y, -udpClient.rigidTargets[0].pos.z);
-				float thumbIndex = Vector3.Distance(udpClient.rigidTargets[0].pos, udpClient.rigidTargets[1].pos);
-				float thumbPinky =  Vector3.Distance(udpClient.rigidTargets[0].pos, udpClient.rigidTargets[2].pos);
-				Vector3 transVec = currentPos - prevPos;
 
-				Vector3 indexPos = new Vector3(udpClient.rigidTargets[1].pos.x, udpClient.rigidTargets[1].pos.y, -udpClient.rigidTargets[1].pos.z);
+
+				Vector3 newthumbPos = new Vector3(udpClient.rigidTargets[0].pos.x, udpClient.rigidTargets[0].pos.y, -udpClient.rigidTargets[0].pos.z);
+				Vector3 newindexPos = new Vector3(udpClient.rigidTargets[1].pos.x, udpClient.rigidTargets[1].pos.y, -udpClient.rigidTargets[1].pos.z);
+				Vector3 newpinkyPos = new Vector3(udpClient.rigidTargets[2].pos.x, udpClient.rigidTargets[2].pos.y, -udpClient.rigidTargets[2].pos.z);
+
+
+				if(newthumbPos == Vector3.zero)
+				{
+					Debug.Log("thumb untracked");
+				}
+				else
+					thumbPos = newthumbPos;
+
+				if(newindexPos == Vector3.zero)
+				{
+					Debug.Log("index untracked");
+				}
+				else
+					indexPos = newindexPos;
+				if(newpinkyPos == Vector3.zero)
+				{
+					Debug.Log("pinky untracked");
+				}
+				else
+					pinkyPos = newpinkyPos;
+
+				float thumbIndex = Vector3.Distance(thumbPos, indexPos);
+				float thumbPinky =  Vector3.Distance(thumbPos, pinkyPos);
+
+
+				fingerObj.transform.position = indexPos;
+				Vector3 transVec = indexPos - prevPos;
 
 				/*Debug.Log(udpClient.rigidTargets[0].name + udpClient.rigidTargets[0].pos + udpClient.rigidTargets[0].ori + "\n" + 
 				          udpClient.rigidTargets[1].name + udpClient.rigidTargets[1].pos + udpClient.rigidTargets[1].ori);*/
 
-				Debug.Log(indexPos +" " +thumbPinky);
-				if(thumbIndex < 6f && thumbPinky > 7f) 
+				/*Debug.Log(udpClient.rigidTargets[0].name + thumbPos + udpClient.rigidTargets[0].ori + "\t" + 
+				          udpClient.rigidTargets[1].name + indexPos + udpClient.rigidTargets[1].ori + "\t" + 
+				          udpClient.rigidTargets[2].name + pinkyPos + udpClient.rigidTargets[2].ori);*/
+
+				Debug.Log("index " +thumbIndex +" pinky " +thumbPinky);
+				if(thumbIndex < 8f && thumbPinky > 8f) 
 				{
-					//Debug.Log(thumbIndex +" pinch");
-					fingerObj.transform.position = indexPos;
+
+
 					/*fingerObj.transform.position = new Vector3 (Mathf.Clamp(fingerObj.transform.position.x, -xMax, xMax),
 					                                            Mathf.Clamp(fingerObj.transform.position.y, 3.0f, yMax),
 					                                            Mathf.Clamp(fingerObj.transform.position.z, -zMax, zMax));*/
-					fingerObj.renderer.enabled = true;
-					fingerObj.renderer.material = yellow;
-					//Debug.Log(transVec.magnitude);
-					if(transVec.magnitude > 0.05f)
-					{
-						rotate = true;
-						trail.GetComponent<TrailRenderer>().enabled = true;
-						sphere.transform.position = cursor.transform.position;
-						sphere.renderer.enabled = true;
-					}
+
+					//fingerObj.renderer.material = yellow;
+		
+					rotate = true;
+					trail.GetComponent<TrailRenderer>().enabled = true;
+					sphere.transform.position = cursor.transform.position;
+					sphere.renderer.enabled = true;
+
+					Vector3 to = indexPos - cursor.transform.position;
+					to.Normalize();
+					Vector3 axisVec = Vector3.Cross(prevPinch, to);
+					cursor.transform.RotateAround(cursor.transform.position, axisVec, Vector3.Angle(prevPinch, to));
+					prevPinch = to;
+	
 				}
-				else if(thumbPinky < 6f && thumbPinky > 0f) 
+				else if(thumbPinky < 7f && thumbPinky > 0f) 
 				{
 					translate = true;
 
-					fingerObj.renderer.enabled = false;
+					//fingerObj.renderer.enabled = false;
 					//Debug.Log(thumbPinky +" translate");
 
 					cursor.transform.Translate (transVec, Space.World);
@@ -191,7 +234,7 @@ public class OptiTrackBehavoir : MonoBehaviour {
 					translate = false;
 					rotate = false;
 					info = "hold";
-					fingerObj.renderer.enabled = false;
+					//fingerObj.renderer.enabled = false;
 
 					if(isDocked)
 					{
@@ -204,7 +247,7 @@ public class OptiTrackBehavoir : MonoBehaviour {
 						File.AppendAllText(path, prevTime.ToString()+ Environment.NewLine);//save to file
 					}
 				}
-				prevPos = currentPos;
+				prevPos = indexPos;
 			}
 			else
 				Debug.Log("null trackable");
