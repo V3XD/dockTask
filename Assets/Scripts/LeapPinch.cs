@@ -19,12 +19,11 @@ public class LeapPinch : MonoBehaviour
 	public GameObject trail;
 	public GUIText pointText;
 	public Camera secondCamera;
-	public GameObject pointerObj;
 	public GameObject rotAxis;
 	public AudioClip popSound;
 	public AudioSource popSource;
 	public AudioSource ambientSource;
-	public GUIText keysText;
+	//public GUIText keysText;
 
 	private Controller mController;
 	private Frame mLastFrame;
@@ -47,12 +46,14 @@ public class LeapPinch : MonoBehaviour
 	Vector3 fingerDir;
 	Difficulty difficulty;
 	bool locked;
+	bool mute;
+	Vector3 prevPinch = new Vector3 ();
 
 	void Awake ()
 	{
 		difficulty = Difficulty.Instance;
 		mController = new Controller();
-		path = @"Log/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+difficulty.getLevel()+"_Leap.csv";
+		path = @"Log/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+difficulty.getLevel()+"_LeapPinch.csv";
 		UnityEngine.Screen.showCursor = false;
 	}
 	
@@ -69,6 +70,7 @@ public class LeapPinch : MonoBehaviour
 		prevTime = 0;
 		prevTotalTime = (int)Time.time;
 		setNewPositionAndOrientation();
+		mute = false;
 
 		if(mController.IsConnected)
 		{
@@ -100,7 +102,7 @@ public class LeapPinch : MonoBehaviour
 			Application.CaptureScreenshot(@"Log/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_Screenshot.png");
 			Debug.Log("print");
 		}
-		else if (Input.GetKeyUp (KeyCode.LeftControl) || Input.GetKeyUp (KeyCode.RightControl))
+		/*else if (Input.GetKeyUp (KeyCode.LeftControl) || Input.GetKeyUp (KeyCode.RightControl))
 		{
 			rotate = false;
 			info = "hold";
@@ -109,15 +111,26 @@ public class LeapPinch : MonoBehaviour
 		{
 			rotate = true;
 			translate = false;
-		}
+		}*/
 
-		if(Input.GetKeyUp (KeyCode.L))
+		/*if(Input.GetKeyUp (KeyCode.L))
 		{
 			locked = !locked;
 			if(locked)
 				keysText.text = "[CTRL] rotate [S] skip [L] unlock";
 			else			
 				keysText.text = "[CTRL] rotate [S] skip [L] lock";
+		}*/
+
+		if(Input.GetKeyUp (KeyCode.M))
+		{
+			if(!mute)
+			{
+				mute = true;
+				ambientSource.volume = 0f;
+			}
+			else
+				mute = false;
 		}
 
 		if (pointText.enabled) 
@@ -162,90 +175,39 @@ public class LeapPinch : MonoBehaviour
 			{
 				if(frame.Id != mLastFrame.Id)
 				{
-					InteractionBox iBox= frame.InteractionBox;
-					Pointable finger=frame.Pointables.Frontmost;
+					InteractionBox iBox = frame.InteractionBox;
+					/*Pointable finger = frame.Pointables.Frontmost;
 					Vector normalizedPos = iBox.NormalizePoint(finger.StabilizedTipPosition);
 					fingerObj.transform.position = new Vector3 ( ((normalizedPos.x*2.0f)-1.0f) * xMax,
 					                                            normalizedPos.y * yMax,
 					                                            ((normalizedPos.z*2.0f)-1.0f) * -zMax);
-					Vector direction = frame.Translation (mLastFrame);
-					
-					fingerDir = new Vector3(finger.Direction.x, finger.Direction.y, -finger.Direction.z);
-					
-					if(frame.Pointables.Count > 0 && frame.Pointables.Count < 3 && finger.Length > 30.0f)//~one finger
+					Vector direction = frame.Translation (mLastFrame);*/
+					Hand firstHand = frame.Hands[0];
+					Finger thumb = firstHand.Fingers.FingerType(Finger.FingerType.TYPE_THUMB)[0];
+					Vector normalizedThumbPos = iBox.NormalizePoint(thumb.StabilizedTipPosition);
+					Vector3 thumbPos = new Vector3 ( ((normalizedThumbPos.x*2.0f)-1.0f) * xMax,
+					                                normalizedThumbPos.y * yMax,
+					                                ((normalizedThumbPos.z*2.0f)-1.0f) * -zMax);
+					Vector3 to = thumbPos - cursor.transform.position;
+					to.Normalize();
+
+					fingerDir = new Vector3 (thumb.Direction.x, thumb.Direction.y, -thumb.Direction.z);
+					fingerDir.Normalize();
+					fingerObj.transform.position = thumbPos;
+
+					Debug.Log(firstHand.PinchStrength + " grab "+firstHand.GrabStrength);
+
+					if(firstHand.GrabStrength == 1f)//translation
 					{
-						fingerObj.transform.rotation = Quaternion.LookRotation(fingerDir);
-						fingerObj.renderer.enabled = true;
-						pointerObj.renderer.enabled = true;
-						fingerObj.renderer.material = yellow;
-						translate = false;	
-						updateCam = true;
-						
-						if(rotate)
-						{
-							fingerObj.renderer.material = green;
-							sphere.transform.position = cursor.transform.position;
-							sphere.renderer.enabled = true;
+						fingerObj.renderer.enabled = false;
+						rotate = false;
 
-							if(frame.TranslationProbability(mLastFrame) > 0.60)
-							{
-								trail.GetComponent<TrailRenderer>().enabled = true;
-								Vector3 swipeVec = new Vector3(direction.x, direction.y, -direction.z);
-								Vector3 axisVec = Vector3.Cross(swipeVec, fingerDir);
-								axisVec.Normalize();
-
-								Vector3 tmpAxis = new Vector3(); 
-								if(locked)
-								{
-									tmpAxis.x = Mathf.Round(axisVec.x);
-									tmpAxis.y = Mathf.Round(axisVec.y);
-									tmpAxis.z = Mathf.Round(axisVec.z);
-									
-									if( (Mathf.Abs(tmpAxis.x) + Mathf.Abs(tmpAxis.y) + Mathf.Abs(tmpAxis.z)) > 1f)
-									{
-										if(Mathf.Abs(tmpAxis.x) == 1f)
-										{
-											if(Mathf.Abs(tmpAxis.y) == 1f)
-											{
-												if(Mathf.Abs(axisVec.x) >= Mathf.Abs(axisVec.y))
-													tmpAxis.y = 0f;
-												else
-													tmpAxis.x = 0f;
-											}
-											else
-											{
-												if(Mathf.Abs(axisVec.x) >= Mathf.Abs(axisVec.z))
-													tmpAxis.z = 0f;
-												else
-													tmpAxis.x = 0f;
-												
-											}
-										}
-										else if(Mathf.Abs(tmpAxis.y) == 1f)
-										{
-											if(Mathf.Abs(axisVec.y) >= Mathf.Abs(axisVec.z))
-												tmpAxis.z = 0f;
-											else
-												tmpAxis.y = 0f;
-										}
-									}
-									axisVec = tmpAxis;
-								}
-
-								cursor.transform.RotateAround(cursor.transform.position, axisVec, direction.Magnitude);
-							}
-						}
-					}
-					else if(frame.Pointables.Count > 2)//full hand
-					{
 						if(frame.TranslationProbability(mLastFrame) > 0.60)
 						{
 							translate = true;
 							Vector leapTransVec = frame.Translation (mLastFrame);
 							Vector3 transVec = new Vector3 (leapTransVec.x * scale, leapTransVec.y * scale, -leapTransVec.z * scale);
-							fingerObj.renderer.enabled = false;
-							pointerObj.renderer.enabled = false;
-							info = "translate";
+
 							cursor.transform.Translate (transVec, Space.World);
 							cursor.transform.position = new Vector3 (Mathf.Clamp(cursor.transform.position.x, -xMax, xMax),
 							                                         Mathf.Clamp(cursor.transform.position.y, 2.0f, yMax),
@@ -253,19 +215,40 @@ public class LeapPinch : MonoBehaviour
 						}
 						
 					}
-					else //fist
+					else if(firstHand.PinchStrength > 0.2f)//~rotation
 					{
-						if(fingerObj.transform.position.z > zMax-3)
+						fingerObj.renderer.enabled = true;
+						
+						fingerObj.renderer.material = yellow;
+						translate = false;	
+						updateCam = true;
+						rotate = true;
+						
+						fingerObj.renderer.material = green;
+						sphere.transform.position = cursor.transform.position;
+						sphere.renderer.enabled = true;
+						
+						if(frame.TranslationProbability(mLastFrame) > 0.60)
 						{
-							info = "";
-						}
-						else
-						{
-							info = "hold";
+							trail.GetComponent<TrailRenderer>().enabled = true;
+							
+							
+							Vector3 axisVec = Vector3.Cross(prevPinch, to);
+							cursor.transform.RotateAround(cursor.transform.position, axisVec, Vector3.Angle(prevPinch, to));
+							
 						}
 						
-						fingerObj.renderer.enabled = false;
-						pointerObj.renderer.enabled = false;
+					}
+					else //hold
+					{
+
+						info = "hold";
+
+						updateCam = true;
+						fingerObj.renderer.material = yellow;
+						fingerObj.renderer.enabled = true;
+						rotate = false;
+						translate = false;
 
 						if(isDocked)
 						{
@@ -279,6 +262,7 @@ public class LeapPinch : MonoBehaviour
 						}
 					}
 
+					prevPinch = to;
 					mLastFrame = frame;
 				}
 			}
@@ -342,6 +326,7 @@ public class LeapPinch : MonoBehaviour
 	void setNewPositionAndOrientation()
 	{
 		cursor.transform.rotation = UnityEngine.Random.rotation;
+		//target.transform.rotation = UnityEngine.Random.rotation;
 		cursor.transform.position = new Vector3 (UnityEngine.Random.Range(-xMax, xMax),
 		                                         UnityEngine.Random.Range(4.0F, yMax),
 		                                         UnityEngine.Random.Range(-zMax, zMax));
@@ -355,7 +340,9 @@ public class LeapPinch : MonoBehaviour
 		Vector3 cursorV = cursor.transform.position;
 		float distance = (targetV - cursorV).magnitude;
 		float angle = Quaternion.Angle(cursorQ, targetQ);
-		ambientSource.volume = 1f-(angle / 180f);
+
+		if(!mute)
+			ambientSource.volume = 1f-(angle / 180f);
 		
 		if ((angle <= difficulty.angle) && (distance < difficulty.distance)) 
 		{	
