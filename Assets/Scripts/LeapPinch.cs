@@ -24,6 +24,7 @@ public class LeapPinch : MonoBehaviour
 	public AudioSource popSource;
 	public AudioSource ambientSource;
 	//public GUIText keysText;
+	public GameObject indexObj;
 
 	private Controller mController;
 	private Frame mLastFrame;
@@ -48,6 +49,7 @@ public class LeapPinch : MonoBehaviour
 	bool locked;
 	bool mute;
 	Vector3 prevPinch = new Vector3 ();
+	static float chairRadius = 5f;
 
 	void Awake ()
 	{
@@ -185,26 +187,58 @@ public class LeapPinch : MonoBehaviour
 					Hand firstHand = frame.Hands[0];
 					Finger thumb = firstHand.Fingers.FingerType(Finger.FingerType.TYPE_THUMB)[0];
 					Vector normalizedThumbPos = iBox.NormalizePoint(thumb.StabilizedTipPosition);
-					Vector3 thumbPos = new Vector3 ( ((normalizedThumbPos.x*2.0f)-1.0f) * xMax,
+					/*Vector3 thumbPos = new Vector3 ( ((normalizedThumbPos.x*2.0f)-1.0f) * xMax,
 					                                normalizedThumbPos.y * yMax,
+					                                ((normalizedThumbPos.z*2.0f)-1.0f) * -zMax);*/
+					Vector3 thumbPos = new Vector3 ( ((normalizedThumbPos.x*2.0f)-1.0f) * xMax,
+					                                ((normalizedThumbPos.y*2.0f)-1.0f) * yMax,
 					                                ((normalizedThumbPos.z*2.0f)-1.0f) * -zMax);
-					Vector3 to = thumbPos - cursor.transform.position;
-					to.Normalize();
+
+					Finger index = firstHand.Fingers.FingerType(Finger.FingerType.TYPE_INDEX)[0];
+					Vector normalizedIndexPos = iBox.NormalizePoint(index.StabilizedTipPosition);
+					/*Vector3 indexPos = new Vector3 ( ((normalizedIndexPos.x*2.0f)-1.0f) * xMax,
+					                                normalizedIndexPos.y * yMax,
+					                                ((normalizedIndexPos.z*2.0f)-1.0f) * -zMax);*/
+					Vector3 indexPos = new Vector3 ( ((normalizedIndexPos.x*2.0f)-1.0f) * xMax,
+					                                ((normalizedIndexPos.y*2.0f)-1.0f) * yMax,
+					                                ((normalizedIndexPos.z*2.0f)-1.0f) * -zMax);
+
+					float thumbToIndex = Vector3.Distance( thumbPos, indexPos);
+					//Debug.Log(indexPos + " thumb "+thumbPos + " dist "+ thumbToIndex);
+
+
 
 					fingerDir = new Vector3 (thumb.Direction.x, thumb.Direction.y, -thumb.Direction.z);
 					fingerDir.Normalize();
-					fingerObj.transform.position = thumbPos;
 
-					Debug.Log(firstHand.PinchStrength + " grab "+firstHand.GrabStrength);
+					thumbPos = thumbPos + cursor.transform.position;
+					indexPos = indexPos + cursor.transform.position;
+	
+					Vector3 clampedThumb = new Vector3 (Mathf.Clamp(thumbPos.x, cursor.transform.position.x-chairRadius, cursor.transform.position.x+chairRadius),
+					                                   Mathf.Clamp(thumbPos.y, cursor.transform.position.y-chairRadius, cursor.transform.position.y+chairRadius),
+					                                   Mathf.Clamp(thumbPos.z, cursor.transform.position.z-chairRadius, cursor.transform.position.z+chairRadius));
+					fingerObj.transform.position = clampedThumb;
+
+					Vector3 clampedIndex = new Vector3 (Mathf.Clamp(indexPos.x, cursor.transform.position.x-chairRadius, cursor.transform.position.x+chairRadius),
+					                                    Mathf.Clamp(indexPos.y, cursor.transform.position.y-chairRadius, cursor.transform.position.y+chairRadius),
+					                                    Mathf.Clamp(indexPos.z, cursor.transform.position.z-chairRadius, cursor.transform.position.z+chairRadius));
+					indexObj.transform.position = clampedIndex;
+
+					Vector3 avgPos = (thumbPos+indexPos)*0.5f;
+					Vector3 to = avgPos - cursor.transform.position;
+					to.Normalize();
+
+					Debug.Log(firstHand.PinchStrength + " grab "+firstHand.GrabStrength + " dist " +thumbToIndex);
 
 					if(firstHand.GrabStrength == 1f)//translation
 					{
 						fingerObj.renderer.enabled = false;
+						indexObj.renderer.enabled = false;
 						rotate = false;
+						translate = true;
 
 						if(frame.TranslationProbability(mLastFrame) > 0.60)
 						{
-							translate = true;
 							Vector leapTransVec = frame.Translation (mLastFrame);
 							Vector3 transVec = new Vector3 (leapTransVec.x * scale, leapTransVec.y * scale, -leapTransVec.z * scale);
 
@@ -215,11 +249,13 @@ public class LeapPinch : MonoBehaviour
 						}
 						
 					}
-					else if(firstHand.PinchStrength > 0.2f)//~rotation
+					else if(thumbToIndex < 3.5f)//~rotation//if(firstHand.PinchStrength > 0.2f)//~rotation
 					{
 						fingerObj.renderer.enabled = true;
-						
-						fingerObj.renderer.material = yellow;
+						indexObj.renderer.enabled = true;
+
+						//fingerObj.renderer.material = yellow;
+						indexObj.renderer.material =  green;
 						translate = false;	
 						updateCam = true;
 						rotate = true;
@@ -228,15 +264,15 @@ public class LeapPinch : MonoBehaviour
 						sphere.transform.position = cursor.transform.position;
 						sphere.renderer.enabled = true;
 						
-						if(frame.TranslationProbability(mLastFrame) > 0.60)
-						{
+						//if(frame.TranslationProbability(mLastFrame) > 0.60)
+						//{
 							trail.GetComponent<TrailRenderer>().enabled = true;
 							
 							
 							Vector3 axisVec = Vector3.Cross(prevPinch, to);
 							cursor.transform.RotateAround(cursor.transform.position, axisVec, Vector3.Angle(prevPinch, to));
 							
-						}
+						//}
 						
 					}
 					else //hold
@@ -247,6 +283,8 @@ public class LeapPinch : MonoBehaviour
 						updateCam = true;
 						fingerObj.renderer.material = yellow;
 						fingerObj.renderer.enabled = true;
+						indexObj.renderer.enabled = true;
+						indexObj.renderer.material = yellow;
 						rotate = false;
 						translate = false;
 
