@@ -25,11 +25,12 @@ public class OptiTrackUDPClient
 	public Skeleton skelTarget = null;
 	public RigidBody[] rigidTargets = new RigidBody[10];
 	public int numTrackables = 0;
-
+	public Vector3[] markers = new Vector3[10];
 	Socket sockData = null;
 	Socket sockCommand = null;
 	String strFrame = "";
 	String[] trackerNames = new string[10];
+	public int numMarkers = 0;
 	
 	public OptiTrackUDPClient ()
 	{
@@ -44,6 +45,9 @@ public class OptiTrackUDPClient
 		rigidTargets [0] = new RigidBody ();
 		rigidTargets [1] = new RigidBody ();
 		rigidTargets [2] = new RigidBody ();
+		markers [0] = new Vector3 ();
+		markers [1] = new Vector3 ();
+		markers [2] = new Vector3 ();
 		// create data socket
 		sockData = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 		sockData.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
@@ -237,21 +241,7 @@ public class OptiTrackUDPClient
 					offset +=4;
 					offset +=4;
 					offset +=4;
-					/*int ID = 0; memcpy(&ID, ptr, 4); ptr +=4;
-					printf("ID : %d\n", ID);
-					
-					int parentID = 0; memcpy(&parentID, ptr, 4); ptr +=4;
-					printf("Parent ID : %d\n", parentID);
-					
-					float xoffset = 0; memcpy(&xoffset, ptr, 4); ptr +=4;
-					printf("X Offset : %3.2f\n", xoffset);
-					
-					float yoffset = 0; memcpy(&yoffset, ptr, 4); ptr +=4;
-					printf("Y Offset : %3.2f\n", yoffset);
-					
-					float zoffset = 0; memcpy(&zoffset, ptr, 4); ptr +=4;
-					printf("Z Offset : %3.2f\n", zoffset);*/
-                 
+                
 				}
 				else if(type ==2)   // skeleton
 				{
@@ -274,6 +264,7 @@ public class OptiTrackUDPClient
 			// MarkerSets
 			Buffer.BlockCopy(b, offset, iData, 0, 4); offset += 4;
 			int nMarkerSets = iData[0];
+
 			strFrame += String.Format("MarkerSets # : {0}\n", iData[0]);
 			for (int i = 0; i < nMarkerSets; i++)
 			{
@@ -298,16 +289,20 @@ public class OptiTrackUDPClient
 			Buffer.BlockCopy(b, offset, iData, 0, 4); offset += 4;
 			int nOtherMarkers = iData[0];
 			strFrame += String.Format("Other Markers : {0}\n", iData[0]);
-			nBytes = iData[0] * 3 * 4;
-			Buffer.BlockCopy(b, offset, fData, 0, nBytes); offset += nBytes;
-			
+			numMarkers = iData[0];
+
+			for (int i = 0; i < nOtherMarkers; i++)
+			{
+				Buffer.BlockCopy(b, offset, fData, 0, 4 * 3); offset += 4 * 3;
+				markers[i].x = fData[0]*100; markers[i].y = fData[1]*100; markers[i].z = fData[2]*100;
+			}
+
 			// Rigid Bodies
 			RigidBody rb = new RigidBody();
 			Buffer.BlockCopy(b, offset, iData, 0, 4); offset += 4;
 			int nRigidBodies = iData[0];
 			strFrame += String.Format("Rigid Bodies : {0}\n", iData[0]);
 
-			//trackableList.Clear();
 			for (int i = 0; i < nRigidBodies; i++)
 			{
 				ReadRB(b, ref offset, rb);
