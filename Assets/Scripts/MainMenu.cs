@@ -20,6 +20,11 @@ public class MainMenu : MonoBehaviour {
 			Application.LoadLevel("leapTutorial");
 		if (GUI.Button(new Rect(UnityEngine.Screen.width - 100,10,80,50),"<size=20>Quit</size>"))
 			Application.Quit();
+		if (GUI.Button(new Rect((UnityEngine.Screen.width)/4,(UnityEngine.Screen.height)/2,100,50),"<size=20>Opti</size>"))
+			Application.LoadLevel("optiTrack");
+		if (GUI.Button(new Rect((UnityEngine.Screen.width)/2,(UnityEngine.Screen.height)/2,100,60),"<size=20>Opti\nTutorial</size>"))
+			Application.LoadLevel("optiTrack");
+			
 
 		GUI.Label(new Rect((3 * UnityEngine.Screen.width) / 4, (UnityEngine.Screen.height) / 2 - 100, 150, 50), "<size=20>Difficulty Level</size>");
 		if (GUI.Toggle (new Rect ((3 * UnityEngine.Screen.width) / 4, (UnityEngine.Screen.height) / 2 + 50, 100, 50), isNormal, "<size=20>Normal</size>"))

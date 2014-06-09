@@ -41,8 +41,8 @@ public class OptiTrackBehavoir : MonoBehaviour {
 	private string connectionMessage="not connected";
 	private string message="";
 	private string info="";
-	private int prevTime;
-	private int prevTotalTime;
+	private float prevTime;
+	private float prevTotalTime;
 	string path;
 	bool updateCam;
 	Vector3 fingerDir;
@@ -53,13 +53,18 @@ public class OptiTrackBehavoir : MonoBehaviour {
 	Vector3 indexPos;
 	Vector3 pinkyPos;*/
 	static float chairRadius = 5f;
+	static float touchDist = 3f;
+	static float minDist = 4.75f;
+	AudioSource hum;
+	float distance = 0;
+	float angle = 0;
 
 	void OnGUI()
 	{
 		GUI.Box (new Rect (0,0,150,60), "<size=20>"+info + "\n" + message + "\n" +"</size>");
 		
 		GUI.Box (new Rect (UnityEngine.Screen.width - 120,0,120,80), "<size=20>Score: " + score +
-		         "\nTime: " + ((int)Time.time - prevTotalTime) +"\nPrev: " + prevTime+"</size>");
+		         "\nTime: " + (int)(Time.time - prevTotalTime) +"\nPrev: " + ((int)prevTime).ToString()+"</size>");
 		GUI.Box (new Rect (UnityEngine.Screen.width - 150,UnityEngine.Screen.height - 30, 150, 30), "<size=18>"+connectionMessage+"</size>");
 	}
 
@@ -68,6 +73,8 @@ public class OptiTrackBehavoir : MonoBehaviour {
 		difficulty = Difficulty.Instance;
 		path = @"Log/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+difficulty.getLevel()+"_Opti.csv";
 		UnityEngine.Screen.showCursor = false;
+		hum = fingerObj.GetComponent<AudioSource>();
+		File.AppendAllText(path, "Time,Distance,Angle"+ Environment.NewLine);//save to file
 	}
 
 	void Start () 
@@ -82,7 +89,7 @@ public class OptiTrackBehavoir : MonoBehaviour {
 		updateCam = false;
 		score = 0;
 		prevTime = 0;
-		prevTotalTime = (int)Time.time;
+		prevTotalTime = Time.time;
 		setNewPositionAndOrientation();
 		prevPinch = new Vector3 ();
 		fingerObj.renderer.enabled = true;
@@ -103,7 +110,7 @@ public class OptiTrackBehavoir : MonoBehaviour {
 		else if (Input.GetKeyUp (KeyCode.S))
 		{
 			setNewPositionAndOrientation();
-			prevTotalTime = (int)Time.time;
+			prevTotalTime = Time.time;
 		}
 		else if(Input.GetKeyDown (KeyCode.P))
 		{
@@ -114,7 +121,7 @@ public class OptiTrackBehavoir : MonoBehaviour {
 		if(translate)
 		{
 			rotate = false;
-
+			hum.mute = true;
 			info = "translate";
 			axis.transform.position = cursor.transform.position;
 			foreach(Transform child in axis.transform) 
@@ -127,6 +134,7 @@ public class OptiTrackBehavoir : MonoBehaviour {
 		}
 		else
 		{	
+			hum.mute = false;
 			foreach(Transform child in axis.transform) 
 			{
 				child.renderer.enabled = false;
@@ -144,17 +152,11 @@ public class OptiTrackBehavoir : MonoBehaviour {
 			thumb.renderer.enabled = false;
 			ring.renderer.enabled = false;
 			sphere.renderer.enabled = true;
-			/*index.renderer.enabled = true;
-			thumb.renderer.enabled = true;
-			ring.renderer.enabled = true;
-			index.renderer.material = green;
-			thumb.renderer.material = green;
-			ring.renderer.material = green;*/
+	
 		}
 		else
 		{	
 			sphere.renderer.enabled = false;
-			fingerObj.renderer.material = yellow;
 			trail.GetComponent<TrailRenderer>().enabled = false;
 			prevPinch = new Vector3 ();
 			fingerObj.renderer.enabled = false;
@@ -172,6 +174,10 @@ public class OptiTrackBehavoir : MonoBehaviour {
 
 			if(udpClient.numMarkers == 3)
 			{
+				thumb.renderer.material = green;
+				index.renderer.material = green;
+				ring.renderer.material = green;
+				fingerObj.renderer.material = green; 
 
 				Vector3 thumbPos = new Vector3(udpClient.markers[0].x,
 		                                       udpClient.markers[0].y,
@@ -183,37 +189,26 @@ public class OptiTrackBehavoir : MonoBehaviour {
 	                                        udpClient.markers[2].y,
 	                                        -udpClient.markers[2].z);
 
-				thumb.transform.position = thumbPos;// - cursor.transform.position;
-				index.transform.position = indexPos;// - cursor.transform.position;
-				ring.transform.position = ringPos;// - cursor.transform.position;
+				float thumbToIndex = Vector3.Distance(thumbPos, 
+				                                      indexPos);
+				float thumbToRing = Vector3.Distance(thumbPos, 
+				                                     ringPos);
+				float indexToRing = Vector3.Distance(indexPos, 
+				                                     ringPos);
 
-
-				float thumbToIndex = Vector3.Distance(thumb.transform.position, 
-				                                      index.transform.position);
-				float thumbToRing = Vector3.Distance(thumb.transform.position, 
-				                                     ring.transform.position);
-				float indexToRing = Vector3.Distance(index.transform.position, 
-				                                     ring.transform.position);
-
-				/*thumb.transform.position = new Vector3 (Mathf.Clamp(thumb.transform.position, cursor.transform.position.x-chairRadius, cursor.transform.position.x+chairRadius),
-				                                        Mathf.Clamp(thumb.transform.position, cursor.transform.position.y-chairRadius, cursor.transform.position.y+chairRadius),
-				                                        Mathf.Clamp(thumb.transform.position, cursor.transform.position.z-chairRadius, cursor.transform.position.z+chairRadius));
-
-				index.transform.position = new Vector3 (Mathf.Clamp(index.transform.position, cursor.transform.position.x-chairRadius, cursor.transform.position.x+chairRadius),
-				                                        Mathf.Clamp(index.transform.position, cursor.transform.position.y-chairRadius, cursor.transform.position.y+chairRadius),
-				                                        Mathf.Clamp(index.transform.position, cursor.transform.position.z-chairRadius, cursor.transform.position.z+chairRadius));
-
-				index.transform.position = new Vector3 (Mathf.Clamp(index.transform.position, cursor.transform.position.x-chairRadius, cursor.transform.position.x+chairRadius),
-				                                        Mathf.Clamp(index.transform.position, cursor.transform.position.y-chairRadius, cursor.transform.position.y+chairRadius),
-				                                        Mathf.Clamp(index.transform.position, cursor.transform.position.z-chairRadius, cursor.transform.position.z+chairRadius));*/
-
-				//Debug.Log(thumbToIndex + " " + thumbToRing +" "+indexToRing );
-
-				Debug.Log(thumb.transform.position + " "+ index.transform.position+" "+ring.transform.position);
-
-
-				Vector3 currentPos = (thumb.transform.position + index.transform.position + ring.transform.position)*0.33f;
+				Vector3 currentPos = (thumbPos + indexPos + ringPos)*0.33f;
 				Vector3 transVec = currentPos - prevPos;
+				fingerDir = Vector3.zero - fingerObj.transform.position;
+				fingerDir.Normalize();
+
+				thumb.transform.position = thumbPos; 
+				index.transform.position = indexPos; 
+				ring.transform.position = ringPos;
+
+				//Debug.Log(thumb.transform.position + " "+ index.transform.position+" "+ring.transform.position);
+
+				//Debug.Log(thumbToIndex + " "+ thumbToRing+" "+indexToRing);
+
 				if(thumbToIndex < 3f && thumbToRing < 3f && indexToRing < 3f)
 				{
 					translate = true;
@@ -223,9 +218,12 @@ public class OptiTrackBehavoir : MonoBehaviour {
 					                                         Mathf.Clamp(cursor.transform.position.y, 3.0f, yMax),
 					                                         Mathf.Clamp(cursor.transform.position.z, -zMax, zMax));
 				}
-				else if(thumbToIndex < 3f || thumbToRing < 3f || indexToRing < 3f)
+				else if((thumbToIndex < touchDist && thumbToRing > minDist && indexToRing > minDist) ||
+				        (thumbToIndex > minDist && thumbToRing < touchDist && indexToRing > minDist) ||
+				        (thumbToIndex > minDist && thumbToRing > minDist && indexToRing < touchDist))
 				{
 					rotate = true;
+					updateCam = true;
 					sphere.transform.position = cursor.transform.position;
 					Vector3 pointerPos = new Vector3();
 					if(thumbToIndex < 3f)
@@ -250,87 +248,32 @@ public class OptiTrackBehavoir : MonoBehaviour {
 					thumb.renderer.enabled = true;
 					ring.renderer.enabled = true;
 					info = "hold";
-					
+					updateCam = true;
+					fingerObj.transform.position = currentPos;
+
 					if(isDocked)
 					{
 						popSource.PlayOneShot(popSound);
 						setNewPositionAndOrientation();
-						prevTime = (int)Time.time - prevTotalTime;
-						prevTotalTime = (int)Time.time;
+						prevTime = Time.time - prevTotalTime;
+						prevTotalTime = Time.time;
 						pointText.enabled = true;
 						score++;
-						File.AppendAllText(path, prevTime.ToString()+ Environment.NewLine);//save to file
+						File.AppendAllText(path, prevTime.ToString()+","+distance.ToString()+","+angle.ToString()+ Environment.NewLine);//save to file
 					}
 				}
 				prevPos = currentPos;
 			}
 			else
-				Debug.Log("not tracked");
-
-			/*if(udpClient.rigidTargets[0] != null && udpClient.rigidTargets[1]!= null && udpClient.rigidTargets[2]!= null)
 			{
+				thumb.renderer.material = yellow;
+				index.renderer.material = yellow;
+				ring.renderer.material = yellow;
+				fingerObj.renderer.material = yellow;
+				Debug.Log("not tracked");
+			}
 
 
-				Vector3 newthumbPos = new Vector3(udpClient.rigidTargets[0].pos.x, udpClient.rigidTargets[0].pos.y, -udpClient.rigidTargets[0].pos.z);
-				Vector3 newindexPos = new Vector3(udpClient.rigidTargets[1].pos.x, udpClient.rigidTargets[1].pos.y, -udpClient.rigidTargets[1].pos.z);
-				Vector3 newpinkyPos = new Vector3(udpClient.rigidTargets[2].pos.x, udpClient.rigidTargets[2].pos.y, -udpClient.rigidTargets[2].pos.z);
-
-
-				if(newthumbPos == Vector3.zero)
-				{
-					Debug.Log("thumb untracked");
-				}
-				else
-					thumbPos = newthumbPos;
-
-				if(newindexPos == Vector3.zero)
-				{
-					Debug.Log("index untracked");
-				}
-				else
-					indexPos = newindexPos;
-				if(newpinkyPos == Vector3.zero)
-				{
-					Debug.Log("pinky untracked");
-				}
-				else
-					pinkyPos = newpinkyPos;
-
-				float thumbIndex = Vector3.Distance(thumbPos, indexPos);
-				float thumbPinky =  Vector3.Distance(thumbPos, pinkyPos);
-
-
-				fingerObj.transform.position = indexPos;
-				Vector3 transVec = indexPos - prevPos;
-
-
-				Debug.Log("index " +thumbIndex +" pinky " +thumbPinky);
-				if(thumbIndex < 8f && thumbPinky > 8f) 
-				{
-	
-					rotate = true;
-					trail.GetComponent<TrailRenderer>().enabled = true;
-					sphere.transform.position = cursor.transform.position;
-					sphere.renderer.enabled = true;
-
-					Vector3 to = indexPos - cursor.transform.position;
-					to.Normalize();
-					Vector3 axisVec = Vector3.Cross(prevPinch, to);
-					cursor.transform.RotateAround(cursor.transform.position, axisVec, Vector3.Angle(prevPinch, to));
-					prevPinch = to;
-	
-				}
-				else if(thumbPinky < 7f && thumbPinky > 0f) 
-				{
-					translate = true;
-
-					cursor.transform.Translate (transVec, Space.World);
-					cursor.transform.position = new Vector3 (Mathf.Clamp(cursor.transform.position.x, -xMax, xMax),
-					                                         Mathf.Clamp(cursor.transform.position.y, 3.0f, yMax),
-					                                         Mathf.Clamp(cursor.transform.position.z, -zMax, zMax));
-
-				}
-				*/
 		}
 		evaluateDock();
 	}
@@ -340,10 +283,10 @@ public class OptiTrackBehavoir : MonoBehaviour {
 		udpClient.Close();
 	}
 
-	
 	void setNewPositionAndOrientation()
 	{
 		cursor.transform.rotation = UnityEngine.Random.rotation;
+		target.transform.rotation = UnityEngine.Random.rotation;
 		cursor.transform.position = new Vector3 (UnityEngine.Random.Range(-xMax, xMax),
 		                                         UnityEngine.Random.Range(4.0F, yMax),
 		                                         UnityEngine.Random.Range(-zMax, zMax));
@@ -355,8 +298,8 @@ public class OptiTrackBehavoir : MonoBehaviour {
 		Quaternion cursorQ = cursor.transform.rotation;
 		Vector3 targetV = target.transform.position;
 		Vector3 cursorV = cursor.transform.position;
-		float distance = (targetV - cursorV).magnitude;
-		float angle = Quaternion.Angle(cursorQ, targetQ);
+		distance = (targetV - cursorV).magnitude;
+		angle = Quaternion.Angle(cursorQ, targetQ);
 		ambientSource.volume = 1f-(angle / 180f);
 		
 		if ((angle <= difficulty.angle) && (distance < difficulty.distance)) 
@@ -384,6 +327,8 @@ public class OptiTrackBehavoir : MonoBehaviour {
 
 	void LateUpdate()
 	{
+		bool vertical = false;
+
 		if(updateCam)
 		{
 			Vector3 camPos = new Vector3();
@@ -418,12 +363,28 @@ public class OptiTrackBehavoir : MonoBehaviour {
 							camPos = axisVec;
 						}
 						else
-							camPos = new Vector3(0f, 0f, 1f);
+						{
+							vertical = true;
+							axisVec = new Vector3(0f, 1f, 0f);
+							angle = Vector3.Angle(axisVec, fingerDir);
+							if(angle <= 45f)
+							{
+								camPos = axisVec;
+							}
+							else
+								axisVec = new Vector3(0f, -1f, 0f);
+						}
 					}
 				}
 			}
-			camPos = camPos*-15f;
-			camPos.y = 10f;
+
+			if(!vertical)
+			{
+				camPos = camPos*-15f;
+				camPos.y = 10f;
+			}
+			else
+				camPos = camPos*5f;
 			
 			secondCamera.transform.position = camPos;
 			secondCamera.transform.LookAt(target.transform.position);
