@@ -196,6 +196,7 @@ public class PhantomGrab : MonoBehaviour {
 	protected void setNewPositionAndOrientation()
 	{
 		cursor.transform.rotation = UnityEngine.Random.rotation;
+		target.transform.rotation = UnityEngine.Random.rotation;
 		cursor.transform.position = new Vector3 (UnityEngine.Random.Range(-xMax, xMax), 
 		                                         UnityEngine.Random.Range(4.0F, yMax), 
 		                                         UnityEngine.Random.Range(-zMax, zMax));
@@ -209,7 +210,7 @@ public class PhantomGrab : MonoBehaviour {
 		Vector3 cursorV = cursor.transform.GetChild(0).position;
 		float distance = (targetV - cursorV).magnitude;
 		float angle = Quaternion.Angle(cursorQ, targetQ);
-		ambientSource.volume = 1f-(angle / 180f);
+		ambientSource.volume = (1f-(angle / 180f))*0.75f;
 
 		if ((angle <= difficulty.angle) && (distance < difficulty.distance)) 
 		{	

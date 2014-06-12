@@ -23,7 +23,7 @@ public class MainMenu : MonoBehaviour {
 		if (GUI.Button(new Rect((UnityEngine.Screen.width)/4,(UnityEngine.Screen.height)/2,100,50),"<size=20>Opti</size>"))
 			Application.LoadLevel("optiTrack");
 		if (GUI.Button(new Rect((UnityEngine.Screen.width)/2,(UnityEngine.Screen.height)/2,100,60),"<size=20>Opti\nTutorial</size>"))
-			Application.LoadLevel("optiTrack");
+			Application.LoadLevel("optiTrackCalibration");
 			
 
 		GUI.Label(new Rect((3 * UnityEngine.Screen.width) / 4, (UnityEngine.Screen.height) / 2 - 100, 150, 50), "<size=20>Difficulty Level</size>");

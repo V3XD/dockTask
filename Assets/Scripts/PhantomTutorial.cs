@@ -208,7 +208,7 @@ public class PhantomTutorial : MonoBehaviour {
 		Vector3 cursorV = cursor.transform.GetChild(0).position;
 		float distance = (targetV - cursorV).magnitude;
 		float angle = Quaternion.Angle(cursorQ, targetQ);
-		ambientSource.volume = 1f-(angle / 180f);
+		ambientSource.volume = (1f-(angle / 180f))*0.75f;
 		
 		if ((angle <= difficulty.angle) && (distance < difficulty.distance)) 
 		{	
