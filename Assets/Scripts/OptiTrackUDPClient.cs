@@ -19,7 +19,7 @@ public class OptiTrackUDPClient
 	public int dataPort = 1511;
 	public int commandPort = 1510;
 	public string multicastIPAddress = "239.255.42.99";
-	public string localIPAddress = "192.168.53.22";
+	public string localIPAddress = "132.206.74.217";//"192.168.53.22";
 	
 	public bool bNewData = false;
 	public Skeleton skelTarget = null;

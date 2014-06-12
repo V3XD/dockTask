@@ -28,15 +28,17 @@ public class PhantomGrab : MonoBehaviour {
 	private string connectionMessage="not connected";
 	private string message="";
 	private string info="";
-	private int prevTime;
-	protected int prevTotalTime;
+	private float prevTime;
+	protected float prevTotalTime;
 	protected static float xMax = 12.0f;
 	protected static float yMax = 12.0f;
 	protected static float zMax = 12.0f;
 	protected static float scale = 0.10f;
 	string path;
 	Difficulty difficulty;
-	
+	float distance = 0;
+	float angle = 0;
+
 	[DllImport("phantomDll")]
 	private static extern bool initDevice();
 	[DllImport("phantomDll")]
@@ -81,7 +83,7 @@ public class PhantomGrab : MonoBehaviour {
 		GUI.Box (new Rect (0,0,150,70), "<size=20>" +info + "\n" + message+"</size>");
 		
 		GUI.Box (new Rect (UnityEngine.Screen.width - 120,0,120,80), "<size=20>Score: " + score +
-		         "\nTime: " + ((int)Time.time - prevTotalTime) +"\nPrev: " + prevTime+"</size>");
+		         "\nTime: " + (int)(Time.time - prevTotalTime) +"\nPrev: " + (int)prevTime+"</size>");
 		GUI.Box (new Rect (UnityEngine.Screen.width - 150,UnityEngine.Screen.height - 30, 150, 30), "<size=18>"+connectionMessage+"</size>");
 	}
 	
@@ -90,6 +92,7 @@ public class PhantomGrab : MonoBehaviour {
 		difficulty = Difficulty.Instance;
 		path = @"Log/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+difficulty.getLevel()+"_Phantom.csv";
 		UnityEngine.Screen.showCursor = false;
+		File.AppendAllText(path, "Time,Distance,Angle"+ Environment.NewLine);//save to file
 	}
 	
 	void Start()
@@ -127,7 +130,7 @@ public class PhantomGrab : MonoBehaviour {
 		
 		if (pointText.enabled) 
 		{
-			if( ((int)Time.time - prevTotalTime) > 1)
+			if( (int)(Time.time - prevTotalTime) > 1)
 				pointText.enabled = false;
 		}
 		
@@ -195,8 +198,8 @@ public class PhantomGrab : MonoBehaviour {
 	
 	protected void setNewPositionAndOrientation()
 	{
-		cursor.transform.rotation = UnityEngine.Random.rotation;
 		target.transform.rotation = UnityEngine.Random.rotation;
+		cursor.transform.rotation = UnityEngine.Random.rotation;
 		cursor.transform.position = new Vector3 (UnityEngine.Random.Range(-xMax, xMax), 
 		                                         UnityEngine.Random.Range(4.0F, yMax), 
 		                                         UnityEngine.Random.Range(-zMax, zMax));
@@ -208,8 +211,8 @@ public class PhantomGrab : MonoBehaviour {
 		Quaternion cursorQ = cursor.transform.GetChild(0).rotation;
 		Vector3 targetV = target.transform.GetChild(0).position;
 		Vector3 cursorV = cursor.transform.GetChild(0).position;
-		float distance = (targetV - cursorV).magnitude;
-		float angle = Quaternion.Angle(cursorQ, targetQ);
+		distance = (targetV - cursorV).magnitude;
+		angle = Quaternion.Angle(cursorQ, targetQ);
 		ambientSource.volume = (1f-(angle / 180f))*0.75f;
 
 		if ((angle <= difficulty.angle) && (distance < difficulty.distance)) 
@@ -245,9 +248,9 @@ public class PhantomGrab : MonoBehaviour {
 	protected void newGame()
 	{
 		setNewPositionAndOrientation();
-		prevTime = (int)Time.time - prevTotalTime;
-		prevTotalTime = (int)Time.time;
-		File.AppendAllText(path, prevTime.ToString()+ Environment.NewLine);//save to file
+		prevTime = Time.time - prevTotalTime;
+		prevTotalTime = Time.time;
+		File.AppendAllText(path, prevTime.ToString()+","+distance.ToString()+","+angle.ToString()+ Environment.NewLine);//save to file
 		score++;
 	}
 }

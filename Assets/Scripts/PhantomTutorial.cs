@@ -28,8 +28,8 @@ public class PhantomTutorial : MonoBehaviour {
 	private string connectionMessage="not connected";
 	private string message="";
 	private string info="not grabbed";
-	private int prevTime;
-	protected int prevTotalTime;
+	private float prevTime;
+	protected float prevTotalTime;
 	protected static float xMax = 12.0f;
 	protected static float yMax = 12.0f;
 	protected static float zMax = 12.0f;
@@ -80,7 +80,7 @@ public class PhantomTutorial : MonoBehaviour {
 		GUI.Box (new Rect (0,0,150,70), "<size=20>" +info + "\n" + message+"</size>");
 		
 		GUI.Box (new Rect (UnityEngine.Screen.width - 120,0,120,80), "<size=20>Score: " + score +
-		         "\nTime: " + ((int)Time.time - prevTotalTime) +"\nPrev: " + prevTime+"</size>");
+		         "\nTime: " + (int)(Time.time - prevTotalTime) +"\nPrev: " + (int)prevTime+"</size>");
 		GUI.Box (new Rect (UnityEngine.Screen.width - 150,UnityEngine.Screen.height - 30, 150, 30), "<size=18>"+connectionMessage+"</size>");
 	}
 	
@@ -126,7 +126,7 @@ public class PhantomTutorial : MonoBehaviour {
 		
 		if (pointText.enabled) 
 		{
-			if( ((int)Time.time - prevTotalTime) > 1)
+			if( (int)(Time.time - prevTotalTime) > 1)
 				pointText.enabled = false;
 		}
 		
@@ -194,7 +194,33 @@ public class PhantomTutorial : MonoBehaviour {
 	
 	protected void setNewPositionAndOrientation()
 	{
-		cursor.transform.rotation = UnityEngine.Random.rotation;
+		switch (score)
+		{
+			//learn to translate
+		case 0:
+			cursor.transform.rotation = target.transform.rotation;
+			break;
+			//learn to rotate around y
+		case 1:
+			cursor.transform.rotation = target.transform.rotation;
+			cursor.transform.Rotate(Vector3.up * 45f, Space.World);
+			break;
+			//learn to rotate around x
+		case 2:
+			cursor.transform.rotation = target.transform.rotation;
+			cursor.transform.Rotate(Vector3.right * 45f, Space.World);
+			break;
+			//learn to rotate around z
+		case 3:
+			cursor.transform.rotation = target.transform.rotation;
+			cursor.transform.Rotate(Vector3.forward * 45f, Space.World);
+			break;
+			//practise docking
+		default:
+			target.transform.rotation = UnityEngine.Random.rotation;
+			cursor.transform.rotation = UnityEngine.Random.rotation;
+			break;
+		}
 		cursor.transform.position = new Vector3 (UnityEngine.Random.Range(-xMax, xMax), 
 		                                         UnityEngine.Random.Range(4.0F, yMax), 
 		                                         UnityEngine.Random.Range(-zMax, zMax));
@@ -243,8 +269,8 @@ public class PhantomTutorial : MonoBehaviour {
 	protected void newGame()
 	{
 		setNewPositionAndOrientation();
-		prevTime = (int)Time.time - prevTotalTime;
-		prevTotalTime = (int)Time.time;
+		prevTime = Time.time - prevTotalTime;
+		prevTotalTime = Time.time;
 		score++;
 	}
 }

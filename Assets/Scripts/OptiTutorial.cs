@@ -294,7 +294,7 @@ public class OptiTutorial : MonoBehaviour {
 			{
 				translate = false;
 				rotate = false;
-				info = "not tracked";
+				//info = "not tracked";
 				thumb.renderer.material = yellow;
 				index.renderer.material = yellow;
 				ring.renderer.material = yellow;
@@ -314,7 +314,33 @@ public class OptiTutorial : MonoBehaviour {
 
 	void setNewPositionAndOrientation()
 	{
-		cursor.transform.rotation = UnityEngine.Random.rotation;
+		switch (score)
+		{
+			//learn to translate
+		case 0:
+			cursor.transform.rotation = target.transform.rotation;
+			break;
+			//learn to rotate around y
+		case 1:
+			cursor.transform.rotation = target.transform.rotation;
+			cursor.transform.Rotate(Vector3.up * 45f, Space.World);
+			break;
+			//learn to rotate around x
+		case 2:
+			cursor.transform.rotation = target.transform.rotation;
+			cursor.transform.Rotate(Vector3.right * 45f, Space.World);
+			break;
+			//learn to rotate around z
+		case 3:
+			cursor.transform.rotation = target.transform.rotation;
+			cursor.transform.Rotate(Vector3.forward * 45f, Space.World);
+			break;
+			//practise docking
+		default:
+			cursor.transform.rotation = UnityEngine.Random.rotation;
+			target.transform.rotation = UnityEngine.Random.rotation;
+			break;
+		}
 		target.transform.rotation = UnityEngine.Random.rotation;
 		cursor.transform.position = new Vector3 (UnityEngine.Random.Range(-xMax, xMax),
 		                                         UnityEngine.Random.Range(4.0F, yMax),

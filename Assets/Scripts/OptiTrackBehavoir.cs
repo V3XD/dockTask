@@ -272,7 +272,7 @@ public class OptiTrackBehavoir : MonoBehaviour {
 			{
 				translate = false;
 				rotate = false;
-				info = "not tracked";
+				//info = "not tracked";
 				thumb.renderer.material = yellow;
 				index.renderer.material = yellow;
 				ring.renderer.material = yellow;
