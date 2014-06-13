@@ -44,7 +44,7 @@ public class OptiTutorial : MonoBehaviour {
 	private float prevTime;
 	private float prevTotalTime;
 	bool updateCam;
-	Vector3 fingerDir;
+	//Vector3 fingerDir;
 	Difficulty difficulty;
 	Vector3 prevPinch;
 	static float chairRadius = 5f;
@@ -54,6 +54,7 @@ public class OptiTutorial : MonoBehaviour {
 	OptiCalibration calibration;
 	bool isCalibrated;
 	float maxDist = 0;
+	string path;
 
 	void OnGUI()
 	{
@@ -70,7 +71,9 @@ public class OptiTutorial : MonoBehaviour {
 		calibration = OptiCalibration.Instance;
 		UnityEngine.Screen.showCursor = false;
 		hum = fingerObj.GetComponent<AudioSource>();
-
+		difficulty.setEasy();
+		path = @"Log/tutorial/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_OptiTutorial.csv";
+		File.AppendAllText(path, "Time,Distance,Angle"+ Environment.NewLine);//save to file
 	}
 
 	void Start () 
@@ -166,7 +169,7 @@ public class OptiTutorial : MonoBehaviour {
 				pointText.enabled = false;
 		}
 
-
+		updateCam = false;
 
 		if(bSuccess)
 		{
@@ -198,14 +201,14 @@ public class OptiTutorial : MonoBehaviour {
 
 				Vector3 currentPos = (thumbPos + indexPos + ringPos)*0.33f;
 				Vector3 transVec = currentPos - prevPos;
-				fingerDir = Vector3.zero - fingerObj.transform.position;
-				fingerDir.Normalize();
+				//fingerDir = Vector3.zero - fingerObj.transform.position;
+				//fingerDir.Normalize();
 
 				thumb.transform.position = thumbPos; 
 				index.transform.position = indexPos; 
 				ring.transform.position = ringPos;
 
-				Debug.Log(thumbToIndex + " "+ thumbToRing+" "+indexToRing);
+				//Debug.Log(thumbToIndex + " "+ thumbToRing+" "+indexToRing);
 
 				if(!isCalibrated)
 				{
@@ -228,7 +231,7 @@ public class OptiTutorial : MonoBehaviour {
 						isCalibrated = true;
 
 						calibration.setTouchDist(maxDist);
-						maxDist = maxDist+0.5f;
+						//maxDist = maxDist+0.5f;
 						Debug.Log("************ "+calibration.touchDist +" " + calibration.minDist);
 						prevTotalTime = Time.time;
 					}
@@ -281,11 +284,12 @@ public class OptiTutorial : MonoBehaviour {
 					if(isDocked)
 					{
 						popSource.PlayOneShot(popSound);
+						score++;
 						setNewPositionAndOrientation();
 						prevTime = Time.time - prevTotalTime;
 						prevTotalTime = Time.time;
 						pointText.enabled = true;
-						score++;
+						File.AppendAllText(path, prevTime.ToString()+","+distance.ToString()+","+angle.ToString()+ Environment.NewLine);//save to file
 					}
 				}
 				prevPos = currentPos;
@@ -341,7 +345,7 @@ public class OptiTutorial : MonoBehaviour {
 			target.transform.rotation = UnityEngine.Random.rotation;
 			break;
 		}
-		target.transform.rotation = UnityEngine.Random.rotation;
+
 		cursor.transform.position = new Vector3 (UnityEngine.Random.Range(-xMax, xMax),
 		                                         UnityEngine.Random.Range(4.0F, yMax),
 		                                         UnityEngine.Random.Range(-zMax, zMax));
@@ -384,67 +388,10 @@ public class OptiTutorial : MonoBehaviour {
 
 	void LateUpdate()
 	{
-		bool vertical = false;
-
 		if(updateCam)
 		{
-			Vector3 camPos = new Vector3();
-			Vector3 axisVec = new Vector3(0f, 0f, 1f);
-			float angle = Vector3.Angle(axisVec, fingerDir);
-			if(angle <= 45f)
-			{
-				camPos = axisVec;
-			}
-			else
-			{
-				axisVec = new Vector3(-1f, 0f, 0f);
-				angle = Vector3.Angle(axisVec, fingerDir);
-				if(angle <= 45f)
-				{
-					camPos = axisVec;
-				}
-				else
-				{
-					axisVec = new Vector3(1f, 0f, 0f);
-					angle = Vector3.Angle(axisVec, fingerDir);
-					if(angle <= 45f)
-					{
-						camPos = axisVec;
-					}
-					else
-					{
-						axisVec = new Vector3(0f, 0f, -1f);
-						angle = Vector3.Angle(axisVec, fingerDir);
-						if(angle <= 45f)
-						{
-							camPos = axisVec;
-						}
-						else
-						{
-							vertical = true;
-							axisVec = new Vector3(0f, 1f, 0f);
-							angle = Vector3.Angle(axisVec, fingerDir);
-							if(angle <= 45f)
-							{
-								camPos = axisVec;
-							}
-							else
-								axisVec = new Vector3(0f, -1f, 0f);
-						}
-					}
-				}
-			}
-
-			if(!vertical)
-			{
-				camPos = camPos*-15f;
-				camPos.y = 10f;
-			}
-			else
-				camPos = camPos*5f;
-			
-			secondCamera.transform.position = camPos;
-			secondCamera.transform.LookAt(target.transform.position);
+			secondCamera.transform.position = fingerObj.transform.position;
+			secondCamera.transform.LookAt(cursor.transform.position);
 		}
 	}
 }

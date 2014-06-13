@@ -90,7 +90,7 @@ public class PhantomGrab : MonoBehaviour {
 	void Awake ()
 	{
 		difficulty = Difficulty.Instance;
-		path = @"Log/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+difficulty.getLevel()+"_Phantom.csv";
+		path = @"Log/"+difficulty.getLevel()+"/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+difficulty.getLevel()+"_Phantom.csv";
 		UnityEngine.Screen.showCursor = false;
 		File.AppendAllText(path, "Time,Distance,Angle"+ Environment.NewLine);//save to file
 	}

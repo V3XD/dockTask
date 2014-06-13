@@ -10,28 +10,28 @@ public class Difficulty : Singleton<Difficulty> {
 
 	void Awake () 
 	{
-		setNormal ();
+		setEasy ();
 	}
 
-	public void setNormal()
+	public void setEasy()
 	{
 		angle = 20f;
 		distance = 3f;
-		level = "normal";
+		level = "easy";
 	} 
 
-	public void setDifficult()
+	public void setNormal()
 	{
 		angle = 15f;
 		distance = 2f;
-		level = "difficult";
+		level = "normal";
 	}
 
-	public void setVeryDifficult()
+	public void setHard()
 	{
 		angle = 5f;
 		distance = 1f;
-		level = "veryDifficult";
+		level = "hard";
 	}
 
 	public string getLevel()

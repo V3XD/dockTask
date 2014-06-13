@@ -45,7 +45,7 @@ public class OptiTrackBehavoir : MonoBehaviour {
 	private float prevTotalTime;
 	string path;
 	bool updateCam;
-	Vector3 fingerDir;
+	//Vector3 fingerDir;
 	Difficulty difficulty;
 	bool locked;
 	Vector3 prevPinch;
@@ -71,7 +71,7 @@ public class OptiTrackBehavoir : MonoBehaviour {
 	{
 		difficulty = Difficulty.Instance;
 		calibration = OptiCalibration.Instance;
-		path = @"Log/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+difficulty.getLevel()+"_Opti.csv";
+		path = @"Log/"+difficulty.getLevel()+"/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+difficulty.getLevel()+"_Opti.csv";
 		UnityEngine.Screen.showCursor = false;
 		hum = fingerObj.GetComponent<AudioSource>();
 		File.AppendAllText(path, "Time,Distance,Angle"+ Environment.NewLine);//save to file
@@ -93,7 +93,6 @@ public class OptiTrackBehavoir : MonoBehaviour {
 		setNewPositionAndOrientation();
 		prevPinch = new Vector3 ();
 		fingerObj.renderer.enabled = true;
-		//chairCollider = cursor.transform.GetChild (0).GetComponent<Collider> ();
 
 		if (bSuccess) 
 		{
@@ -169,6 +168,8 @@ public class OptiTrackBehavoir : MonoBehaviour {
 				pointText.enabled = false;
 		}
 
+		updateCam = false;
+
 		if(bSuccess)
 		{
 			udpClient.RequestDataDescriptions();
@@ -199,8 +200,8 @@ public class OptiTrackBehavoir : MonoBehaviour {
 
 				Vector3 currentPos = (thumbPos + indexPos + ringPos)*0.33f;
 				Vector3 transVec = currentPos - prevPos;
-				fingerDir = Vector3.zero - fingerObj.transform.position;
-				fingerDir.Normalize();
+				//fingerDir = Vector3.zero - fingerObj.transform.position;
+				//fingerDir.Normalize();
 
 				thumb.transform.position = thumbPos; 
 				index.transform.position = indexPos; 
@@ -334,67 +335,10 @@ public class OptiTrackBehavoir : MonoBehaviour {
 
 	void LateUpdate()
 	{
-		bool vertical = false;
-
 		if(updateCam)
 		{
-			Vector3 camPos = new Vector3();
-			Vector3 axisVec = new Vector3(0f, 0f, 1f);
-			float angle = Vector3.Angle(axisVec, fingerDir);
-			if(angle <= 45f)
-			{
-				camPos = axisVec;
-			}
-			else
-			{
-				axisVec = new Vector3(-1f, 0f, 0f);
-				angle = Vector3.Angle(axisVec, fingerDir);
-				if(angle <= 45f)
-				{
-					camPos = axisVec;
-				}
-				else
-				{
-					axisVec = new Vector3(1f, 0f, 0f);
-					angle = Vector3.Angle(axisVec, fingerDir);
-					if(angle <= 45f)
-					{
-						camPos = axisVec;
-					}
-					else
-					{
-						axisVec = new Vector3(0f, 0f, -1f);
-						angle = Vector3.Angle(axisVec, fingerDir);
-						if(angle <= 45f)
-						{
-							camPos = axisVec;
-						}
-						else
-						{
-							vertical = true;
-							axisVec = new Vector3(0f, 1f, 0f);
-							angle = Vector3.Angle(axisVec, fingerDir);
-							if(angle <= 45f)
-							{
-								camPos = axisVec;
-							}
-							else
-								axisVec = new Vector3(0f, -1f, 0f);
-						}
-					}
-				}
-			}
-
-			if(!vertical)
-			{
-				camPos = camPos*-15f;
-				camPos.y = 10f;
-			}
-			else
-				camPos = camPos*5f;
-			
-			secondCamera.transform.position = camPos;
-			secondCamera.transform.LookAt(target.transform.position);
+			secondCamera.transform.position = fingerObj.transform.position;
+			secondCamera.transform.LookAt(cursor.transform.position);
 		}
 	}
 }

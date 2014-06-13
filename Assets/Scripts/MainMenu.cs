@@ -4,9 +4,9 @@ using System.Collections;
 public class MainMenu : MonoBehaviour {
 
 	Difficulty difficulty;
+	public bool isEasy;
 	public bool isNormal;
 	public bool isHard;
-	public bool isVeryHard;
 
 	void OnGUI() 
 	{
@@ -27,29 +27,29 @@ public class MainMenu : MonoBehaviour {
 			
 
 		GUI.Label(new Rect((3 * UnityEngine.Screen.width) / 4, (UnityEngine.Screen.height) / 2 - 100, 150, 50), "<size=20>Difficulty Level</size>");
-		if (GUI.Toggle (new Rect ((3 * UnityEngine.Screen.width) / 4, (UnityEngine.Screen.height) / 2 + 50, 100, 50), isNormal, "<size=20>Normal</size>"))
+		if (GUI.Toggle (new Rect ((3 * UnityEngine.Screen.width) / 4, (UnityEngine.Screen.height) / 2 + 50, 100, 50), isEasy, "<size=20>Easy</size>"))
+			isEasy = SetMeOnly ();
+
+		if (GUI.Toggle (new Rect ((3 * UnityEngine.Screen.width) / 4, (UnityEngine.Screen.height) / 2, 100, 50), isNormal, "<size=20>Normal</size>"))
 			isNormal = SetMeOnly ();
 
-		if (GUI.Toggle (new Rect ((3 * UnityEngine.Screen.width) / 4, (UnityEngine.Screen.height) / 2, 100, 50), isHard, "<size=20>Difficult</size>"))
+		if (GUI.Toggle (new Rect ((3 * UnityEngine.Screen.width) / 4, (UnityEngine.Screen.height) / 2 - 50, 150, 50), isHard, "<size=20>Hard</size>"))
 			isHard = SetMeOnly ();
-
-		if (GUI.Toggle (new Rect ((3 * UnityEngine.Screen.width) / 4, (UnityEngine.Screen.height) / 2 - 50, 150, 50), isVeryHard, "<size=20>Very difficult</size>"))
-			isVeryHard = SetMeOnly ();
 	}
 
 	void Awake()
 	{
 		difficulty = Difficulty.Instance;
+		isEasy = false;
 		isNormal = false;
 		isHard = false;
-		isVeryHard = false;
 
 		if(difficulty.angle == 20f)
-			isNormal = true;
+			isEasy = true;
 		else if (difficulty.angle == 15f)
-			isHard = true;
+			isNormal = true;
 		else
-			isVeryHard = true;
+			isHard = true;
 	}
 
 	void Start()
@@ -69,25 +69,25 @@ public class MainMenu : MonoBehaviour {
 			Application.CaptureScreenshot(@"Log/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_Screenshot.png");
 			Debug.Log("print");
 		}
-		if(isNormal)
+		if(isEasy)
+		{
+			difficulty.setEasy();
+		}
+		else if(isNormal)
 		{
 			difficulty.setNormal();
 		}
 		else if(isHard)
 		{
-			difficulty.setDifficult();
-		}
-		else if(isVeryHard)
-		{
-			difficulty.setVeryDifficult();
+			difficulty.setHard();
 		}
 	}
 
 	bool SetMeOnly()
 	{
+		isEasy = false;
 		isNormal = false;
 		isHard = false;
-		isVeryHard = false;
 
 		return true;
 	}

@@ -10,8 +10,8 @@ public class OptiCalibration : Singleton<OptiCalibration>
 
 	void Awake () 
 	{
-		touchDist = 3f;
-		minDist = 4.75f;
+		touchDist = 3.1f;
+		minDist = 3.6f;
 	}
 
 	public void setTouchDist(float dist)

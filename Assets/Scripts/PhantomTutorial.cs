@@ -35,7 +35,10 @@ public class PhantomTutorial : MonoBehaviour {
 	protected static float zMax = 12.0f;
 	protected static float scale = 0.10f;
 	Difficulty difficulty;
-	
+	float distance = 0;
+	float angle = 0;
+	string path;
+
 	[DllImport("phantomDll")]
 	private static extern bool initDevice();
 	[DllImport("phantomDll")]
@@ -88,7 +91,9 @@ public class PhantomTutorial : MonoBehaviour {
 	{
 		UnityEngine.Screen.showCursor = false;
 		difficulty = Difficulty.Instance;
-		difficulty.setNormal();
+		difficulty.setEasy();
+		path = @"Log/tutorial/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_PhantomTutorial.csv";
+		File.AppendAllText(path, "Time,Distance,Angle"+ Environment.NewLine);//save to file
 	}
 	
 	void Start()
@@ -179,6 +184,7 @@ public class PhantomTutorial : MonoBehaviour {
 				popSource.PlayOneShot(popSound);
 				pointText.enabled = true;
 				newGame();
+
 			}
 			
 			evaluateDock();
@@ -232,8 +238,8 @@ public class PhantomTutorial : MonoBehaviour {
 		Quaternion cursorQ = cursor.transform.GetChild(0).rotation;
 		Vector3 targetV = target.transform.GetChild(0).position;
 		Vector3 cursorV = cursor.transform.GetChild(0).position;
-		float distance = (targetV - cursorV).magnitude;
-		float angle = Quaternion.Angle(cursorQ, targetQ);
+		distance = (targetV - cursorV).magnitude;
+		angle = Quaternion.Angle(cursorQ, targetQ);
 		ambientSource.volume = (1f-(angle / 180f))*0.75f;
 		
 		if ((angle <= difficulty.angle) && (distance < difficulty.distance)) 
@@ -267,10 +273,11 @@ public class PhantomTutorial : MonoBehaviour {
 	}
 	
 	protected void newGame()
-	{
+	{		
+		score++;
 		setNewPositionAndOrientation();
 		prevTime = Time.time - prevTotalTime;
 		prevTotalTime = Time.time;
-		score++;
+		File.AppendAllText(path, prevTime.ToString()+","+distance.ToString()+","+angle.ToString()+ Environment.NewLine);//save to file
 	}
 }
