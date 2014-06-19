@@ -14,16 +14,20 @@ public class MainMenu : MonoBehaviour {
 			Application.LoadLevel("phantomGrab");
 		if (GUI.Button(new Rect((UnityEngine.Screen.width)/2,(3*UnityEngine.Screen.height)/4,100,60),"<size=20>Phantom\nPractice</size>"))
 			Application.LoadLevel("phantomTutorial");
-		if (GUI.Button(new Rect((UnityEngine.Screen.width)/4,(UnityEngine.Screen.height)/4,100,50),"<size=20>Leap</size>"))
-			Application.LoadLevel("leapCube");
-		if (GUI.Button(new Rect((UnityEngine.Screen.width)/2,(UnityEngine.Screen.height)/4,100,60),"<size=20>Leap\nTutorial</size>"))
-			Application.LoadLevel("leapTutorial");
+		if (GUI.Button(new Rect((UnityEngine.Screen.width)/4,(UnityEngine.Screen.height)/4,100,50),"<size=20>Minichair</size>"))
+			Application.LoadLevel("optiChair");
+		if (GUI.Button(new Rect((UnityEngine.Screen.width)/2,(UnityEngine.Screen.height)/4,100,60),"<size=20>Minichair\nTutorial</size>"))
+			Application.LoadLevel("optiChairTutorial");
 		if (GUI.Button(new Rect(UnityEngine.Screen.width - 100,10,80,50),"<size=20>Quit</size>"))
 			Application.Quit();
-		if (GUI.Button(new Rect((UnityEngine.Screen.width)/4,(UnityEngine.Screen.height)/2,100,50),"<size=20>Opti</size>"))
+		if (GUI.Button(new Rect((UnityEngine.Screen.width)/4,(UnityEngine.Screen.height)/2,100,50),"<size=20>Fingers</size>"))
 			Application.LoadLevel("optiTrack");
-		if (GUI.Button(new Rect((UnityEngine.Screen.width)/2,(UnityEngine.Screen.height)/2,100,60),"<size=20>Opti\nTutorial</size>"))
+		if (GUI.Button(new Rect((UnityEngine.Screen.width)/2,(UnityEngine.Screen.height)/2,100,60),"<size=20>Fingers\nTutorial</size>"))
 			Application.LoadLevel("optiTrackCalibration");
+		if (GUI.Button(new Rect((UnityEngine.Screen.width)/4,10,100,50),"<size=20>AirPen</size>"))
+			Application.LoadLevel("optiAirPen");
+		if (GUI.Button(new Rect((UnityEngine.Screen.width)/2,10,100,60),"<size=20>AirPen\nTutorial</size>"))
+			Application.LoadLevel("optiAirPenTutorial");
 			
 
 		GUI.Label(new Rect((3 * UnityEngine.Screen.width) / 4, (UnityEngine.Screen.height) / 2 - 100, 150, 50), "<size=20>Difficulty Level</size>");

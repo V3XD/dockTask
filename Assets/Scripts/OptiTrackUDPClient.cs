@@ -42,12 +42,14 @@ public class OptiTrackUDPClient
 		MyStateObject so;
 		
 		Debug.Log("[UDPClient] Connecting.");
+		for(int i=0; i<10; i++)
+		{
+			markers [i] = new Vector3 ();
+		}
 		rigidTargets [0] = new RigidBody ();
 		rigidTargets [1] = new RigidBody ();
 		rigidTargets [2] = new RigidBody ();
-		markers [0] = new Vector3 ();
-		markers [1] = new Vector3 ();
-		markers [2] = new Vector3 ();
+		rigidTargets [3] = new RigidBody ();
 		// create data socket
 		sockData = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 		sockData.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);

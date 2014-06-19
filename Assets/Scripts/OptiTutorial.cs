@@ -17,7 +17,6 @@ public class OptiTutorial : MonoBehaviour {
 	public Material red;
 	public Light roomLight;
 	public GameObject axis;
-	//public GameObject sphere;
 	public GameObject trail;
 	public GUIText pointText;
 	public Camera secondCamera;
@@ -29,6 +28,7 @@ public class OptiTutorial : MonoBehaviour {
 	public GameObject thumb;
 	public GameObject ring;
 	public GUIText instructionsText;
+	public GUIText completeText;
 
 	static float xMax = 15.0f;
 	static float yMax = 15.0f;
@@ -72,7 +72,7 @@ public class OptiTutorial : MonoBehaviour {
 		UnityEngine.Screen.showCursor = false;
 		hum = fingerObj.GetComponent<AudioSource>();
 		difficulty.setEasy();
-		path = @"Log/tutorial/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_OptiTutorial.csv";
+		path = @"Log/tutorial/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_FingersTutorial.csv";
 		File.AppendAllText(path, "Time,Distance,Angle"+ Environment.NewLine);//save to file
 	}
 
@@ -99,7 +99,7 @@ public class OptiTutorial : MonoBehaviour {
 		{
 			udpClient.RequestDataDescriptions ();
 			if(udpClient.rigidTargets[0] != null)
-				prevPos = new Vector3(udpClient.rigidTargets[0].pos.x, udpClient.rigidTargets[0].pos.y, -udpClient.rigidTargets[0].pos.z);
+				prevPos = new Vector3(udpClient.markers[0].x, udpClient.markers[0].y, -udpClient.markers[0].z);
 			connectionMessage="connected";
 		}
 	}
@@ -117,6 +117,12 @@ public class OptiTutorial : MonoBehaviour {
 		{
 			Application.CaptureScreenshot(@"Log/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_Screenshot.png");
 			Debug.Log("print");
+		}
+
+		if (completeText.enabled ) 
+		{
+			if( (int)(Time.time - prevTotalTime) > 2)
+				completeText.enabled  = false;
 		}
 
 		if(translate)
@@ -290,6 +296,8 @@ public class OptiTutorial : MonoBehaviour {
 						prevTotalTime = Time.time;
 						pointText.enabled = true;
 						File.AppendAllText(path, prevTime.ToString()+","+distance.ToString()+","+angle.ToString()+ Environment.NewLine);//save to file
+						if(score == 5)
+							completeText.enabled = true;
 					}
 				}
 				prevPos = currentPos;
@@ -322,30 +330,28 @@ public class OptiTutorial : MonoBehaviour {
 		{
 			//learn to translate
 		case 0:
-			cursor.transform.rotation = target.transform.rotation;
+			target.transform.rotation = new Quaternion();
 			break;
 			//learn to rotate around y
 		case 1:
-			cursor.transform.rotation = target.transform.rotation;
-			cursor.transform.Rotate(Vector3.up * 45f, Space.World);
+			target.transform.rotation = new Quaternion();
+			target.transform.Rotate(Vector3.up * 45f, Space.World);
 			break;
 			//learn to rotate around x
 		case 2:
-			cursor.transform.rotation = target.transform.rotation;
-			cursor.transform.Rotate(Vector3.right * 45f, Space.World);
+			target.transform.rotation = new Quaternion();
+			target.transform.Rotate(Vector3.right * 45f, Space.World);
 			break;
 			//learn to rotate around z
 		case 3:
-			cursor.transform.rotation = target.transform.rotation;
-			cursor.transform.Rotate(Vector3.forward * 45f, Space.World);
+			target.transform.rotation = new Quaternion();
+			target.transform.Rotate(Vector3.forward * 45f, Space.World);
 			break;
 			//practise docking
 		default:
-			cursor.transform.rotation = UnityEngine.Random.rotation;
 			target.transform.rotation = UnityEngine.Random.rotation;
 			break;
 		}
-
 		cursor.transform.position = new Vector3 (UnityEngine.Random.Range(-xMax, xMax),
 		                                         UnityEngine.Random.Range(4.0F, yMax),
 		                                         UnityEngine.Random.Range(-zMax, zMax));

@@ -57,6 +57,7 @@ public class OptiTrackBehavoir : MonoBehaviour {
 	float distance = 0;
 	float angle = 0;
 	OptiCalibration calibration;
+	bool mute = false;
 
 	void OnGUI()
 	{
@@ -71,7 +72,7 @@ public class OptiTrackBehavoir : MonoBehaviour {
 	{
 		difficulty = Difficulty.Instance;
 		calibration = OptiCalibration.Instance;
-		path = @"Log/"+difficulty.getLevel()+"/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+difficulty.getLevel()+"_Opti.csv";
+		path = @"Log/"+difficulty.getLevel()+"/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+difficulty.getLevel()+"_Fingers.csv";
 		UnityEngine.Screen.showCursor = false;
 		hum = fingerObj.GetComponent<AudioSource>();
 		File.AppendAllText(path, "Time,Distance,Angle"+ Environment.NewLine);//save to file
@@ -98,7 +99,7 @@ public class OptiTrackBehavoir : MonoBehaviour {
 		{
 			udpClient.RequestDataDescriptions ();
 			if(udpClient.rigidTargets[0] != null)
-				prevPos = new Vector3(udpClient.rigidTargets[0].pos.x, udpClient.rigidTargets[0].pos.y, -udpClient.rigidTargets[0].pos.z);
+				prevPos = new Vector3(udpClient.markers[0].x, udpClient.markers[0].y, -udpClient.markers[0].z);
 			connectionMessage="connected";
 		}
 	}
@@ -116,6 +117,18 @@ public class OptiTrackBehavoir : MonoBehaviour {
 		{
 			Application.CaptureScreenshot(@"Log/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_Screenshot.png");
 			Debug.Log("print");
+		}
+
+		if(Input.GetKeyUp (KeyCode.M))
+		{
+			if(!mute)
+			{
+				mute = true;
+				ambientSource.volume = 0f;
+				fingerObj.GetComponent<AudioSource>().volume = 0f;
+			}
+			else
+				mute = false;
 		}
 
 		if(translate)
@@ -293,7 +306,7 @@ public class OptiTrackBehavoir : MonoBehaviour {
 
 	void setNewPositionAndOrientation()
 	{
-		cursor.transform.rotation = UnityEngine.Random.rotation;
+		//cursor.transform.rotation = UnityEngine.Random.rotation;
 		target.transform.rotation = UnityEngine.Random.rotation;
 		cursor.transform.position = new Vector3 (UnityEngine.Random.Range(-xMax, xMax),
 		                                         UnityEngine.Random.Range(4.0F, yMax),
@@ -308,7 +321,8 @@ public class OptiTrackBehavoir : MonoBehaviour {
 		Vector3 cursorV = cursor.transform.position;
 		distance = (targetV - cursorV).magnitude;
 		angle = Quaternion.Angle(cursorQ, targetQ);
-		ambientSource.volume = (1f-(angle / 180f))*0.75f;
+		if(!mute)
+			ambientSource.volume = (1f-(angle / 180f))*0.75f;
 		
 		if ((angle <= difficulty.angle) && (distance < difficulty.distance)) 
 		{	

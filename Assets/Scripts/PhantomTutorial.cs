@@ -38,6 +38,8 @@ public class PhantomTutorial : MonoBehaviour {
 	float distance = 0;
 	float angle = 0;
 	string path;
+	bool mute = false;
+	public GUIText completeText;
 
 	[DllImport("phantomDll")]
 	private static extern bool initDevice();
@@ -134,7 +136,25 @@ public class PhantomTutorial : MonoBehaviour {
 			if( (int)(Time.time - prevTotalTime) > 1)
 				pointText.enabled = false;
 		}
-		
+
+		if (completeText.enabled ) 
+		{
+			if( (int)(Time.time - prevTotalTime) > 2)
+				completeText.enabled  = false;
+		}
+
+		if(Input.GetKeyUp (KeyCode.M))
+		{
+			if(!mute)
+			{
+				mute = true;
+				ambientSource.volume = 0f;
+				j4.GetComponent<AudioSource>().volume = 0f;
+			}
+			else
+				mute = false;
+		}
+
 		isConnected = getData ();
 		if(isConnected)
 		{
@@ -184,7 +204,8 @@ public class PhantomTutorial : MonoBehaviour {
 				popSource.PlayOneShot(popSound);
 				pointText.enabled = true;
 				newGame();
-
+				if(score == 5)
+					completeText.enabled = true;
 			}
 			
 			evaluateDock();
@@ -204,31 +225,30 @@ public class PhantomTutorial : MonoBehaviour {
 		{
 			//learn to translate
 		case 0:
-			cursor.transform.rotation = target.transform.rotation;
+			target.transform.rotation = new Quaternion();
 			break;
 			//learn to rotate around y
 		case 1:
-			cursor.transform.rotation = target.transform.rotation;
-			cursor.transform.Rotate(Vector3.up * 45f, Space.World);
+			target.transform.rotation = new Quaternion();
+			target.transform.Rotate(Vector3.up * 45f, Space.World);
 			break;
 			//learn to rotate around x
 		case 2:
-			cursor.transform.rotation = target.transform.rotation;
-			cursor.transform.Rotate(Vector3.right * 45f, Space.World);
+			target.transform.rotation = new Quaternion();
+			target.transform.Rotate(Vector3.right * 45f, Space.World);
 			break;
 			//learn to rotate around z
 		case 3:
-			cursor.transform.rotation = target.transform.rotation;
-			cursor.transform.Rotate(Vector3.forward * 45f, Space.World);
+			target.transform.rotation = new Quaternion();
+			target.transform.Rotate(Vector3.forward * 45f, Space.World);
 			break;
 			//practise docking
 		default:
 			target.transform.rotation = UnityEngine.Random.rotation;
-			cursor.transform.rotation = UnityEngine.Random.rotation;
 			break;
 		}
-		cursor.transform.position = new Vector3 (UnityEngine.Random.Range(-xMax, xMax), 
-		                                         UnityEngine.Random.Range(4.0F, yMax), 
+		cursor.transform.position = new Vector3 (UnityEngine.Random.Range(-xMax, xMax),
+		                                         UnityEngine.Random.Range(4.0F, yMax),
 		                                         UnityEngine.Random.Range(-zMax, zMax));
 	}
 	
@@ -240,7 +260,8 @@ public class PhantomTutorial : MonoBehaviour {
 		Vector3 cursorV = cursor.transform.GetChild(0).position;
 		distance = (targetV - cursorV).magnitude;
 		angle = Quaternion.Angle(cursorQ, targetQ);
-		ambientSource.volume = (1f-(angle / 180f))*0.75f;
+		if(!mute)
+			ambientSource.volume = (1f-(angle / 180f))*0.75f;
 		
 		if ((angle <= difficulty.angle) && (distance < difficulty.distance)) 
 		{	

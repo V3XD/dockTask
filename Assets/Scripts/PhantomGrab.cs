@@ -38,6 +38,7 @@ public class PhantomGrab : MonoBehaviour {
 	Difficulty difficulty;
 	float distance = 0;
 	float angle = 0;
+	bool mute = false;
 
 	[DllImport("phantomDll")]
 	private static extern bool initDevice();
@@ -133,7 +134,19 @@ public class PhantomGrab : MonoBehaviour {
 			if( (int)(Time.time - prevTotalTime) > 1)
 				pointText.enabled = false;
 		}
-		
+
+		if(Input.GetKeyUp (KeyCode.M))
+		{
+			if(!mute)
+			{
+				mute = true;
+				ambientSource.volume = 0f;
+				j4.GetComponent<AudioSource>().volume = 0f;
+			}
+			else
+				mute = false;
+		}
+
 		isConnected = getData ();
 		if(isConnected)
 		{
@@ -169,13 +182,21 @@ public class PhantomGrab : MonoBehaviour {
 			{
 				grab = true;
 				cursor.transform.Translate (transVec, Space.World);
-				cursor.transform.Rotate(rotVec, Space.World);
+				//cursor.transform.Rotate(rotVec, Space.World);
+				Vector3 zAxis = j4.transform.TransformDirection(Vector3.forward);
+				cursor.transform.RotateAround(cursor.transform.position, zAxis, rotVec.z);
+				Vector3 xAxis = j4.transform.TransformDirection(Vector3.right);
+				cursor.transform.RotateAround(cursor.transform.position, xAxis, rotVec.x);
+				Vector3 yAxis = j4.transform.TransformDirection(Vector3.up);
+				cursor.transform.RotateAround(cursor.transform.position, yAxis, rotVec.y);
 				info = "grabbed";
+				j4.renderer.material = green;
 			}
 			else
 			{
 				grab = false;
 				info = "not grabbed";
+				j4.renderer.material = yellow;
 			}
 
 			if(isDocked && !grab)
@@ -199,7 +220,7 @@ public class PhantomGrab : MonoBehaviour {
 	protected void setNewPositionAndOrientation()
 	{
 		target.transform.rotation = UnityEngine.Random.rotation;
-		cursor.transform.rotation = UnityEngine.Random.rotation;
+		//cursor.transform.rotation = UnityEngine.Random.rotation;
 		cursor.transform.position = new Vector3 (UnityEngine.Random.Range(-xMax, xMax), 
 		                                         UnityEngine.Random.Range(4.0F, yMax), 
 		                                         UnityEngine.Random.Range(-zMax, zMax));
@@ -213,7 +234,8 @@ public class PhantomGrab : MonoBehaviour {
 		Vector3 cursorV = cursor.transform.GetChild(0).position;
 		distance = (targetV - cursorV).magnitude;
 		angle = Quaternion.Angle(cursorQ, targetQ);
-		ambientSource.volume = (1f-(angle / 180f))*0.75f;
+		if(!mute)
+			ambientSource.volume = (1f-(angle / 180f))*0.75f;
 
 		if ((angle <= difficulty.angle) && (distance < difficulty.distance)) 
 		{	
