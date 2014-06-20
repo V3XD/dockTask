@@ -25,7 +25,7 @@ public class OptiTrackUDPClient
 	public Skeleton skelTarget = null;
 	public RigidBody[] rigidTargets = new RigidBody[10];
 	public int numTrackables = 0;
-	public Vector3[] markers = new Vector3[10];
+	public Vector3[] markers = new Vector3[20];
 	Socket sockData = null;
 	Socket sockCommand = null;
 	String strFrame = "";
@@ -42,7 +42,7 @@ public class OptiTrackUDPClient
 		MyStateObject so;
 		
 		Debug.Log("[UDPClient] Connecting.");
-		for(int i=0; i<10; i++)
+		for(int i=0; i<20; i++)
 		{
 			markers [i] = new Vector3 ();
 		}

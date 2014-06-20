@@ -157,55 +157,59 @@ public class AirPenTutorial : MonoBehaviour {
 				                              	 -udpClient.rigidTargets[1].pos.z);
 
 				Quaternion currentOrient = udpClient.rigidTargets[1].ori;
-				Vector3 euler = currentOrient.eulerAngles;
 
-				//Debug.Log(currentPos+" "+currentOrient);
-				Vector3 transVec = currentPos - prevPos;
-
-				Vector3 penOrient = new Vector3(-euler.x, -euler.y, euler.z);
-			
-				fingerObj.transform.position = currentPos;
-				fingerObj.transform.rotation = Quaternion.Euler(penOrient);
-
-				Vector3 rotVec = penOrient - prevOrient;
-				prevOrient = penOrient;
-
-				if(clutch)
+				if(currentPos != Vector3.zero)
 				{
-					fingerObj.renderer.material = green; 
-					cursor.transform.Translate (transVec, Space.World);
-					cursor.transform.position = new Vector3 (Mathf.Clamp(cursor.transform.position.x, -xMax, xMax),
-					                                         Mathf.Clamp(cursor.transform.position.y, 3.0f, yMax),
-					                                         Mathf.Clamp(cursor.transform.position.z, -zMax, zMax));
+					Vector3 euler = currentOrient.eulerAngles;
 
-					Vector3 zAxis = fingerObj.transform.TransformDirection(Vector3.forward);
-					cursor.transform.RotateAround(cursor.transform.position, zAxis, rotVec.z);
-					Vector3 xAxis = fingerObj.transform.TransformDirection(Vector3.right);
-					cursor.transform.RotateAround(cursor.transform.position, xAxis, rotVec.x);
-					Vector3 yAxis = fingerObj.transform.TransformDirection(Vector3.up);
-					cursor.transform.RotateAround(cursor.transform.position, yAxis, rotVec.y);
-					//cursor.transform.Rotate(rotVec,Space.World);
-					//trail.GetComponent<TrailRenderer>().enabled = true;
-				}
-				else
-				{
-					//updateCam = true;
-					fingerObj.renderer.material = yellow;
-					//trail.GetComponent<TrailRenderer>().enabled = false;
-					if(isDocked)
+					//Debug.Log(currentPos+" "+currentOrient);
+					Vector3 transVec = currentPos - prevPos;
+
+					Vector3 penOrient = new Vector3(-euler.x, -euler.y, euler.z);
+				
+					fingerObj.transform.position = currentPos;
+					fingerObj.transform.rotation = Quaternion.Euler(penOrient);
+
+					Vector3 rotVec = penOrient - prevOrient;
+					prevOrient = penOrient;
+					prevPos = currentPos;
+
+					if(clutch)
 					{
-						popSource.PlayOneShot(popSound);
-						score++;
-						setNewPositionAndOrientation();
-						prevTime = Time.time - prevTotalTime;
-						prevTotalTime = Time.time;
-						pointText.enabled = true;
-						File.AppendAllText(path, prevTime.ToString()+","+distance.ToString()+","+angle.ToString()+ Environment.NewLine);//save to file
-						if(score == 5)
-							completeText.enabled = true;
+						fingerObj.renderer.material = green; 
+						cursor.transform.Translate (transVec, Space.World);
+						cursor.transform.position = new Vector3 (Mathf.Clamp(cursor.transform.position.x, -xMax, xMax),
+						                                         Mathf.Clamp(cursor.transform.position.y, 3.0f, yMax),
+						                                         Mathf.Clamp(cursor.transform.position.z, -zMax, zMax));
+
+						Vector3 zAxis = fingerObj.transform.TransformDirection(Vector3.forward);
+						cursor.transform.RotateAround(cursor.transform.position, zAxis, rotVec.z);
+						Vector3 xAxis = fingerObj.transform.TransformDirection(Vector3.right);
+						cursor.transform.RotateAround(cursor.transform.position, xAxis, rotVec.x);
+						Vector3 yAxis = fingerObj.transform.TransformDirection(Vector3.up);
+						cursor.transform.RotateAround(cursor.transform.position, yAxis, rotVec.y);
+						//cursor.transform.Rotate(rotVec,Space.World);
+						//trail.GetComponent<TrailRenderer>().enabled = true;
+					}
+					else
+					{
+						//updateCam = true;
+						fingerObj.renderer.material = yellow;
+						//trail.GetComponent<TrailRenderer>().enabled = false;
+						if(isDocked)
+						{
+							popSource.PlayOneShot(popSound);
+							score++;
+							setNewPositionAndOrientation();
+							prevTime = Time.time - prevTotalTime;
+							prevTotalTime = Time.time;
+							pointText.enabled = true;
+							File.AppendAllText(path, prevTime.ToString()+","+distance.ToString()+","+angle.ToString()+ Environment.NewLine);//save to file
+							if(score == 5)
+								completeText.enabled = true;
+						}
 					}
 				}
-				prevPos = currentPos;
 			}
 			else
 			{

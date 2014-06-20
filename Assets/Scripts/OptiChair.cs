@@ -142,12 +142,16 @@ public class OptiChair : MonoBehaviour {
 
 				Vector3 transVec = currentPos - prevPos;
 
-				cursor.transform.Translate (transVec, Space.World);
-				//cursor.transform.position = currentPos;
-				cursor.transform.position = new Vector3 (Mathf.Clamp(cursor.transform.position.x, -xMax, xMax),
-				                                         Mathf.Clamp(cursor.transform.position.y, 3.0f, yMax),
-				                                         Mathf.Clamp(cursor.transform.position.z, -zMax, zMax));
-				cursor.transform.rotation = rotation;
+				if(currentPos != Vector3.zero)
+				{
+					cursor.transform.Translate (transVec, Space.World);
+					//cursor.transform.position = currentPos;
+					cursor.transform.position = new Vector3 (Mathf.Clamp(cursor.transform.position.x, -xMax, xMax),
+					                                         Mathf.Clamp(cursor.transform.position.y, 3.0f, yMax),
+					                                         Mathf.Clamp(cursor.transform.position.z, -zMax, zMax));
+					cursor.transform.rotation = rotation;
+					prevPos = currentPos;
+				}
 
 				if(confirm)
 				{
@@ -163,8 +167,6 @@ public class OptiChair : MonoBehaviour {
 					}
 					confirm = false;
 				}
-
-				prevPos = currentPos;
 			}
 			else
 			{
