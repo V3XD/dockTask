@@ -66,7 +66,7 @@ public class FingersTut: Game
 		if(translate)
 		{
 			rotate = false;
-			pointer.GetComponent<AudioSource>().mute = true;
+			//pointer.GetComponent<AudioSource>().mute = true;
 			info = "translate";
 			axis.transform.position = cursor.transform.position;
 			foreach(Transform child in axis.transform) 
@@ -79,7 +79,7 @@ public class FingersTut: Game
 		}
 		else
 		{	
-			pointer.GetComponent<AudioSource>().mute = false;
+			//pointer.GetComponent<AudioSource>().mute = false;
 			foreach(Transform child in axis.transform) 
 			{
 				child.renderer.enabled = false;

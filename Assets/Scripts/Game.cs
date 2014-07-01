@@ -16,7 +16,8 @@ public class Game : MonoBehaviour
 	public AudioClip popSound;
 	public AudioSource popSource;
 	public AudioSource ambientSource;
-	
+	public Camera secondCamera;
+
 	protected static float xMax = 15.0f;
 	protected static float yMax = 15.0f;
 	protected static float zMax = 15.0f;
@@ -89,7 +90,77 @@ public class Game : MonoBehaviour
 
 		evaluateDock ();
 	}
-	
+
+	void LateUpdate()
+	{
+		Vector3 camPos = new Vector3();
+		Vector3 axisVec = target.transform.TransformDirection (Vector3.forward);
+		Vector3 pointerDir = target.transform.position - pointer.transform.position;
+		pointerDir.Normalize();
+		float angle = Vector3.Angle(axisVec, pointerDir);
+
+		Debug.Log (pointerDir+" "+angle+" "+axisVec);
+
+		if(angle <= 45f)
+		{
+			camPos = Vector3.forward;
+			camPos = camPos*-15f;
+			camPos.y = 10f;
+		}
+		else
+		{
+			axisVec = target.transform.TransformDirection (Vector3.right);
+			angle = Vector3.Angle(axisVec, pointerDir);
+			if(angle <= 45f)
+			{
+				camPos = Vector3.right;
+				camPos = camPos*-15f;
+				camPos.y = 10f;
+			}
+			else
+			{
+				axisVec = target.transform.TransformDirection (Vector3.left);
+				angle = Vector3.Angle(axisVec, pointerDir);
+				if(angle <= 45f)
+				{
+					camPos = Vector3.left;
+					camPos = camPos*-15f;
+					camPos.y = 10f;
+				}
+				else
+				{
+					axisVec = target.transform.TransformDirection (Vector3.back);
+					angle = Vector3.Angle(axisVec, pointerDir);
+					if(angle <= 45f)
+					{
+						camPos = Vector3.back;
+						camPos = camPos*-15f;
+						camPos.y = 10f;
+					}
+					else
+					{
+						axisVec = target.transform.TransformDirection (Vector3.down);
+						angle = Vector3.Angle(axisVec, pointerDir);
+						if(angle <= 45f)
+						{
+							camPos = Vector3.down;
+							camPos = camPos*-15f;
+						}
+						else
+						{
+							axisVec = target.transform.TransformDirection (Vector3.up);
+							angle = Vector3.Angle(axisVec, pointerDir);
+							camPos = Vector3.up;
+						}
+					}
+				}
+			}
+		}
+
+		secondCamera.transform.position = camPos;
+		secondCamera.transform.LookAt(target.transform.position);
+	}
+
 	void OnDestroy () 
 	{
 		atEnd ();
