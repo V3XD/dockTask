@@ -17,6 +17,7 @@ public class Game : MonoBehaviour
 	public AudioSource popSource;
 	public AudioSource ambientSource;
 	public Camera secondCamera;
+	public GameObject dummy;//the target changes orientation
 
 	protected static float xMax = 15.0f;
 	protected static float yMax = 15.0f;
@@ -94,7 +95,7 @@ public class Game : MonoBehaviour
 	void LateUpdate()
 	{
 		Vector3 camPos = new Vector3();
-		Vector3 axisVec = target.transform.TransformDirection (Vector3.forward);
+		Vector3 axisVec = dummy.transform.TransformDirection (Vector3.forward);
 		Vector3 pointerDir = target.transform.position - pointer.transform.position;
 		pointerDir.Normalize();
 		float angle = Vector3.Angle(axisVec, pointerDir);
@@ -109,7 +110,7 @@ public class Game : MonoBehaviour
 		}
 		else
 		{
-			axisVec = target.transform.TransformDirection (Vector3.right);
+			axisVec = dummy.transform.TransformDirection (Vector3.right);
 			angle = Vector3.Angle(axisVec, pointerDir);
 			if(angle <= 45f)
 			{
@@ -119,7 +120,7 @@ public class Game : MonoBehaviour
 			}
 			else
 			{
-				axisVec = target.transform.TransformDirection (Vector3.left);
+				axisVec = dummy.transform.TransformDirection (Vector3.left);
 				angle = Vector3.Angle(axisVec, pointerDir);
 				if(angle <= 45f)
 				{
@@ -129,7 +130,7 @@ public class Game : MonoBehaviour
 				}
 				else
 				{
-					axisVec = target.transform.TransformDirection (Vector3.back);
+					axisVec = dummy.transform.TransformDirection (Vector3.back);
 					angle = Vector3.Angle(axisVec, pointerDir);
 					if(angle <= 45f)
 					{
@@ -139,7 +140,7 @@ public class Game : MonoBehaviour
 					}
 					else
 					{
-						axisVec = target.transform.TransformDirection (Vector3.down);
+						axisVec = dummy.transform.TransformDirection (Vector3.down);
 						angle = Vector3.Angle(axisVec, pointerDir);
 						if(angle <= 45f)
 						{
@@ -148,7 +149,7 @@ public class Game : MonoBehaviour
 						}
 						else
 						{
-							axisVec = target.transform.TransformDirection (Vector3.up);
+							axisVec = dummy.transform.TransformDirection (Vector3.up);
 							angle = Vector3.Angle(axisVec, pointerDir);
 							camPos = Vector3.up;
 						}
