@@ -46,7 +46,7 @@ public class LeapPinch : MonoBehaviour
 	bool updateCam;
 	Vector3 fingerDir;
 	Difficulty difficulty;
-	bool locked;
+//	bool locked;
 	bool mute;
 	Vector3 prevPinch = new Vector3 ();
 	static float chairRadius = 5f;
@@ -61,7 +61,7 @@ public class LeapPinch : MonoBehaviour
 	
 	void Start ()
 	{
-		locked = true;
+//		locked = true;
 		mLastFrame = new Frame();
 		frame = new Frame();
 		rotate = false;
