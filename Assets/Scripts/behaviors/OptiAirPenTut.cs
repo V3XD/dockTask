@@ -6,10 +6,9 @@ using System.IO;
 public class OptiAirPenTut : Game 
 {
 	
-	OptiTrackUDPClient udpClient;
+	OptiTrackManager optiManager;
 	bool bSuccess;
-	Skeleton skelPerformer = new Skeleton();
-	
+
 	bool action = false;
 	Vector3 prevOrient = new Vector3();
 	public GUIText completeText;
@@ -18,14 +17,13 @@ public class OptiAirPenTut : Game
 	{
 		path = @"Log/tutorial/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+difficulty.getLevel()+"_AirPenTut.csv";
 		File.AppendAllText(path, "Time,Distance,Angle"+ Environment.NewLine);//save to file
+		optiManager = OptiTrackManager.Instance;
 	}
 	
 	protected override void atStart ()
 	{
-		udpClient = new OptiTrackUDPClient();
-		bSuccess = udpClient.Connect();
-		udpClient.skelTarget = skelPerformer;
-		
+		bSuccess = optiManager.isConnected ();
+
 		setNewPositionAndOrientationTut();
 		pointer.renderer.enabled = true;
 		
@@ -62,26 +60,20 @@ public class OptiAirPenTut : Game
 
 		if(bSuccess)
 		{
-			udpClient.RequestDataDescriptions();
-			if(udpClient.numTrackables >= 1)
+			if(optiManager.getRigidBodyNum() >= 1)
 			{
+				Vector3 currentPos = optiManager.getPosition(1);
 				
-				Vector3 currentPos = new Vector3(udpClient.rigidTargets[1].pos.x,
-				                                 udpClient.rigidTargets[1].pos.y,
-				                                 -udpClient.rigidTargets[1].pos.z);
-				
-				Quaternion currentOrient = udpClient.rigidTargets[1].ori;
+				Quaternion currentOrient = optiManager.getOrientation(1);
 				
 				if(currentPos != Vector3.zero)
 				{
-					Vector3 euler = currentOrient.eulerAngles;
-					
 					Vector3 transVec = currentPos - prevPos;
 					
-					Vector3 penOrient = new Vector3(-euler.x, -euler.y, euler.z);
+					Vector3 penOrient = currentOrient.eulerAngles;
 					
 					pointer.transform.position = currentPos;
-					pointer.transform.rotation = Quaternion.Euler(penOrient);
+					pointer.transform.rotation = currentOrient;
 					
 					Vector3 rotVec = penOrient - prevOrient;
 					prevOrient = penOrient;
@@ -127,6 +119,5 @@ public class OptiAirPenTut : Game
 	
 	protected override void atEnd ()
 	{
-		udpClient.Close();
 	}
 }

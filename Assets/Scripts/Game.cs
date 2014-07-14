@@ -100,7 +100,7 @@ public class Game : MonoBehaviour
 		pointerDir.Normalize();
 		float angle = Vector3.Angle(axisVec, pointerDir);
 
-		Debug.Log (pointerDir+" "+angle+" "+axisVec);
+//		Debug.Log (pointerDir+" "+angle+" "+axisVec);
 
 		if(angle <= 45f)
 		{

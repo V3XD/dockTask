@@ -5,11 +5,9 @@ using System.IO;
 
 public class ChairTut: Game 
 {
-	
-	OptiTrackUDPClient udpClient;
+	OptiTrackManager optiManager;
 	bool bSuccess;
-	Skeleton skelPerformer = new Skeleton();
-	
+
 	bool confirm = false;
 	public GUIText completeText;
 
@@ -17,14 +15,13 @@ public class ChairTut: Game
 	{
 		path = @"Log/tutorial/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+difficulty.getLevel()+"_Chair.csv";
 		File.AppendAllText(path, "Time,Distance,Angle"+ Environment.NewLine);//save to file
+		optiManager = OptiTrackManager.Instance;
 	}
 	
 	protected override void atStart ()
 	{
-		udpClient = new OptiTrackUDPClient();
-		bSuccess = udpClient.Connect();
-		udpClient.skelTarget = skelPerformer;
-		
+		bSuccess = optiManager.isConnected ();
+
 		setNewPositionAndOrientationTut();
 		pointer.renderer.enabled = true;
 		
@@ -55,20 +52,12 @@ public class ChairTut: Game
 		
 		if(bSuccess)
 		{
-			udpClient.RequestDataDescriptions();
-			
-			if(udpClient.numTrackables >= 1)
+			if(optiManager.getRigidBodyNum() >= 1)
 			{
 				info = "";
-				Vector3 currentPos = new Vector3(udpClient.rigidTargets[0].pos.x,
-				                                 udpClient.rigidTargets[0].pos.y,
-				                                 -udpClient.rigidTargets[0].pos.z);
+				Vector3 currentPos = optiManager.getPosition(0);
 				
-				Debug.Log(currentPos);
-				Quaternion currentOrient = udpClient.rigidTargets[0].ori;
-				Vector3 euler = currentOrient.eulerAngles;
-				
-				Quaternion rotation = Quaternion.Euler(-euler.x, -euler.y, euler.z);
+				Quaternion currentOrient = optiManager.getOrientation(0);
 				
 				Vector3 transVec = currentPos - prevPos;
 				
@@ -78,7 +67,7 @@ public class ChairTut: Game
 					cursor.transform.position = new Vector3 (Mathf.Clamp(cursor.transform.position.x, -xMax, xMax),
 					                                         Mathf.Clamp(cursor.transform.position.y, 3.0f, yMax),
 					                                         Mathf.Clamp(cursor.transform.position.z, -zMax, zMax));
-					cursor.transform.rotation = rotation;
+					cursor.transform.rotation = currentOrient;
 					prevPos = currentPos;
 				}
 				
@@ -106,6 +95,6 @@ public class ChairTut: Game
 	
 	protected override void atEnd ()
 	{
-		udpClient.Close();
+
 	}
 }

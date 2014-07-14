@@ -5,25 +5,21 @@ using System.IO;
 
 public class Chair: Game 
 {
-	
-	OptiTrackUDPClient udpClient;
+	OptiTrackManager optiManager;
 	bool bSuccess;
-	Skeleton skelPerformer = new Skeleton();
-	
+
 	bool confirm = false;
 
 	protected override void atAwake ()
 	{
 		path = @"Log/"+difficulty.getLevel()+"/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+difficulty.getLevel()+"_Chair.csv";
 		File.AppendAllText(path, "Time,Distance,Angle"+ Environment.NewLine);//save to file
+		optiManager = OptiTrackManager.Instance;
 	}
 	
 	protected override void atStart ()
 	{
-		udpClient = new OptiTrackUDPClient();
-		bSuccess = udpClient.Connect();
-		udpClient.skelTarget = skelPerformer;
-		
+		bSuccess = optiManager.isConnected ();
 		setNewPositionAndOrientation();
 		pointer.renderer.enabled = true;
 		
@@ -48,21 +44,14 @@ public class Chair: Game
 		
 		if(bSuccess)
 		{
-			udpClient.RequestDataDescriptions();
-			
-			if(udpClient.numTrackables >= 1)
+
+			if(optiManager.getRigidBodyNum() >= 1)
 			{
 				info = "";
-				Vector3 currentPos = new Vector3(udpClient.rigidTargets[0].pos.x,
-				                                 udpClient.rigidTargets[0].pos.y,
-				                                 -udpClient.rigidTargets[0].pos.z);
-				
-				Debug.Log(currentPos);
-				Quaternion currentOrient = udpClient.rigidTargets[0].ori;
-				Vector3 euler = currentOrient.eulerAngles;
-				
-				Quaternion rotation = Quaternion.Euler(-euler.x, -euler.y, euler.z);
-				
+				Vector3 currentPos = optiManager.getPosition(0);
+
+				Quaternion currentOrient = optiManager.getOrientation(0);
+
 				Vector3 transVec = currentPos - prevPos;
 				
 				if(currentPos != Vector3.zero)
@@ -71,7 +60,7 @@ public class Chair: Game
 					cursor.transform.position = new Vector3 (Mathf.Clamp(cursor.transform.position.x, -xMax, xMax),
 					                                         Mathf.Clamp(cursor.transform.position.y, 3.0f, yMax),
 					                                         Mathf.Clamp(cursor.transform.position.z, -zMax, zMax));
-					cursor.transform.rotation = rotation;
+					cursor.transform.rotation = currentOrient;
 					prevPos = currentPos;
 				}
 				
@@ -88,7 +77,7 @@ public class Chair: Game
 			else
 			{
 				info = "not tracked";
-				Debug.Log("not tracked");
+				//Debug.Log("not tracked");
 			}
 			
 			
@@ -97,6 +86,5 @@ public class Chair: Game
 	
 	protected override void atEnd ()
 	{
-		udpClient.Close();
 	}
 }

@@ -5,10 +5,8 @@ using System.IO;
 
 public class Fingers: Game 
 {
-	
-	OptiTrackUDPClient udpClient;
+	OptiTrackManager optiManager;
 	bool bSuccess;
-	Skeleton skelPerformer = new Skeleton();
 
 	public GameObject index;
 	public GameObject thumb;
@@ -25,13 +23,12 @@ public class Fingers: Game
 	{
 		path = @"Log/"+difficulty.getLevel()+"/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+difficulty.getLevel()+"_Finger.csv";
 		File.AppendAllText(path, "Time,Distance,Angle"+ Environment.NewLine);//save to file
+		optiManager = OptiTrackManager.Instance;
 	}
 	
 	protected override void atStart ()
 	{
-		udpClient = new OptiTrackUDPClient();
-		bSuccess = udpClient.Connect();
-		udpClient.skelTarget = skelPerformer;
+		bSuccess = optiManager.isConnected ();
 
 		calibration = OptiCalibration.Instance;
 
@@ -99,24 +96,16 @@ public class Fingers: Game
 		
 		if(bSuccess)
 		{
-			udpClient.RequestDataDescriptions();
-			
-			if(udpClient.numMarkers == 3)
+			if(optiManager.getMarkerNum() == 3)
 			{
 				thumb.renderer.material = green;
 				index.renderer.material = green;
 				ring.renderer.material = green;
 				pointer.renderer.material = green; 
 				
-				Vector3 thumbPos = new Vector3(udpClient.markers[0].x,
-				                               udpClient.markers[0].y,
-				                               -udpClient.markers[0].z);
-				Vector3 indexPos = new Vector3(udpClient.markers[1].x,
-				                               udpClient.markers[1].y,
-				                               -udpClient.markers[1].z);
-				Vector3 ringPos = new Vector3(udpClient.markers[2].x,
-				                              udpClient.markers[2].y,
-				                              -udpClient.markers[2].z);
+				Vector3 thumbPos = optiManager.getMarkerPosition(0);
+				Vector3 indexPos = optiManager.getMarkerPosition(1);
+				Vector3 ringPos = optiManager.getMarkerPosition(2);
 				
 				float thumbToIndex = Vector3.Distance(thumbPos, 
 				                                      indexPos);
@@ -191,7 +180,7 @@ public class Fingers: Game
 				index.renderer.material = yellow;
 				ring.renderer.material = yellow;
 				pointer.renderer.material = yellow;
-				Debug.Log("not tracked");
+				//Debug.Log("not tracked");
 			}
 			
 			
@@ -200,6 +189,5 @@ public class Fingers: Game
 	
 	protected override void atEnd ()
 	{
-		udpClient.Close();
 	}
 }

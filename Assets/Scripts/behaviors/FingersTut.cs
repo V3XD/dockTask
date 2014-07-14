@@ -5,10 +5,8 @@ using System.IO;
 
 public class FingersTut: Game 
 {
-	
-	OptiTrackUDPClient udpClient;
+	OptiTrackManager optiManager;
 	bool bSuccess;
-	Skeleton skelPerformer = new Skeleton();
 
 	public GameObject index;
 	public GameObject thumb;
@@ -29,13 +27,12 @@ public class FingersTut: Game
 	{
 		path = @"Log/tutorial/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+difficulty.getLevel()+"_FingerTut.csv";
 		File.AppendAllText(path, "Time,Distance,Angle"+ Environment.NewLine);//save to file
+		optiManager = OptiTrackManager.Instance;
 	}
 	
 	protected override void atStart ()
 	{
-		udpClient = new OptiTrackUDPClient();
-		bSuccess = udpClient.Connect();
-		udpClient.skelTarget = skelPerformer;
+		bSuccess = optiManager.isConnected ();
 
 		calibration = OptiCalibration.Instance;
 
@@ -110,24 +107,16 @@ public class FingersTut: Game
 		
 		if(bSuccess)
 		{
-			udpClient.RequestDataDescriptions();
-			
-			if(udpClient.numMarkers == 3)
+			if(optiManager.getMarkerNum() == 3)
 			{
 				thumb.renderer.material = green;
 				index.renderer.material = green;
 				ring.renderer.material = green;
 				pointer.renderer.material = green; 
 				
-				Vector3 thumbPos = new Vector3(udpClient.markers[0].x,
-				                               udpClient.markers[0].y,
-				                               -udpClient.markers[0].z);
-				Vector3 indexPos = new Vector3(udpClient.markers[1].x,
-				                               udpClient.markers[1].y,
-				                               -udpClient.markers[1].z);
-				Vector3 ringPos = new Vector3(udpClient.markers[2].x,
-				                              udpClient.markers[2].y,
-				                              -udpClient.markers[2].z);
+				Vector3 thumbPos = optiManager.getMarkerPosition(0);
+				Vector3 indexPos = optiManager.getMarkerPosition(1);
+				Vector3 ringPos = optiManager.getMarkerPosition(2);
 				
 				float thumbToIndex = Vector3.Distance(thumbPos, 
 				                                      indexPos);
@@ -135,7 +124,7 @@ public class FingersTut: Game
 				                                     ringPos);
 				float indexToRing = Vector3.Distance(indexPos, 
 				                                     ringPos);
-				
+
 				Vector3 currentPos = (thumbPos + indexPos + ringPos)*0.33f;
 				Vector3 transVec = currentPos - prevPos;
 
@@ -229,7 +218,7 @@ public class FingersTut: Game
 				index.renderer.material = yellow;
 				ring.renderer.material = yellow;
 				pointer.renderer.material = yellow;
-				Debug.Log("not tracked");
+				//Debug.Log("not tracked");
 			}
 			
 			
@@ -238,6 +227,5 @@ public class FingersTut: Game
 	
 	protected override void atEnd ()
 	{
-		udpClient.Close();
 	}
 }
