@@ -28,6 +28,7 @@ public class FingersTut: Game
 		path = @"Log/tutorial/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+difficulty.getLevel()+"_FingerTut.csv";
 		File.AppendAllText(path, "Time,Distance,Angle"+ Environment.NewLine);//save to file
 		optiManager = OptiTrackManager.Instance;
+		difficulty.setEasy ();
 	}
 	
 	protected override void atStart ()

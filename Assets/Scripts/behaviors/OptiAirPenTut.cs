@@ -18,6 +18,7 @@ public class OptiAirPenTut : Game
 		path = @"Log/tutorial/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+difficulty.getLevel()+"_AirPenTut.csv";
 		File.AppendAllText(path, "Time,Distance,Angle"+ Environment.NewLine);//save to file
 		optiManager = OptiTrackManager.Instance;
+		difficulty.setEasy ();
 	}
 	
 	protected override void atStart ()
@@ -71,9 +72,10 @@ public class OptiAirPenTut : Game
 					Vector3 transVec = currentPos - prevPos;
 					
 					Vector3 penOrient = currentOrient.eulerAngles;
+					Vector3 fakeOrient = new Vector3 (penOrient.x, penOrient.y, 0f);
 					
 					pointer.transform.position = currentPos;
-					pointer.transform.rotation = currentOrient;
+					pointer.transform.rotation = Quaternion.Euler(fakeOrient);//currentOrient;
 					
 					Vector3 rotVec = penOrient - prevOrient;
 					prevOrient = penOrient;
@@ -90,7 +92,7 @@ public class OptiAirPenTut : Game
 						cursor.transform.RotateAround(cursor.transform.position, zAxis, rotVec.z);
 						Vector3 xAxis = pointer.transform.TransformDirection(Vector3.right);
 						cursor.transform.RotateAround(cursor.transform.position, xAxis, rotVec.x);
-						Vector3 yAxis = pointer.transform.TransformDirection(Vector3.up);
+						Vector3 yAxis = pointer.transform.TransformDirection(Vector3.up); 
 						cursor.transform.RotateAround(cursor.transform.position, yAxis, rotVec.y);
 					}
 					else

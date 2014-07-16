@@ -195,6 +195,7 @@ namespace OptitrackManagement
 					Vector3 pos = new Vector3 (fData[0], fData[1], fData[2]);
 					_dataStream._markers[i].ID = i;
 					_dataStream._markers[i].position = pos;
+
 				}
 
 				// Rigid Bodies

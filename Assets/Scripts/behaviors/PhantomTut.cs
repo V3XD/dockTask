@@ -57,6 +57,7 @@ public class PhantomTut : Game
 	{
 		path = @"Log/tutorial/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+difficulty.getLevel()+"_Phantom.csv";
 		File.AppendAllText(path, "Time,Distance,Angle"+ Environment.NewLine);//save to file
+		difficulty.setEasy ();
 	}
 
 	protected override void atStart ()

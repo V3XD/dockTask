@@ -43,6 +43,7 @@ public class OptiAirPen : Game
 		{
 			action = false;
 			info = "hold";
+
 		}
 		else if(Input.GetKeyDown (KeyCode.LeftControl) || Input.GetKeyDown (KeyCode.RightControl))
 		{
@@ -63,9 +64,10 @@ public class OptiAirPen : Game
 					Vector3 transVec = currentPos - prevPos;
 					
 					Vector3 penOrient = currentOrient.eulerAngles;
-					
+					Vector3 fakeOrient = new Vector3 (penOrient.x, penOrient.y, 0f);
+
 					pointer.transform.position = currentPos;
-					pointer.transform.rotation = currentOrient;
+					pointer.transform.rotation = Quaternion.Euler(fakeOrient);//currentOrient;
 					
 					Vector3 rotVec = penOrient - prevOrient;
 					prevOrient = penOrient;
@@ -82,7 +84,7 @@ public class OptiAirPen : Game
 						cursor.transform.RotateAround(cursor.transform.position, zAxis, rotVec.z);
 						Vector3 xAxis = pointer.transform.TransformDirection(Vector3.right);
 						cursor.transform.RotateAround(cursor.transform.position, xAxis, rotVec.x);
-						Vector3 yAxis = pointer.transform.TransformDirection(Vector3.up);
+						Vector3 yAxis = pointer.transform.TransformDirection(Vector3.up); //Vector3.up;//
 						cursor.transform.RotateAround(cursor.transform.position, yAxis, rotVec.y);
 					}
 					else

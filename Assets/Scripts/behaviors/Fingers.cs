@@ -96,6 +96,7 @@ public class Fingers: Game
 		
 		if(bSuccess)
 		{
+			//Debug.Log(optiManager.getMarkerNum());
 			if(optiManager.getMarkerNum() == 3)
 			{
 				thumb.renderer.material = green;
