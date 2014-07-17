@@ -36,18 +36,24 @@ public class Game : MonoBehaviour
 	bool mute = false;
 	protected float distance = 0;
 	protected float angle = 0;
-	
+	public bool window = false;
+	protected Folders folders;
+	protected string nextLevel = "MainMenu";
+
 	void OnGUI ()
 	{
-		GUI.Box (new Rect (0,0,150,60), "<size=20>"+info + "\n" + message + "\n" +"</size>");
+		GUI.Box (new Rect (0,0,150,70), "<size=20>"+info + "\n" + message + "\n" +difficulty.getLevel () + "</size>");
 		
 		GUI.Box (new Rect (UnityEngine.Screen.width - 120,0,120,80), "<size=20>Score: " + score +
 		         "\nTime: " + (int)(Time.time - prevTotalTime) +"\nPrev: " + ((int)prevTime).ToString()+"</size>");
 		GUI.Box (new Rect (UnityEngine.Screen.width - 150,UnityEngine.Screen.height - 30, 150, 30), "<size=18>"+connectionMessage+"</size>");
+		if (window)
+			GUI.Window(0, new Rect(UnityEngine.Screen.height*0.5f, UnityEngine.Screen.height*0.5f, 210, 80), DoWindow, "<size=18>Complete</size>");
 	}
 	
 	void Awake ()
 	{
+		folders = Folders.Instance;
 		difficulty = Difficulty.Instance;
 		UnityEngine.Screen.showCursor = false;
 		atAwake ();
@@ -66,7 +72,7 @@ public class Game : MonoBehaviour
 
 		if(Input.GetKeyUp (KeyCode.P))
 		{
-			Application.CaptureScreenshot(@"Log/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_Screenshot.png");
+			Application.CaptureScreenshot(folders.getPath()+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_Screenshot.png");
 		}
 		
 		if(Input.GetKeyUp (KeyCode.M))
@@ -180,28 +186,28 @@ public class Game : MonoBehaviour
 		switch (score)
 		{
 			//learn to translate
-		case 0:
-			target.transform.rotation = new Quaternion();
-			break;
-			//learn to rotate around y
-		case 1:
-			target.transform.rotation = new Quaternion();
-			target.transform.Rotate(Vector3.up * 45f, Space.World);
-			break;
-			//learn to rotate around x
-		case 2:
-			target.transform.rotation = new Quaternion();
-			target.transform.Rotate(Vector3.right * 45f, Space.World);
-			break;
-			//learn to rotate around z
-		case 3:
-			target.transform.rotation = new Quaternion();
-			target.transform.Rotate(Vector3.forward * 45f, Space.World);
-			break;
-			//practise docking
-		default:
-			target.transform.rotation = UnityEngine.Random.rotation;
-			break;
+			case 0:
+				target.transform.rotation = new Quaternion();
+				break;
+				//learn to rotate around y
+			case 1:
+				target.transform.rotation = new Quaternion();
+				target.transform.Rotate(Vector3.up * 45f, Space.World);
+				break;
+				//learn to rotate around x
+			case 2:
+				target.transform.rotation = new Quaternion();
+				target.transform.Rotate(Vector3.right * 45f, Space.World);
+				break;
+				//learn to rotate around z
+			case 3:
+				target.transform.rotation = new Quaternion();
+				target.transform.Rotate(Vector3.forward * 45f, Space.World);
+				break;
+				//practise docking
+			default:
+				target.transform.rotation = UnityEngine.Random.rotation;
+				break;
 		}
 		cursor.transform.position = new Vector3 (UnityEngine.Random.Range(-xMax, xMax),
 		                                         UnityEngine.Random.Range(4.0F, yMax),
@@ -248,9 +254,59 @@ public class Game : MonoBehaviour
 		prevTime = Time.time - prevTotalTime;
 		prevTotalTime = Time.time;
 		pointText.enabled = true;
-		File.AppendAllText(path, prevTime.ToString()+","+distance.ToString()+","+angle.ToString()+ Environment.NewLine);//save to file
+		File.AppendAllText(path, prevTime.ToString()+","+distance.ToString()+","+angle.ToString()+ ","+difficulty.getLevel()+Environment.NewLine);//save to file
 		score++;
 	}
+
+	protected void selectLevel()
+	{
+		switch (score)
+		{
+			case 0:
+				difficulty.setEasy ();
+				break;
+			case 1:
+				difficulty.setNormal ();
+				break;
+			case 2:
+				difficulty.setHard ();
+				break;
+			case 3:
+				difficulty.setNormal ();
+				break;
+			case 4:
+				difficulty.setEasy ();
+				break;
+			case 5:
+				difficulty.setHard ();
+				break;
+			case 6:
+				difficulty.setNormal ();
+				break;
+			case 7:
+				difficulty.setHard ();
+				break;
+			case 8:
+				difficulty.setEasy ();
+				break;
+			default:
+				difficulty.setEasy ();
+				break;
+		}
+	}
+	void DoWindow(int windowID)
+	{
+		if (GUI.Button (new Rect (10, 35, 90, 30), "<size=16>Continue</size>"))
+		{
+			window = false;
+		}
+		else if (GUI.Button(new Rect(110, 35, 95, 30), "<size=16>Next</size>"))
+		{
+			Application.LoadLevel(nextLevel);
+		}
+	}
+
+
 	protected virtual void gameBehavior ()
 	{
 		

@@ -8,13 +8,13 @@ public class ChairTut: Game
 	OptiTrackManager optiManager;
 	bool bSuccess;
 
-	bool confirm = false;
+	bool action = false;
 	public GUIText completeText;
 
 	protected override void atAwake ()
 	{
-		path = @"Log/tutorial/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+difficulty.getLevel()+"_Chair.csv";
-		File.AppendAllText(path, "Time,Distance,Angle"+ Environment.NewLine);//save to file
+		path = folders.getPath()+@"tutorial/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_Chair.csv";
+		File.AppendAllText(path, "Time,Distance,Angle,Difficulty"+ Environment.NewLine);//save to file
 		optiManager = OptiTrackManager.Instance;
 		difficulty.setEasy ();
 	}
@@ -25,7 +25,9 @@ public class ChairTut: Game
 
 		setNewPositionAndOrientationTut();
 		pointer.renderer.enabled = true;
-		
+		info = "hold";
+		nextLevel = "optiChair";
+
 		if (bSuccess) 
 		{
 			connectionMessage="connected";
@@ -39,10 +41,17 @@ public class ChairTut: Game
 			setNewPositionAndOrientationTut();
 			prevTotalTime = Time.time;
 		}
-		
-		if (Input.GetKeyUp (KeyCode.Space))
+
+		if (Input.GetKeyUp (KeyCode.LeftControl) || Input.GetKeyUp (KeyCode.RightControl))
 		{
-			confirm = true;
+			action = false;
+			info = "hold";
+			
+		}
+		else if(Input.GetKeyDown (KeyCode.LeftControl) || Input.GetKeyDown (KeyCode.RightControl))
+		{
+			action = true;
+			info = "translate";
 		}
 
 		if (completeText.enabled ) 
@@ -55,7 +64,7 @@ public class ChairTut: Game
 		{
 			if(optiManager.getRigidBodyNum() >= 1)
 			{
-				info = "";
+				//info = "";
 				Vector3 currentPos = optiManager.getPosition(0);
 				
 				Quaternion currentOrient = optiManager.getOrientation(0);
@@ -64,31 +73,30 @@ public class ChairTut: Game
 				
 				if(currentPos != Vector3.zero)
 				{
-					cursor.transform.Translate (transVec, Space.World);
-					cursor.transform.position = new Vector3 (Mathf.Clamp(cursor.transform.position.x, -xMax, xMax),
-					                                         Mathf.Clamp(cursor.transform.position.y, 3.0f, yMax),
-					                                         Mathf.Clamp(cursor.transform.position.z, -zMax, zMax));
-					cursor.transform.rotation = currentOrient;
-					prevPos = currentPos;
-				}
-				
-				if(confirm)
-				{
-					if(isDocked)
+					if(action)
+					{
+						cursor.transform.Translate (transVec, Space.World);
+						cursor.transform.position = new Vector3 (Mathf.Clamp(cursor.transform.position.x, -xMax, xMax),
+						                                         Mathf.Clamp(cursor.transform.position.y, 3.0f, yMax),
+						                                         Mathf.Clamp(cursor.transform.position.z, -zMax, zMax));
+					}
+					else if(isDocked)
 					{
 						newTask();
 						setNewPositionAndOrientationTut();
 						if(score == 5)
-							completeText.enabled = true;
+							window = true;
 					}
-					confirm = false;
+					
+					cursor.transform.rotation = currentOrient;
+					prevPos = currentPos;
 				}
 			}
-			else
+			/*else
 			{
 				info = "not tracked";
-				Debug.Log("not tracked");
-			}
+				//Debug.Log("not tracked");
+			}*/
 			
 			
 		}

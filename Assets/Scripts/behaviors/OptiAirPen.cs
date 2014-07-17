@@ -13,9 +13,10 @@ public class OptiAirPen : Game
 
 	protected override void atAwake ()
 	{
-		path = @"Log/"+difficulty.getLevel()+"/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+difficulty.getLevel()+"_AirPen.csv";
-		File.AppendAllText(path, "Time,Distance,Angle"+ Environment.NewLine);//save to file
+		path = folders.getPath()+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_AirPen.csv";
+		File.AppendAllText(path, "Time,Distance,Angle,Difficulty"+ Environment.NewLine);//save to file
 		optiManager = OptiTrackManager.Instance;
+		selectLevel ();
 	}
 
 	protected override void atStart ()
@@ -55,9 +56,9 @@ public class OptiAirPen : Game
 		{
 			if(optiManager.getRigidBodyNum() >= 1)
 			{
-				Vector3 currentPos = optiManager.getPosition(1);
+				Vector3 currentPos = optiManager.getPosition(0);
 				
-				Quaternion currentOrient = optiManager.getOrientation(1);
+				Quaternion currentOrient = optiManager.getOrientation(0);
 				
 				if(currentPos != Vector3.zero)
 				{
@@ -84,7 +85,7 @@ public class OptiAirPen : Game
 						cursor.transform.RotateAround(cursor.transform.position, zAxis, rotVec.z);
 						Vector3 xAxis = pointer.transform.TransformDirection(Vector3.right);
 						cursor.transform.RotateAround(cursor.transform.position, xAxis, rotVec.x);
-						Vector3 yAxis = pointer.transform.TransformDirection(Vector3.up); //Vector3.up;//
+						Vector3 yAxis = pointer.transform.TransformDirection(Vector3.up); 
 						cursor.transform.RotateAround(cursor.transform.position, yAxis, rotVec.y);
 					}
 					else
@@ -94,6 +95,9 @@ public class OptiAirPen : Game
 						{
 							newTask();
 							setNewPositionAndOrientation();
+							selectLevel();
+							if(score == 9)
+								window = true;
 						}
 					}
 					prevPos = currentPos;

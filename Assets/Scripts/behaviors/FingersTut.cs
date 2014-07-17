@@ -25,8 +25,8 @@ public class FingersTut: Game
 
 	protected override void atAwake ()
 	{
-		path = @"Log/tutorial/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+difficulty.getLevel()+"_FingerTut.csv";
-		File.AppendAllText(path, "Time,Distance,Angle"+ Environment.NewLine);//save to file
+		path = folders.getPath()+@"tutorial/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_FingerTut.csv";
+		File.AppendAllText(path, "Time,Distance,Angle,Difficulty"+ Environment.NewLine);//save to file
 		optiManager = OptiTrackManager.Instance;
 		difficulty.setEasy ();
 	}
@@ -34,7 +34,7 @@ public class FingersTut: Game
 	protected override void atStart ()
 	{
 		bSuccess = optiManager.isConnected ();
-
+		nextLevel = "optiTrack";
 		calibration = OptiCalibration.Instance;
 
 		setNewPositionAndOrientationTut();
@@ -204,7 +204,7 @@ public class FingersTut: Game
 						newTask();
 						setNewPositionAndOrientationTut();
 						if(score == 5)
-							completeText.enabled = true;
+							window = true;
 						
 					}
 				}

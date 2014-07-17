@@ -15,8 +15,8 @@ public class OptiAirPenTut : Game
 
 	protected override void atAwake ()
 	{
-		path = @"Log/tutorial/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+difficulty.getLevel()+"_AirPenTut.csv";
-		File.AppendAllText(path, "Time,Distance,Angle"+ Environment.NewLine);//save to file
+		path = folders.getPath()+@"tutorial/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_AirPenTut.csv";
+		File.AppendAllText(path, "Time,Distance,Angle,Difficulty"+ Environment.NewLine);//save to file
 		optiManager = OptiTrackManager.Instance;
 		difficulty.setEasy ();
 	}
@@ -24,7 +24,7 @@ public class OptiAirPenTut : Game
 	protected override void atStart ()
 	{
 		bSuccess = optiManager.isConnected ();
-
+		nextLevel = "optiAirPen";
 		setNewPositionAndOrientationTut();
 		pointer.renderer.enabled = true;
 		
@@ -63,9 +63,9 @@ public class OptiAirPenTut : Game
 		{
 			if(optiManager.getRigidBodyNum() >= 1)
 			{
-				Vector3 currentPos = optiManager.getPosition(1);
+				Vector3 currentPos = optiManager.getPosition(0);
 				
-				Quaternion currentOrient = optiManager.getOrientation(1);
+				Quaternion currentOrient = optiManager.getOrientation(0);
 				
 				if(currentPos != Vector3.zero)
 				{
@@ -103,7 +103,7 @@ public class OptiAirPenTut : Game
 							newTask();
 							setNewPositionAndOrientationTut();
 							if(score == 5)
-								completeText.enabled = true;
+								window = true;
 						}
 					}
 					prevPos = currentPos;
@@ -112,7 +112,7 @@ public class OptiAirPenTut : Game
 			else
 			{
 				pointer.renderer.material = yellow;
-				Debug.Log("not tracked");
+				//Debug.Log("not tracked");
 			}
 			
 			

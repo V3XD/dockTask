@@ -54,8 +54,9 @@ public class Phantom : Game
 	
 	protected override void atAwake ()
 	{
-		path = @"Log/"+difficulty.getLevel()+"/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+difficulty.getLevel()+"_Phantom.csv";
-		File.AppendAllText(path, "Time,Distance,Angle"+ Environment.NewLine);//save to file
+		path = folders.getPath()+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_Phantom.csv";
+		File.AppendAllText(path, "Time,Distance,Angle,Difficulty"+ Environment.NewLine);//save to file
+		selectLevel ();
 	}
 
 	protected override void atStart ()
@@ -68,6 +69,7 @@ public class Phantom : Game
 		if(isConnected)
 		{
 			getData ();
+			connectionMessage = "connected";
 			prevPos = new Vector3 ( (float)getPosX()*scale, 
 			                            (float)getPosY()*scale, 
 			                            -(float)getPosZ()*scale);
@@ -88,6 +90,7 @@ public class Phantom : Game
 		isConnected = getData ();
 		if(isConnected)
 		{
+			connectionMessage = "connected";
 			Vector3 newPos = new Vector3 ( (float)getPosX()*scale, 
 			                              (float)getPosY()*scale, 
 			                              -(float)getPosZ()*scale);
@@ -110,7 +113,9 @@ public class Phantom : Game
 			j3.transform.rotation = rotation;
 			
 			Vector3 penOrient = new Vector3(joints2.y, -joints2.x, -joints2.z);
-			rotation = Quaternion.Euler(joints2.y, -joints2.x, -joints2.z);
+
+			Vector3 fakeOrient = new Vector3 (penOrient.x, penOrient.y, 0f);
+			rotation = Quaternion.Euler(fakeOrient);
 			j4.transform.localRotation = rotation;
 			
 			Vector3 rotVec = penOrient - prevOrient;
@@ -141,8 +146,13 @@ public class Phantom : Game
 			{
 				newTask();
 				setNewPositionAndOrientation();
+				selectLevel();
+				if(score == 9)
+					window = true;
 			}
 		}
+		else
+			connectionMessage = "not connected";
 	}
 	
 	protected override void atEnd ()

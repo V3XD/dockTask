@@ -21,9 +21,10 @@ public class Fingers: Game
 
 	protected override void atAwake ()
 	{
-		path = @"Log/"+difficulty.getLevel()+"/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+difficulty.getLevel()+"_Finger.csv";
-		File.AppendAllText(path, "Time,Distance,Angle"+ Environment.NewLine);//save to file
+		path = folders.getPath()+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_Finger.csv";
+		File.AppendAllText(path, "Time,Distance,Angle,Difficulty"+ Environment.NewLine);//save to file
 		optiManager = OptiTrackManager.Instance;
+		selectLevel ();
 	}
 	
 	protected override void atStart ()
@@ -96,7 +97,6 @@ public class Fingers: Game
 		
 		if(bSuccess)
 		{
-			//Debug.Log(optiManager.getMarkerNum());
 			if(optiManager.getMarkerNum() == 3)
 			{
 				thumb.renderer.material = green;
@@ -167,7 +167,9 @@ public class Fingers: Game
 					{
 						newTask();
 						setNewPositionAndOrientation();
-
+						selectLevel();
+						if(score == 9)
+							window = true;
 					}
 				}
 				prevPos = currentPos;

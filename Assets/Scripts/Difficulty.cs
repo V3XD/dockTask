@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Difficulty : Singleton<Difficulty> {
+public class Difficulty : Singleton<Difficulty> 
+{
 	protected Difficulty () {} 
 
 	public float angle;//angle between quaternions

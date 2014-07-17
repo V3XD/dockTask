@@ -55,20 +55,21 @@ public class PhantomTut : Game
 	
 	protected override void atAwake ()
 	{
-		path = @"Log/tutorial/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+difficulty.getLevel()+"_Phantom.csv";
-		File.AppendAllText(path, "Time,Distance,Angle"+ Environment.NewLine);//save to file
+		path = folders.getPath()+@"tutorial/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_Phantom.csv";
+		File.AppendAllText(path, "Time,Distance,Angle,Difficulty"+ Environment.NewLine);//save to file
 		difficulty.setEasy ();
 	}
 
 	protected override void atStart ()
 	{
-
-		setNewPositionAndOrientation();
+		nextLevel = "phantomGrab";
+		setNewPositionAndOrientationTut();
 		pointer.renderer.enabled = true;
 
 		isConnected = initDevice ();
 		if(isConnected)
 		{
+			connectionMessage = "connected";
 			getData ();
 			prevPos = new Vector3 ( (float)getPosX()*scale, 
 			                            (float)getPosY()*scale, 
@@ -96,6 +97,7 @@ public class PhantomTut : Game
 		isConnected = getData ();
 		if(isConnected)
 		{
+			connectionMessage = "connected";
 			Vector3 newPos = new Vector3 ( (float)getPosX()*scale, 
 			                              (float)getPosY()*scale, 
 			                              -(float)getPosZ()*scale);
@@ -116,9 +118,11 @@ public class PhantomTut : Game
 			j2.transform.rotation = rotation;
 			rotation = Quaternion.Euler(joints.z, joints.x, 0f);
 			j3.transform.rotation = rotation;
-			
+
 			Vector3 penOrient = new Vector3(joints2.y, -joints2.x, -joints2.z);
-			rotation = Quaternion.Euler(joints2.y, -joints2.x, -joints2.z);
+			
+			Vector3 fakeOrient = new Vector3 (penOrient.x, penOrient.y, 0f);
+			rotation = Quaternion.Euler(fakeOrient);
 			j4.transform.localRotation = rotation;
 			
 			Vector3 rotVec = penOrient - prevOrient;
@@ -147,11 +151,13 @@ public class PhantomTut : Game
 			if(isDocked && !grab)
 			{
 				newTask();
-				setNewPositionAndOrientation();
+				setNewPositionAndOrientationTut();
 				if(score == 5)
-					completeText.enabled = true;
+					window = true;
 			}
 		}
+		else
+			connectionMessage = "not connected";
 	}
 	
 	protected override void atEnd ()
