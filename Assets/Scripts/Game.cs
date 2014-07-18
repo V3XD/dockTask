@@ -42,7 +42,7 @@ public class Game : MonoBehaviour
 
 	void OnGUI ()
 	{
-		GUI.Box (new Rect (0,0,150,70), "<size=20>"+info + "\n" + message + "\n" +difficulty.getLevel () + "</size>");
+		GUI.Box (new Rect (0,0,150,80), "<size=20>"+info + "\n" + message + "\n" +difficulty.getLevel () + "</size>");
 		
 		GUI.Box (new Rect (UnityEngine.Screen.width - 120,0,120,80), "<size=20>Score: " + score +
 		         "\nTime: " + (int)(Time.time - prevTotalTime) +"\nPrev: " + ((int)prevTime).ToString()+"</size>");
@@ -92,6 +92,11 @@ public class Game : MonoBehaviour
 			if( (int)(Time.time - prevTotalTime) > 1)
 				pointText.enabled = false;
 		}
+
+		if (window)
+			UnityEngine.Screen.showCursor = true;
+		else
+			UnityEngine.Screen.showCursor = false;
 
 		gameBehavior ();
 
@@ -178,7 +183,7 @@ public class Game : MonoBehaviour
 		target.transform.rotation = UnityEngine.Random.rotation;
 		cursor.transform.position = new Vector3 (UnityEngine.Random.Range(-xMax, xMax),
 		                                         UnityEngine.Random.Range(4.0F, yMax),
-		                                         UnityEngine.Random.Range(-zMax, zMax));
+		                                         UnityEngine.Random.Range(-zMax+2.5f, zMax));
 	}
 
 	protected void setNewPositionAndOrientationTut()

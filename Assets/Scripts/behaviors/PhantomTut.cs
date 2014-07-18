@@ -55,7 +55,7 @@ public class PhantomTut : Game
 	
 	protected override void atAwake ()
 	{
-		path = folders.getPath()+@"tutorial/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_Phantom.csv";
+		path = folders.getPath()+@"tutorial/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_PhantomTut.csv";
 		File.AppendAllText(path, "Time,Distance,Angle,Difficulty"+ Environment.NewLine);//save to file
 		difficulty.setEasy ();
 	}
