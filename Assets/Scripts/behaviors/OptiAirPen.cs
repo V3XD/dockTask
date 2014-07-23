@@ -10,8 +10,6 @@ public class OptiAirPen : Game
 
 	bool action = false;
 	Vector3 prevOrient = new Vector3();
-	public GameObject pen;
-	public Material brown;
 
 	protected override void atAwake ()
 	{
@@ -105,12 +103,6 @@ public class OptiAirPen : Game
 					prevPos = currentPos;
 				//}
 			}
-			else
-			{
-				pen.renderer.material = brown;
-			}
-			
-			
 		}
 	}
 	
