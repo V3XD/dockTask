@@ -13,7 +13,6 @@ public class FingersTut: Game
 	public GameObject ring;
 	public GameObject axis;
 	public GameObject trail;
-	public GUIText completeText;
 	public GUIText instructionsText;
 
 	OptiCalibration calibration;
@@ -21,6 +20,7 @@ public class FingersTut: Game
 	bool rotate = false;
 	Vector3 prevPinch = new Vector3 ();
 	bool isCalibrated = false;
+	bool isGrabSet = false;
 	float maxDist = 0;
 
 	protected override void atAwake ()
@@ -55,12 +55,6 @@ public class FingersTut: Game
 			prevTotalTime = Time.time;
 		}
 
-		if (completeText.enabled ) 
-		{
-			if( (int)(Time.time - prevTotalTime) > 2)
-				completeText.enabled  = false;
-		}
-		
 		if(translate)
 		{
 			rotate = false;
@@ -133,32 +127,59 @@ public class FingersTut: Game
 				index.transform.position = indexPos; 
 				ring.transform.position = ringPos;
 
+				float aveDist = (thumbToIndex + thumbToRing + indexToRing)*0.33f;
+
+				Debug.Log(aveDist + " " + thumbToIndex + " " + thumbToRing + " " +indexToRing);
+
 				if(!isCalibrated)
 				{
 					int count = (int)(Time.time - prevTotalTime);
-					instructionsText.text = "Grab "+ (10-count).ToString();
-					if( count > 5)
+					if(!isGrabSet)
 					{
-						instructionsText.material.color = Color.white;
-						if(thumbToIndex > maxDist)
-							maxDist = thumbToIndex;
-						if(thumbToRing > maxDist)
-							maxDist = thumbToRing;
-						if(indexToRing > maxDist)
-							maxDist = indexToRing;
-					}
-					
-					if( count > 10)
-					{
-						instructionsText.enabled = false;
-						isCalibrated = true;
+						instructionsText.text = "Grab "+ (10-count).ToString();
+						if( count > 5)
+						{
+							instructionsText.material.color = Color.white;
+							if(aveDist > maxDist)
+								maxDist = aveDist;
+						}
 						
-						calibration.setTouchDist(maxDist);
-						//Debug.Log("************ "+calibration.touchDist +" " + calibration.minDist);
-						prevTotalTime = Time.time;
+						if( count > 10)
+						{
+							isGrabSet = true;
+							
+							calibration.setAveDist (maxDist);
+							maxDist = 100;
+							prevTotalTime = Time.time;
+							instructionsText.material.color = Color.gray;
+						}
 					}
+					else
+					{
+						instructionsText.text = "Pinch "+ (10-count).ToString();
+						if( count > 5)
+						{
+							instructionsText.material.color = Color.white;
+							if(thumbToIndex < maxDist)
+								maxDist = thumbToIndex;
+							if(thumbToRing < maxDist)
+								maxDist = thumbToRing;
+							if(indexToRing < maxDist)
+								maxDist = indexToRing;
+						}
+						
+						if( count > 10)
+						{
+							instructionsText.enabled = false;
+							isCalibrated = true;
+							
+							calibration.setTouchDist(maxDist);
+							prevTotalTime = Time.time;
+						}
+					}
+
 				}
-				else if(thumbToIndex < calibration.touchDist && thumbToRing < calibration.touchDist && indexToRing < calibration.touchDist)
+				else if(aveDist <= calibration.ave)
 				{
 					translate = true;
 					
@@ -167,9 +188,9 @@ public class FingersTut: Game
 					                                         Mathf.Clamp(cursor.transform.position.y, 3.0f, yMax),
 					                                         Mathf.Clamp(cursor.transform.position.z, -zMax, zMax));
 				}
-				else if((thumbToIndex < calibration.touchDist && thumbToRing > calibration.minDist && indexToRing > calibration.minDist) ||
-				        (thumbToIndex > calibration.minDist && thumbToRing < calibration.touchDist && indexToRing > calibration.minDist) ||
-				        (thumbToIndex > calibration.minDist && thumbToRing > calibration.minDist && indexToRing < calibration.touchDist))
+				else if((thumbToIndex <= calibration.touchDist ||
+				        thumbToRing <= calibration.touchDist ||
+				         indexToRing <= calibration.touchDist) && aveDist > calibration.minDist)
 				{
 					rotate = true;
 					Vector3 pointerPos = new Vector3();
@@ -196,7 +217,7 @@ public class FingersTut: Game
 					index.renderer.enabled = true;
 					thumb.renderer.enabled = true;
 					ring.renderer.enabled = true;
-					info = "hold";
+					info = "";
 					pointer.transform.position = currentPos;
 					
 					if(isDocked)

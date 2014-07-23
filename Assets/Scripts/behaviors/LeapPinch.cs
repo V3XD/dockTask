@@ -4,75 +4,42 @@ using System.Collections;
 using Leap;
 using System.IO;
 
-public class LeapPinch : MonoBehaviour 
+public class LeapPinch : Game 
 {
-	
-	public GameObject fingerObj;
-	public GameObject cursor;
-	public GameObject target;
-	public Material green;
-	public Material yellow;
-	public Material red;
-	public Light camLight;
 	public GameObject axis;
-	public GameObject sphere;
 	public GameObject trail;
-	public GUIText pointText;
-	public Camera secondCamera;
-	public GameObject rotAxis;
-	public AudioClip popSound;
-	public AudioSource popSource;
-	public AudioSource ambientSource;
-	//public GUIText keysText;
+
 	public GameObject indexObj;
+	public GameObject thumbObj;
 
 	private Controller mController;
 	private Frame mLastFrame;
-	static float scale = 0.10F;
 	bool rotate;
 	bool translate;
-	bool isDocked;
-	private int score;
-	private string connectionMessage="not connected";
-	private string message="";
-	private string info="";
-	private int prevTime;
-	private int prevTotalTime;
 	private Frame frame;
-	static float xMax = 15.0f;
-	static float yMax = 15.0f;
-	static float zMax = 15.0f;
-	string path;
-	bool updateCam;
 	Vector3 fingerDir;
-	Difficulty difficulty;
-//	bool locked;
-	bool mute;
+
 	Vector3 prevPinch = new Vector3 ();
 	static float chairRadius = 5f;
+	static float scale = 0.1f;
 
-	void Awake ()
+	protected override void atAwake ()
 	{
-		difficulty = Difficulty.Instance;
 		mController = new Controller();
-		path = @"Log/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+difficulty.getLevel()+"_LeapPinch.csv";
-		UnityEngine.Screen.showCursor = false;
+		path = folders.getPath()+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_LeapPinch.csv";
+		File.AppendAllText(path, "Time,Distance,Angle,Difficulty"+ Environment.NewLine);//save to file
+		selectLevel ();
 	}
 	
-	void Start ()
+	protected override void atStart ()
 	{
-//		locked = true;
 		mLastFrame = new Frame();
 		frame = new Frame();
 		rotate = false;
 		isDocked = false;
 		translate = false;
-		updateCam = false;
-		score = 0;
-		prevTime = 0;
 		prevTotalTime = (int)Time.time;
 		setNewPositionAndOrientation();
-		mute = false;
 
 		if(mController.IsConnected)
 		{
@@ -81,94 +48,56 @@ public class LeapPinch : MonoBehaviour
 		}
 	}
 	
-	void OnGUI()
+	protected override void gameBehavior ()
 	{
-		GUI.Box (new Rect (0,0,150,60), "<size=20>"+info + "\n" + message + "\n" +"</size>");
-		
-		GUI.Box (new Rect (UnityEngine.Screen.width - 120,0,120,80), "<size=20>Score: " + score +
-		         "\nTime: " + ((int)Time.time - prevTotalTime) +"\nPrev: " + prevTime+"</size>");
-		GUI.Box (new Rect (UnityEngine.Screen.width - 150,UnityEngine.Screen.height - 30, 150, 30), "<size=18>"+connectionMessage+"</size>");
-	}
 	
-	void Update ()
-	{
-		if (Input.GetKey(KeyCode.Escape))
-			Application.LoadLevel("MainMenu");
-		else if (Input.GetKeyUp (KeyCode.S))
+		if (Input.GetKeyUp (KeyCode.S))
 		{
 			setNewPositionAndOrientation();
 			prevTotalTime = (int)Time.time;
 		}
-		else if(Input.GetKeyDown (KeyCode.P))
-		{
-			Application.CaptureScreenshot(@"Log/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_Screenshot.png");
-			Debug.Log("print");
-		}
-		/*else if (Input.GetKeyUp (KeyCode.LeftControl) || Input.GetKeyUp (KeyCode.RightControl))
-		{
-			rotate = false;
-			info = "hold";
-		}
-		else if(Input.GetKeyDown (KeyCode.LeftControl) || Input.GetKeyDown (KeyCode.RightControl))
-		{
-			rotate = true;
-			translate = false;
-		}*/
 
-		/*if(Input.GetKeyUp (KeyCode.L))
-		{
-			locked = !locked;
-			if(locked)
-				keysText.text = "[CTRL] rotate [S] skip [L] unlock";
-			else			
-				keysText.text = "[CTRL] rotate [S] skip [L] lock";
-		}*/
-
-		if(Input.GetKeyUp (KeyCode.M))
-		{
-			if(!mute)
-			{
-				mute = true;
-				ambientSource.volume = 0f;
-			}
-			else
-				mute = false;
-		}
-
-		if (pointText.enabled) 
-		{
-			if( ((int)Time.time - prevTotalTime) > 1)
-				pointText.enabled = false;
-		}
-		
 		if(translate)
 		{
+			rotate = false;
+			pointer.GetComponent<AudioSource>().mute = true;
 			info = "translate";
 			axis.transform.position = cursor.transform.position;
 			foreach(Transform child in axis.transform) 
 			{
 				child.renderer.enabled = true;
 			}
+			indexObj.renderer.enabled = false;
+			thumbObj.renderer.enabled = false;
 		}
 		else
 		{	
+			//pointer.GetComponent<AudioSource>().mute = false;
 			foreach(Transform child in axis.transform) 
 			{
 				child.renderer.enabled = false;
 			}
+			
 		}
 		
 		if(rotate)
 		{
-			info = "rotate";	
+			info = "rotate";
+			translate = false;
+			pointer.renderer.enabled = true;
+			trail.GetComponent<TrailRenderer>().enabled = true;
+			indexObj.renderer.enabled = false;
+			thumbObj.renderer.enabled = false;
+			cursor.renderer.enabled = true;
+			
 		}
 		else
 		{	
-			sphere.renderer.enabled = false;
+			cursor.renderer.enabled = false;
 			trail.GetComponent<TrailRenderer>().enabled = false;
+			prevPinch = new Vector3 ();
+			pointer.renderer.enabled = false;
 		}
-		
-		updateCam = false;
 		if (mController.IsConnected)
 		{
 			connectionMessage = "Connected";
@@ -217,7 +146,7 @@ public class LeapPinch : MonoBehaviour
 					Vector3 clampedThumb = new Vector3 (Mathf.Clamp(thumbPos.x, cursor.transform.position.x-chairRadius, cursor.transform.position.x+chairRadius),
 					                                   Mathf.Clamp(thumbPos.y, cursor.transform.position.y-chairRadius, cursor.transform.position.y+chairRadius),
 					                                   Mathf.Clamp(thumbPos.z, cursor.transform.position.z-chairRadius, cursor.transform.position.z+chairRadius));
-					fingerObj.transform.position = clampedThumb;
+					thumbObj.transform.position = clampedThumb;
 
 					Vector3 clampedIndex = new Vector3 (Mathf.Clamp(indexPos.x, cursor.transform.position.x-chairRadius, cursor.transform.position.x+chairRadius),
 					                                    Mathf.Clamp(indexPos.y, cursor.transform.position.y-chairRadius, cursor.transform.position.y+chairRadius),
@@ -229,11 +158,10 @@ public class LeapPinch : MonoBehaviour
 					to.Normalize();
 
 					Debug.Log(firstHand.PinchStrength + " grab "+firstHand.GrabStrength + " dist " +thumbToIndex);
+					pointer.transform.position = (clampedThumb+clampedIndex)*0.5f;
 
 					if(firstHand.GrabStrength == 1f)//translation
 					{
-						fingerObj.renderer.enabled = false;
-						indexObj.renderer.enabled = false;
 						rotate = false;
 						translate = true;
 
@@ -251,23 +179,13 @@ public class LeapPinch : MonoBehaviour
 					}
 					else if(thumbToIndex < 3.5f)//~rotation//if(firstHand.PinchStrength > 0.2f)//~rotation
 					{
-						fingerObj.renderer.enabled = true;
-						indexObj.renderer.enabled = true;
-
-						//fingerObj.renderer.material = yellow;
-						indexObj.renderer.material =  green;
 						translate = false;	
-						updateCam = true;
 						rotate = true;
 						
-						fingerObj.renderer.material = green;
-						sphere.transform.position = cursor.transform.position;
-						sphere.renderer.enabled = true;
-						
+						//pointer.renderer.material = green;
+							
 						//if(frame.TranslationProbability(mLastFrame) > 0.60)
 						//{
-							trail.GetComponent<TrailRenderer>().enabled = true;
-							
 							
 							Vector3 axisVec = Vector3.Cross(prevPinch, to);
 							cursor.transform.RotateAround(cursor.transform.position, axisVec, Vector3.Angle(prevPinch, to));
@@ -279,24 +197,19 @@ public class LeapPinch : MonoBehaviour
 					{
 
 						info = "hold";
-
-						updateCam = true;
-						fingerObj.renderer.material = yellow;
-						fingerObj.renderer.enabled = true;
 						indexObj.renderer.enabled = true;
-						indexObj.renderer.material = yellow;
+						thumbObj.renderer.enabled = true;
+						//indexObj.renderer.material = yellow;
 						rotate = false;
 						translate = false;
 
 						if(isDocked)
 						{
-							popSource.PlayOneShot(popSound);
+							newTask();
 							setNewPositionAndOrientation();
-							prevTime = (int)Time.time - prevTotalTime;
-							prevTotalTime = (int)Time.time;
-							pointText.enabled = true;
-							score++;
-							File.AppendAllText(path, prevTime.ToString()+ Environment.NewLine);//save to file
+							selectLevel();
+							if(score == 9)
+								window = true;
 						}
 					}
 
@@ -306,102 +219,10 @@ public class LeapPinch : MonoBehaviour
 			}
 		}else
 			connectionMessage = "Not connected";
-		evaluateDock();
-	}
-	void LateUpdate()
-	{
-		if(updateCam)
-		{
-			Vector3 camPos = new Vector3();
-			Vector3 axisVec = new Vector3(0f, 0f, 1f);
-			float angle = Vector3.Angle(axisVec, fingerDir);
-			if(angle <= 45f)
-			{
-				camPos = axisVec;
-			}
-			else
-			{
-				axisVec = new Vector3(-1f, 0f, 0f);
-				angle = Vector3.Angle(axisVec, fingerDir);
-				if(angle <= 45f)
-				{
-					camPos = axisVec;
-				}
-				else
-				{
-					axisVec = new Vector3(1f, 0f, 0f);
-					angle = Vector3.Angle(axisVec, fingerDir);
-					if(angle <= 45f)
-					{
-						camPos = axisVec;
-					}
-					else
-					{
-						axisVec = new Vector3(0f, 0f, -1f);
-						angle = Vector3.Angle(axisVec, fingerDir);
-						if(angle <= 45f)
-						{
-							camPos = axisVec;
-						}
-						else
-							camPos = new Vector3(0f, 0f, 1f);
-					}
-				}
-			}
-			camPos = camPos*-15f;
-			camPos.y = 10f;
-			
-			secondCamera.transform.position = camPos;
-			secondCamera.transform.LookAt(target.transform.position);
-		}
 	}
 	
-	void OnDestroy() 
+	protected override void atEnd ()
 	{
 		mController.Dispose();
-	}
-	
-	void setNewPositionAndOrientation()
-	{
-		cursor.transform.rotation = UnityEngine.Random.rotation;
-		//target.transform.rotation = UnityEngine.Random.rotation;
-		cursor.transform.position = new Vector3 (UnityEngine.Random.Range(-xMax, xMax),
-		                                         UnityEngine.Random.Range(4.0F, yMax),
-		                                         UnityEngine.Random.Range(-zMax, zMax));
-	}
-	
-	void evaluateDock()
-	{
-		Quaternion targetQ = target.transform.rotation;
-		Quaternion cursorQ = cursor.transform.rotation;
-		Vector3 targetV = target.transform.position;
-		Vector3 cursorV = cursor.transform.position;
-		float distance = (targetV - cursorV).magnitude;
-		float angle = Quaternion.Angle(cursorQ, targetQ);
-
-		if(!mute)
-			ambientSource.volume = 1f-(angle / 180f);
-		
-		if ((angle <= difficulty.angle) && (distance < difficulty.distance)) 
-		{	
-			isDocked = true;
-			camLight.intensity = 4.0f;
-			message= "Target docked!";
-		}
-		else
-		{
-			isDocked=false;
-			camLight.intensity = 1.0f;
-			message= "";
-		}
-
-		if (angle <= difficulty.angle)
-		{	
-			sphere.renderer.material = green;
-		}
-		else
-		{
-			sphere.renderer.material = yellow;
-		}
 	}
 }

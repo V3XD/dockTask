@@ -11,7 +11,8 @@ public class OptiAirPenTut : Game
 
 	bool action = false;
 	Vector3 prevOrient = new Vector3();
-	public GUIText completeText;
+	public GameObject pen;
+	public Material brown;
 
 	protected override void atAwake ()
 	{
@@ -53,12 +54,6 @@ public class OptiAirPenTut : Game
 			info = "free";
 		}
 
-		if (completeText.enabled ) 
-		{
-			if( (int)(Time.time - prevTotalTime) > 2)
-				completeText.enabled  = false;
-		}
-
 		if(bSuccess)
 		{
 			if(optiManager.getRigidBodyNum() >= 1)
@@ -67,8 +62,8 @@ public class OptiAirPenTut : Game
 				
 				Quaternion currentOrient = optiManager.getOrientation(0);
 				
-				if(currentPos != Vector3.zero)
-				{
+				//if(currentPos != Vector3.zero)
+				//{
 					Vector3 transVec = currentPos - prevPos;
 					
 					Vector3 penOrient = currentOrient.eulerAngles;
@@ -107,12 +102,11 @@ public class OptiAirPenTut : Game
 						}
 					}
 					prevPos = currentPos;
-				}
+				//}
 			}
 			else
 			{
-				pointer.renderer.material = yellow;
-				//Debug.Log("not tracked");
+				pen.renderer.material = brown;
 			}
 			
 			

@@ -9,7 +9,7 @@ public class ChairTut: Game
 	bool bSuccess;
 
 	bool action = false;
-	public GUIText completeText;
+	public GameObject trackedObj;
 
 	protected override void atAwake ()
 	{
@@ -25,7 +25,7 @@ public class ChairTut: Game
 
 		setNewPositionAndOrientationTut();
 		pointer.renderer.enabled = true;
-		info = "hold";
+		info = "";
 		nextLevel = "optiChair";
 
 		if (bSuccess) 
@@ -45,7 +45,7 @@ public class ChairTut: Game
 		if (Input.GetKeyUp (KeyCode.LeftControl) || Input.GetKeyUp (KeyCode.RightControl))
 		{
 			action = false;
-			info = "hold";
+			info = "";
 			
 		}
 		else if(Input.GetKeyDown (KeyCode.LeftControl) || Input.GetKeyDown (KeyCode.RightControl))
@@ -54,25 +54,22 @@ public class ChairTut: Game
 			info = "translate";
 		}
 
-		if (completeText.enabled ) 
-		{
-			if( (int)(Time.time - prevTotalTime) > 2)
-				completeText.enabled  = false;
-		}
-		
+
 		if(bSuccess)
 		{
 			if(optiManager.getRigidBodyNum() >= 1)
 			{
 				//info = "";
+
 				Vector3 currentPos = optiManager.getPosition(0);
 				
 				Quaternion currentOrient = optiManager.getOrientation(0);
 				
 				Vector3 transVec = currentPos - prevPos;
 				
-				if(currentPos != Vector3.zero)
-				{
+				//if(currentPos != Vector3.zero)
+				//{
+					trackedObj.renderer.enabled = false;
 					if(action)
 					{
 						cursor.transform.Translate (transVec, Space.World);
@@ -90,13 +87,12 @@ public class ChairTut: Game
 					
 					cursor.transform.rotation = currentOrient;
 					prevPos = currentPos;
-				}
+				//}
 			}
-			/*else
+			else
 			{
-				info = "not tracked";
-				//Debug.Log("not tracked");
-			}*/
+				trackedObj.renderer.enabled = true;
+			}
 			
 			
 		}

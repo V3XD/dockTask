@@ -36,19 +36,21 @@ public class Game : MonoBehaviour
 	bool mute = false;
 	protected float distance = 0;
 	protected float angle = 0;
-	public bool window = false;
+	protected bool window = false;
 	protected Folders folders;
 	protected string nextLevel = "MainMenu";
+	float maxTime = 60f;
+	bool updateCam = true;
 
 	void OnGUI ()
 	{
-		GUI.Box (new Rect (0,0,150,80), "<size=20>"+info + "\n" + message + "\n" +difficulty.getLevel () + "</size>");
+		GUI.Box (new Rect (0,0,165,100), "<size=24>"+info + "\n" + message + "\n" +difficulty.getLevel () + "</size>");
 		
-		GUI.Box (new Rect (UnityEngine.Screen.width - 120,0,120,80), "<size=20>Score: " + score +
+		GUI.Box (new Rect (UnityEngine.Screen.width - 150,0,150,100), "<size=24>Score: " + score +
 		         "\nTime: " + (int)(Time.time - prevTotalTime) +"\nPrev: " + ((int)prevTime).ToString()+"</size>");
 		GUI.Box (new Rect (UnityEngine.Screen.width - 150,UnityEngine.Screen.height - 30, 150, 30), "<size=18>"+connectionMessage+"</size>");
 		if (window)
-			GUI.Window(0, new Rect(UnityEngine.Screen.height*0.5f, UnityEngine.Screen.height*0.5f, 210, 80), DoWindow, "<size=18>Complete</size>");
+			GUI.Window(0, new Rect((UnityEngine.Screen.width*0.5f)-105, (UnityEngine.Screen.height*0.5f)-50, 210, 100), DoWindow, "<size=24>Complete</size>");
 	}
 	
 	void Awake ()
@@ -74,7 +76,12 @@ public class Game : MonoBehaviour
 		{
 			Application.CaptureScreenshot(folders.getPath()+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_Screenshot.png");
 		}
-		
+
+		if(Input.GetKeyUp (KeyCode.F))
+		{
+			updateCam = !updateCam;
+		}
+
 		if(Input.GetKeyUp (KeyCode.M))
 		{
 			if(!mute)
@@ -96,81 +103,83 @@ public class Game : MonoBehaviour
 		if (window)
 			UnityEngine.Screen.showCursor = true;
 		else
+		{
 			UnityEngine.Screen.showCursor = false;
-
-		gameBehavior ();
+			gameBehavior ();
+		}
 
 		evaluateDock ();
 	}
 
 	void LateUpdate()
 	{
-		Vector3 camPos = new Vector3();
-		Vector3 axisVec = dummy.transform.TransformDirection (Vector3.forward);
-		Vector3 pointerDir = target.transform.position - pointer.transform.position;
-		pointerDir.Normalize();
-		float angle = Vector3.Angle(axisVec, pointerDir);
-
-//		Debug.Log (pointerDir+" "+angle+" "+axisVec);
-
-		if(angle <= 45f)
+		if (updateCam)
 		{
-			camPos = Vector3.forward;
-			camPos = camPos*-15f;
-			camPos.y = 10f;
-		}
-		else
-		{
-			axisVec = dummy.transform.TransformDirection (Vector3.right);
-			angle = Vector3.Angle(axisVec, pointerDir);
+			Vector3 camPos = new Vector3();
+			Vector3 axisVec = dummy.transform.TransformDirection (Vector3.forward);
+			Vector3 pointerDir = target.transform.position - pointer.transform.position;
+			pointerDir.Normalize();
+			float angle = Vector3.Angle(axisVec, pointerDir);
+
 			if(angle <= 45f)
 			{
-				camPos = Vector3.right;
+				camPos = Vector3.forward;
 				camPos = camPos*-15f;
 				camPos.y = 10f;
 			}
 			else
 			{
-				axisVec = dummy.transform.TransformDirection (Vector3.left);
+				axisVec = dummy.transform.TransformDirection (Vector3.right);
 				angle = Vector3.Angle(axisVec, pointerDir);
 				if(angle <= 45f)
 				{
-					camPos = Vector3.left;
+					camPos = Vector3.right;
 					camPos = camPos*-15f;
 					camPos.y = 10f;
 				}
 				else
 				{
-					axisVec = dummy.transform.TransformDirection (Vector3.back);
+					axisVec = dummy.transform.TransformDirection (Vector3.left);
 					angle = Vector3.Angle(axisVec, pointerDir);
 					if(angle <= 45f)
 					{
-						camPos = Vector3.back;
+						camPos = Vector3.left;
 						camPos = camPos*-15f;
 						camPos.y = 10f;
 					}
 					else
 					{
-						axisVec = dummy.transform.TransformDirection (Vector3.down);
+						axisVec = dummy.transform.TransformDirection (Vector3.back);
 						angle = Vector3.Angle(axisVec, pointerDir);
 						if(angle <= 45f)
 						{
-							camPos = Vector3.down;
+							camPos = Vector3.back;
 							camPos = camPos*-15f;
+							camPos.y = 10f;
 						}
 						else
 						{
-							axisVec = dummy.transform.TransformDirection (Vector3.up);
+							axisVec = dummy.transform.TransformDirection (Vector3.down);
 							angle = Vector3.Angle(axisVec, pointerDir);
-							camPos = Vector3.up;
+							if(angle <= 45f)
+							{
+								camPos = Vector3.down;
+								camPos = camPos*-15f;
+							}
+							else
+							{
+								axisVec = dummy.transform.TransformDirection (Vector3.up);
+								angle = Vector3.Angle(axisVec, pointerDir);
+								camPos = Vector3.up;
+							}
 						}
 					}
 				}
 			}
-		}
 
-		secondCamera.transform.position = camPos;
-		secondCamera.transform.LookAt(target.transform.position);
+			secondCamera.transform.position = camPos;
+			secondCamera.transform.LookAt(target.transform.position);
+		}
 	}
 
 	void OnDestroy () 
@@ -180,7 +189,8 @@ public class Game : MonoBehaviour
 	
 	protected void setNewPositionAndOrientation()
 	{
-		target.transform.rotation = UnityEngine.Random.rotation;
+		setRotation ();
+		//target.transform.rotation = UnityEngine.Random.rotation;
 		cursor.transform.position = new Vector3 (UnityEngine.Random.Range(-xMax, xMax),
 		                                         UnityEngine.Random.Range(4.0F, yMax),
 		                                         UnityEngine.Random.Range(-zMax+2.5f, zMax));
@@ -211,7 +221,8 @@ public class Game : MonoBehaviour
 				break;
 				//practise docking
 			default:
-				target.transform.rotation = UnityEngine.Random.rotation;
+				setRotation ();
+				//target.transform.rotation = UnityEngine.Random.rotation;
 				break;
 		}
 		cursor.transform.position = new Vector3 (UnityEngine.Random.Range(-xMax, xMax),
@@ -255,12 +266,16 @@ public class Game : MonoBehaviour
 
 	protected void newTask()
 	{
+		float tmpTime = Time.time - prevTotalTime;
 		popSource.PlayOneShot(popSound);
-		prevTime = Time.time - prevTotalTime;
 		prevTotalTime = Time.time;
 		pointText.enabled = true;
-		File.AppendAllText(path, prevTime.ToString()+","+distance.ToString()+","+angle.ToString()+ ","+difficulty.getLevel()+Environment.NewLine);//save to file
-		score++;
+		//if(tmpTime < maxTime)
+		//{
+			prevTime = tmpTime;
+			File.AppendAllText(path, prevTime.ToString()+","+distance.ToString()+","+angle.ToString()+ ","+difficulty.getLevel()+Environment.NewLine);//save to file
+			score++;
+		//}
 	}
 
 	protected void selectLevel()
@@ -301,16 +316,31 @@ public class Game : MonoBehaviour
 	}
 	void DoWindow(int windowID)
 	{
-		if (GUI.Button (new Rect (10, 35, 90, 30), "<size=16>Continue</size>"))
+		/*if (GUI.Button (new Rect (10, 40, 95, 30), "<size=20>Continue</size>"))
 		{
 			window = false;
+			prevTotalTime = Time.time;
 		}
-		else if (GUI.Button(new Rect(110, 35, 95, 30), "<size=16>Next</size>"))
+		else if (GUI.Button(new Rect(110, 40, 95, 30), "<size=20>Next</size>"))
+		{
+			Application.LoadLevel(nextLevel);
+		}*/
+		if (GUI.Button(new Rect(50, 45, 95, 30), "<size=20>Next</size>"))
 		{
 			Application.LoadLevel(nextLevel);
 		}
 	}
 
+	void setRotation ()
+	{ 
+		float angle = 0f;
+		do
+		{
+			target.transform.rotation = UnityEngine.Random.rotation;
+			angle = Vector3.Angle(target.transform.up, Vector3.down);
+		}while(angle < 60f);
+
+	}
 
 	protected virtual void gameBehavior ()
 	{

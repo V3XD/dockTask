@@ -9,6 +9,7 @@ public class Chair: Game
 	bool bSuccess = false;
 
 	bool action = false;
+	public GameObject trackedObj;
 
 	protected override void atAwake ()
 	{
@@ -23,7 +24,7 @@ public class Chair: Game
 		bSuccess = optiManager.isConnected ();
 		setNewPositionAndOrientation();
 		pointer.renderer.enabled = true;
-		info = "hold";
+		info = "";
 
 		if (bSuccess) 
 		{
@@ -42,7 +43,7 @@ public class Chair: Game
 		if (Input.GetKeyUp (KeyCode.LeftControl) || Input.GetKeyUp (KeyCode.RightControl))
 		{
 			action = false;
-			info = "hold";
+			info = "";
 			
 		}
 		else if(Input.GetKeyDown (KeyCode.LeftControl) || Input.GetKeyDown (KeyCode.RightControl))
@@ -57,14 +58,17 @@ public class Chair: Game
 			if(optiManager.getRigidBodyNum() >= 1)
 			{
 				//info = "";
+
 				Vector3 currentPos = optiManager.getPosition(0);
 
 				Quaternion currentOrient = optiManager.getOrientation(0);
 
 				Vector3 transVec = currentPos - prevPos;
-				
-				if(currentPos != Vector3.zero)
-				{
+				Debug.Log(currentPos);
+
+				//if(currentPos != Vector3.zero)
+				//{
+					trackedObj.renderer.enabled = false;
 					if(action)
 					{
 						cursor.transform.Translate (transVec, Space.World);
@@ -83,13 +87,16 @@ public class Chair: Game
 
 					cursor.transform.rotation = currentOrient;
 					prevPos = currentPos;
-				}
+				/*}
+				else
+				{
+					trackedObj.renderer.enabled = true;
+				}*/
 			}
-			/*else
+			else
 			{
-				info = "not tracked";
-				//Debug.Log("not tracked");
-			}*/
+				trackedObj.renderer.enabled = true;
+			}
 			
 			
 		}

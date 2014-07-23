@@ -178,12 +178,6 @@ namespace OptitrackManagement
 				}
 				
 				// Other Markers - All 3D points that were triangulated but not labeled for the given frame.
-				/*Buffer.BlockCopy(b, offset, iData, 0, 4); offset += 4;
-				_strFrameLog += String.Format("Other Markers : {0}\n", iData[0]);
-				nBytes = iData[0] * 3 * 4;
-				Buffer.BlockCopy(b, offset, fData, 0, nBytes); offset += nBytes; */
-
-
 				Buffer.BlockCopy(b, offset, iData, 0, 4); offset += 4;
 				int nOtherMarkers = iData[0];
 				_strFrameLog += String.Format("Other Markers : {0}\n", iData[0]);

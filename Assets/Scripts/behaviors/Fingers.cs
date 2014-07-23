@@ -66,7 +66,7 @@ public class Fingers: Game
 		}
 		else
 		{	
-			pointer.GetComponent<AudioSource>().mute = false;
+			//pointer.GetComponent<AudioSource>().mute = false;
 			foreach(Transform child in axis.transform) 
 			{
 				child.renderer.enabled = false;
@@ -122,7 +122,9 @@ public class Fingers: Game
 				index.transform.position = indexPos; 
 				ring.transform.position = ringPos;
 
-				if(thumbToIndex < calibration.touchDist && thumbToRing < calibration.touchDist && indexToRing < calibration.touchDist)
+				float aveDist = (thumbToIndex + thumbToRing + indexToRing)*0.33f;
+
+				if(aveDist <= calibration.ave)
 				{
 					translate = true;
 					
@@ -131,9 +133,9 @@ public class Fingers: Game
 					                                         Mathf.Clamp(cursor.transform.position.y, 3.0f, yMax),
 					                                         Mathf.Clamp(cursor.transform.position.z, -zMax, zMax));
 				}
-				else if((thumbToIndex < calibration.touchDist && thumbToRing > calibration.minDist && indexToRing > calibration.minDist) ||
-				        (thumbToIndex > calibration.minDist && thumbToRing < calibration.touchDist && indexToRing > calibration.minDist) ||
-				        (thumbToIndex > calibration.minDist && thumbToRing > calibration.minDist && indexToRing < calibration.touchDist))
+				else if( (thumbToIndex <= calibration.touchDist ||
+				        thumbToRing <= calibration.touchDist ||
+				        indexToRing <= calibration.touchDist) && aveDist > calibration.minDist)
 				{
 					rotate = true;
 					Vector3 pointerPos = new Vector3();
@@ -160,7 +162,7 @@ public class Fingers: Game
 					index.renderer.enabled = true;
 					thumb.renderer.enabled = true;
 					ring.renderer.enabled = true;
-					info = "hold";
+					info = "";
 					pointer.transform.position = currentPos;
 					
 					if(isDocked)
@@ -183,7 +185,6 @@ public class Fingers: Game
 				index.renderer.material = yellow;
 				ring.renderer.material = yellow;
 				pointer.renderer.material = yellow;
-				//Debug.Log("not tracked");
 			}
 			
 			

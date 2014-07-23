@@ -138,7 +138,7 @@ public class Phantom : Game
 			else
 			{
 				grab = false;
-				info = "not grabbed";
+				info = "";
 				j4.renderer.material = yellow;
 			}
 			

@@ -14,7 +14,6 @@ public class PhantomTut : Game
 	public GameObject j2;
 	public GameObject j3;
 	public GameObject j4;
-	public GUIText completeText;
 
 	[DllImport("phantomDll")]
 	private static extern bool initDevice();
@@ -88,12 +87,6 @@ public class PhantomTut : Game
 			prevTotalTime = Time.time;
 		}
 
-		if (completeText.enabled ) 
-		{
-			if( (int)(Time.time - prevTotalTime) > 2)
-				completeText.enabled  = false;
-		}
-
 		isConnected = getData ();
 		if(isConnected)
 		{
@@ -144,7 +137,7 @@ public class PhantomTut : Game
 			else
 			{
 				grab = false;
-				info = "not grabbed";
+				info = "";
 				j4.renderer.material = yellow;
 			}
 			

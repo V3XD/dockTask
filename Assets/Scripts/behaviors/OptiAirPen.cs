@@ -10,6 +10,8 @@ public class OptiAirPen : Game
 
 	bool action = false;
 	Vector3 prevOrient = new Vector3();
+	public GameObject pen;
+	public Material brown;
 
 	protected override void atAwake ()
 	{
@@ -60,8 +62,8 @@ public class OptiAirPen : Game
 				
 				Quaternion currentOrient = optiManager.getOrientation(0);
 				
-				if(currentPos != Vector3.zero)
-				{
+				//if(currentPos != Vector3.zero)
+				//{
 					Vector3 transVec = currentPos - prevPos;
 					
 					Vector3 penOrient = currentOrient.eulerAngles;
@@ -101,12 +103,11 @@ public class OptiAirPen : Game
 						}
 					}
 					prevPos = currentPos;
-				}
+				//}
 			}
 			else
 			{
-				pointer.renderer.material = yellow;
-				//Debug.Log("not tracked");
+				pen.renderer.material = brown;
 			}
 			
 			
