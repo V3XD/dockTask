@@ -21,9 +21,9 @@ public class MainMenu : MonoBehaviour {
 		if (GUI.Button(new Rect(UnityEngine.Screen.width - 100,10,80,50),"<size=20>Quit</size>"))
 			Application.Quit();
 		if (GUI.Button(new Rect((UnityEngine.Screen.width)/4,(UnityEngine.Screen.height)/2,100,50),"<size=20>Fingers</size>"))
-			Application.LoadLevel("optiTrack");
+			Application.LoadLevel("optiHand");
 		if (GUI.Button(new Rect((UnityEngine.Screen.width)/2,(UnityEngine.Screen.height)/2,100,60),"<size=20>Fingers\nPractice</size>"))
-			Application.LoadLevel("optiTrackCalibration");
+			Application.LoadLevel("optiHandTut");
 		if (GUI.Button(new Rect((UnityEngine.Screen.width)/4,10,100,50),"<size=20>AirPen</size>"))
 			Application.LoadLevel("optiAirPen");
 		if (GUI.Button(new Rect((UnityEngine.Screen.width)/2,10,100,60),"<size=20>AirPen\nPractice</size>"))

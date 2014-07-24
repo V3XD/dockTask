@@ -18,6 +18,7 @@ public class Fingers: Game
 	bool translate = false;
 	bool rotate = false;
 	Vector3 prevPinch = new Vector3 ();
+	public Material blue;
 
 	protected override void atAwake ()
 	{
@@ -99,9 +100,9 @@ public class Fingers: Game
 		{
 			if(optiManager.getMarkerNum() == 3)
 			{
-				thumb.renderer.material = green;
-				index.renderer.material = green;
-				ring.renderer.material = green;
+				thumb.renderer.material = blue;
+				index.renderer.material = blue;
+				ring.renderer.material = blue;
 				pointer.renderer.material = green; 
 				
 				Vector3 thumbPos = optiManager.getMarkerPosition(0);
@@ -181,9 +182,9 @@ public class Fingers: Game
 				translate = false;
 				rotate = false;
 
-				thumb.renderer.material = yellow;
-				index.renderer.material = yellow;
-				ring.renderer.material = yellow;
+				thumb.renderer.material = red;
+				index.renderer.material = red;
+				ring.renderer.material = red;
 				pointer.renderer.material = yellow;
 			}
 			

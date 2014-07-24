@@ -3,18 +3,18 @@ using System;
 using System.Collections;
 using System.IO;
 
-public class FingersTut: Game 
+public class FingersTut: Game
 {
 	OptiTrackManager optiManager;
 	bool bSuccess;
-
+	
 	public GameObject index;
 	public GameObject thumb;
 	public GameObject ring;
 	public GameObject axis;
 	public GameObject trail;
 	public GUIText instructionsText;
-
+	
 	OptiCalibration calibration;
 	bool translate = false;
 	bool rotate = false;
@@ -22,7 +22,7 @@ public class FingersTut: Game
 	bool isCalibrated = false;
 	bool isGrabSet = false;
 	float maxDist = 0;
-
+	
 	protected override void atAwake ()
 	{
 		path = folders.getPath()+@"tutorial/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_FingerTut.csv";
@@ -36,12 +36,12 @@ public class FingersTut: Game
 		bSuccess = optiManager.isConnected ();
 		nextLevel = "optiTrack";
 		calibration = OptiCalibration.Instance;
-
+		
 		setNewPositionAndOrientationTut();
 		pointer.renderer.enabled = true;
 		instructionsText.material.color = Color.gray;
-
-		if (bSuccess) 
+		
+		if (bSuccess)
 		{
 			connectionMessage="connected";
 		}
@@ -54,14 +54,14 @@ public class FingersTut: Game
 			setNewPositionAndOrientationTut();
 			prevTotalTime = Time.time;
 		}
-
+		
 		if(translate)
 		{
 			rotate = false;
 			//pointer.GetComponent<AudioSource>().mute = true;
 			info = "translate";
 			axis.transform.position = cursor.transform.position;
-			foreach(Transform child in axis.transform) 
+			foreach(Transform child in axis.transform)
 			{
 				child.renderer.enabled = true;
 			}
@@ -72,7 +72,7 @@ public class FingersTut: Game
 		else
 		{	
 			//pointer.GetComponent<AudioSource>().mute = false;
-			foreach(Transform child in axis.transform) 
+			foreach(Transform child in axis.transform)
 			{
 				child.renderer.enabled = false;
 			}
@@ -98,7 +98,7 @@ public class FingersTut: Game
 			prevPinch = new Vector3 ();
 			pointer.renderer.enabled = false;
 		}
-
+		
 		
 		if(bSuccess)
 		{
@@ -107,30 +107,30 @@ public class FingersTut: Game
 				thumb.renderer.material = green;
 				index.renderer.material = green;
 				ring.renderer.material = green;
-				pointer.renderer.material = green; 
+				pointer.renderer.material = green;
 				
 				Vector3 thumbPos = optiManager.getMarkerPosition(0);
 				Vector3 indexPos = optiManager.getMarkerPosition(1);
 				Vector3 ringPos = optiManager.getMarkerPosition(2);
 				
-				float thumbToIndex = Vector3.Distance(thumbPos, 
+				float thumbToIndex = Vector3.Distance(thumbPos,
 				                                      indexPos);
-				float thumbToRing = Vector3.Distance(thumbPos, 
+				float thumbToRing = Vector3.Distance(thumbPos,
 				                                     ringPos);
-				float indexToRing = Vector3.Distance(indexPos, 
+				float indexToRing = Vector3.Distance(indexPos,
 				                                     ringPos);
-
+				
 				Vector3 currentPos = (thumbPos + indexPos + ringPos)*0.33f;
 				Vector3 transVec = currentPos - prevPos;
-
-				thumb.transform.position = thumbPos; 
-				index.transform.position = indexPos; 
+				
+				thumb.transform.position = thumbPos;
+				index.transform.position = indexPos;
 				ring.transform.position = ringPos;
-
+				
 				float aveDist = (thumbToIndex + thumbToRing + indexToRing)*0.33f;
-
+				
 				Debug.Log(aveDist + " " + thumbToIndex + " " + thumbToRing + " " +indexToRing);
-
+				
 				if(!isCalibrated)
 				{
 					int count = (int)(Time.time - prevTotalTime);
@@ -177,7 +177,7 @@ public class FingersTut: Game
 							prevTotalTime = Time.time;
 						}
 					}
-
+					
 				}
 				else if(aveDist <= calibration.ave)
 				{
@@ -189,7 +189,7 @@ public class FingersTut: Game
 					                                         Mathf.Clamp(cursor.transform.position.z, -zMax, zMax));
 				}
 				else if((thumbToIndex <= calibration.touchDist ||
-				        thumbToRing <= calibration.touchDist ||
+				         thumbToRing <= calibration.touchDist ||
 				         indexToRing <= calibration.touchDist) && aveDist > calibration.minDist)
 				{
 					rotate = true;
@@ -199,9 +199,9 @@ public class FingersTut: Game
 						pointerPos = (thumb.transform.position + index.transform.position)*0.5f;
 					else if (thumbToRing < calibration.touchDist)
 						pointerPos = (thumb.transform.position + ring.transform.position)*0.5f;
-					else 
+					else
 						pointerPos = (index.transform.position + ring.transform.position)*0.5f;
-
+					
 					pointer.transform.position = pointerPos;//closestPoint
 					
 					Vector3 to = pointerPos - cursor.transform.position;
@@ -235,7 +235,7 @@ public class FingersTut: Game
 			{
 				translate = false;
 				rotate = false;
-
+				
 				thumb.renderer.material = yellow;
 				index.renderer.material = yellow;
 				ring.renderer.material = yellow;

@@ -83,7 +83,7 @@ public class PhantomTut : Game
 	{
 		if (Input.GetKeyUp (KeyCode.S))
 		{
-			setNewPositionAndOrientation();
+			setNewPositionAndOrientationTut();
 			prevTotalTime = Time.time;
 		}
 

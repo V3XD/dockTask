@@ -46,8 +46,8 @@ public class Game : MonoBehaviour
 	{
 		GUI.Box (new Rect (0,0,165,100), "<size=24>"+info + "\n" + message + "\n" +difficulty.getLevel () + "</size>");
 		
-		GUI.Box (new Rect (UnityEngine.Screen.width - 150,0,150,100), "<size=24>Score: " + score +
-		         "\nTime: " + (int)(Time.time - prevTotalTime) +"\nPrev: " + ((int)prevTime).ToString()+"</size>");
+		GUI.Box (new Rect (UnityEngine.Screen.width - 150,0,150,100), "<size=24>Trial: " + score +
+		         "\nTime: " + (int)(Time.time - prevTotalTime)+"</size>");// +"\nPrev: " + ((int)prevTime).ToString()+"</size>");
 		GUI.Box (new Rect (UnityEngine.Screen.width - 150,UnityEngine.Screen.height - 30, 150, 30), "<size=18>"+connectionMessage+"</size>");
 		if (window)
 			GUI.Window(0, new Rect((UnityEngine.Screen.width*0.5f)-105, (UnityEngine.Screen.height*0.5f)-50, 210, 100), DoWindow, "<size=24>Complete</size>");

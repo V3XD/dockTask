@@ -16,14 +16,14 @@ public class Difficulty : Singleton<Difficulty>
 
 	public void setEasy()
 	{
-		angle = 20f;
+		angle = 15f;
 		distance = 3f;
 		level = "easy";
 	} 
 
 	public void setNormal()
 	{
-		angle = 15f;
+		angle = 10f;
 		distance = 2f;
 		level = "normal";
 	}
