@@ -49,6 +49,7 @@ public class Fingers: Game
 		{
 			setNewPositionAndOrientation();
 			prevTotalTime = Time.time;
+			skipWindow = false;
 		}
 		
 		if(translate)
@@ -85,6 +86,7 @@ public class Fingers: Game
 			thumb.renderer.enabled = false;
 			ring.renderer.enabled = false;
 			cursor.renderer.enabled = true;
+			targetSphere.renderer.enabled = true;
 			
 		}
 		else
@@ -93,6 +95,7 @@ public class Fingers: Game
 			trail.GetComponent<TrailRenderer>().enabled = false;
 			prevPinch = new Vector3 ();
 			pointer.renderer.enabled = false;
+			targetSphere.renderer.enabled = false;
 		}
 
 		

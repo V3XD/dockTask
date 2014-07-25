@@ -38,6 +38,7 @@ public class Chair: Game
 		{
 			setNewPositionAndOrientation();
 			prevTotalTime = Time.time;
+			skipWindow = false;
 		}
 
 		if (Input.GetKeyUp (KeyCode.LeftControl) || Input.GetKeyUp (KeyCode.RightControl))

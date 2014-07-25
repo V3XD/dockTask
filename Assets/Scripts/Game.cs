@@ -11,6 +11,8 @@ public class Game : MonoBehaviour
 	public Material green;
 	public Material yellow;
 	public Material red;
+	public Material transGreen;
+	public Material transYellow;
 	public Light roomLight;
 	public GUIText pointText;
 	public AudioClip popSound;
@@ -18,6 +20,7 @@ public class Game : MonoBehaviour
 	public AudioSource ambientSource;
 	public Camera secondCamera;
 	public GameObject dummy;//the target changes orientation
+	public GameObject targetSphere;
 
 	protected static float xMax = 15.0f;
 	protected static float yMax = 15.0f;
@@ -37,6 +40,7 @@ public class Game : MonoBehaviour
 	protected float distance = 0;
 	protected float angle = 0;
 	protected bool window = false;
+	protected bool skipWindow = false;
 	protected Folders folders;
 	protected string nextLevel = "MainMenu";
 	float maxTime = 60f;
@@ -44,13 +48,15 @@ public class Game : MonoBehaviour
 
 	void OnGUI ()
 	{
-		GUI.Box (new Rect (0,0,165,100), "<size=24>"+info + "\n" + message + "\n" +difficulty.getLevel () + "</size>");
+		GUI.Box (new Rect (0,0,260,130), "<size=36>"+info + "\n" + message + "\n" +difficulty.getLevel () + "</size>");
 		
-		GUI.Box (new Rect (UnityEngine.Screen.width - 150,0,150,100), "<size=24>Trial: " + score +
+		GUI.Box (new Rect (UnityEngine.Screen.width - 200,0,200,100), "<size=36>Trial: " + score +
 		         "\nTime: " + (int)(Time.time - prevTotalTime)+"</size>");// +"\nPrev: " + ((int)prevTime).ToString()+"</size>");
-		GUI.Box (new Rect (UnityEngine.Screen.width - 150,UnityEngine.Screen.height - 30, 150, 30), "<size=18>"+connectionMessage+"</size>");
+		GUI.Box (new Rect (UnityEngine.Screen.width - 150,UnityEngine.Screen.height - 30, 150, 36), "<size=18>"+connectionMessage+"</size>");
 		if (window)
-			GUI.Window(0, new Rect((UnityEngine.Screen.width*0.5f)-105, (UnityEngine.Screen.height*0.5f)-50, 210, 100), DoWindow, "<size=24>Complete</size>");
+			GUI.Window(0, new Rect((UnityEngine.Screen.width*0.5f)-105, (UnityEngine.Screen.height*0.5f)-50, 210, 100), DoWindow, "<size=28>Complete</size>");
+		if (skipWindow)
+			GUI.Window(1, new Rect((UnityEngine.Screen.width*0.5f)-105, (UnityEngine.Screen.height*0.5f)-50, 210, 100), DoWindow, "<size=28>Skip this trial</size>");
 	}
 	
 	void Awake ()
@@ -100,13 +106,17 @@ public class Game : MonoBehaviour
 				pointText.enabled = false;
 		}
 
-		if (window)
+		if (window || skipWindow)
 			UnityEngine.Screen.showCursor = true;
 		else
 		{
 			UnityEngine.Screen.showCursor = false;
 			gameBehavior ();
 		}
+
+		if((Time.time - prevTotalTime) > maxTime)
+			skipWindow = true;
+
 
 		evaluateDock ();
 	}
@@ -204,30 +214,31 @@ public class Game : MonoBehaviour
 			case 0:
 				target.transform.rotation = new Quaternion();
 				break;
-				//learn to rotate around y
+			//learn to rotate around y
 			case 1:
 				target.transform.rotation = new Quaternion();
 				target.transform.Rotate(Vector3.up * 45f, Space.World);
 				break;
-				//learn to rotate around x
+			//learn to rotate around x
 			case 2:
 				target.transform.rotation = new Quaternion();
-				target.transform.Rotate(Vector3.right * 45f, Space.World);
+				target.transform.Rotate(Vector3.right * -45f, Space.World);
 				break;
-				//learn to rotate around z
+			//learn to rotate around z
 			case 3:
 				target.transform.rotation = new Quaternion();
 				target.transform.Rotate(Vector3.forward * 45f, Space.World);
 				break;
-				//practise docking
+			//practise docking
 			default:
 				setRotation ();
 				//target.transform.rotation = UnityEngine.Random.rotation;
 				break;
 		}
+
 		cursor.transform.position = new Vector3 (UnityEngine.Random.Range(-xMax, xMax),
 		                                         UnityEngine.Random.Range(4.0F, yMax),
-		                                         UnityEngine.Random.Range(-zMax, zMax));
+		                                         UnityEngine.Random.Range(-zMax+2.5f, zMax));
 	}
 
 	void evaluateDock ()
@@ -257,10 +268,12 @@ public class Game : MonoBehaviour
 		if (angle <= difficulty.angle)
 		{	
 			cursor.renderer.material = green;
+			targetSphere.renderer.material = transGreen;
 		}
 		else
 		{
 			cursor.renderer.material = yellow;
+			targetSphere.renderer.material = transYellow;
 		}
 	}
 
@@ -325,9 +338,21 @@ public class Game : MonoBehaviour
 		{
 			Application.LoadLevel(nextLevel);
 		}*/
-		if (GUI.Button(new Rect(50, 45, 95, 30), "<size=20>Next</size>"))
+		if(windowID == 0)
 		{
-			Application.LoadLevel(nextLevel);
+			if (GUI.Button(new Rect(50, 45, 95, 30), "<size=20>Next</size>"))
+			{
+				Application.LoadLevel(nextLevel);
+			}
+		}
+		else
+		{
+			if (GUI.Button(new Rect(50, 45, 95, 30), "<size=20>Skip</size>"))
+			{
+				setNewPositionAndOrientation();
+				skipWindow = false;
+				prevTotalTime = Time.time;
+			}
 		}
 	}
 

@@ -85,6 +85,7 @@ public class PhantomTut : Game
 		{
 			setNewPositionAndOrientationTut();
 			prevTotalTime = Time.time;
+			skipWindow = false;
 		}
 
 		isConnected = getData ();

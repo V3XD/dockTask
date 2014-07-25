@@ -171,7 +171,7 @@ namespace OptitrackManagement
 					
 					Buffer.BlockCopy(b, offset, iData, 0, 4); offset += 4;
 					_strFrameLog += String.Format("{0}:" + strName + ": marker count : {1}\n", i, iData[0]);
-					
+
 					nBytes = iData[0] * 3 * 4;
 					Buffer.BlockCopy(b, offset, fData, 0, nBytes); offset += nBytes;
 					//do not need   

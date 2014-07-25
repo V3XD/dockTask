@@ -53,6 +53,7 @@ public class FingersTut: Game
 		{
 			setNewPositionAndOrientationTut();
 			prevTotalTime = Time.time;
+			skipWindow = false;
 		}
 		
 		if(translate)
@@ -89,6 +90,7 @@ public class FingersTut: Game
 			thumb.renderer.enabled = false;
 			ring.renderer.enabled = false;
 			cursor.renderer.enabled = true;
+			targetSphere.renderer.enabled = true;
 			
 		}
 		else
@@ -97,6 +99,7 @@ public class FingersTut: Game
 			trail.GetComponent<TrailRenderer>().enabled = false;
 			prevPinch = new Vector3 ();
 			pointer.renderer.enabled = false;
+			targetSphere.renderer.enabled = false;
 		}
 		
 		

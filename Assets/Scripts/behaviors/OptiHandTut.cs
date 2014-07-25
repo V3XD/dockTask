@@ -15,7 +15,6 @@ public class OptiHandTut: Game
 	public GameObject trail;
 
 	OptiCalibration calibration;
-	Vector3 prevPinch = new Vector3 ();
 	public Material blue;
 	Vector3 prevOrient = new Vector3();
 	bool isCalibrated = false;
@@ -52,11 +51,12 @@ public class OptiHandTut: Game
 		{
 			setNewPositionAndOrientationTut();
 			prevTotalTime = Time.time;
+			skipWindow = false;
 		}
 
 		if(bSuccess)
 		{
-			Debug.Log(optiManager.getMarkerNum()+" "+optiManager.getRigidBodyNum());
+			//Debug.Log(optiManager.getMarkerNum()+" "+optiManager.getRigidBodyNum());
 			if(optiManager.getMarkerNum() == 2 && optiManager.getRigidBodyNum() >= 1)
 			{
 				thumb.renderer.material = blue;
@@ -94,7 +94,7 @@ public class OptiHandTut: Game
 					int count = (int)(Time.time - prevTotalTime);
 
 					instructionsText.text = "Pinch "+ (10-count).ToString();
-					if( count > 5)
+					if( count > 7)
 					{
 						instructionsText.material.color = Color.white;
 						if(thumbToIndex > maxDist)

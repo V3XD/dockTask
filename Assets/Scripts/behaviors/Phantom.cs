@@ -85,6 +85,7 @@ public class Phantom : Game
 		{
 			setNewPositionAndOrientation();
 			prevTotalTime = Time.time;
+			skipWindow = false;
 		}
 
 		isConnected = getData ();

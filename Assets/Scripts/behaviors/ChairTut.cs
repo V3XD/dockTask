@@ -40,6 +40,7 @@ public class ChairTut: Game
 		{
 			setNewPositionAndOrientationTut();
 			prevTotalTime = Time.time;
+			skipWindow = false;
 		}
 
 		if (Input.GetKeyUp (KeyCode.LeftControl) || Input.GetKeyUp (KeyCode.RightControl))

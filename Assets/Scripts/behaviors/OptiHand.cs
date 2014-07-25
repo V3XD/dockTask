@@ -14,7 +14,6 @@ public class OptiHand: Game
 	public GameObject trail;
 
 	OptiCalibration calibration;
-	Vector3 prevPinch = new Vector3 ();
 	public Material blue;
 	Vector3 prevOrient = new Vector3();
 
@@ -47,11 +46,12 @@ public class OptiHand: Game
 		{
 			setNewPositionAndOrientation();
 			prevTotalTime = Time.time;
+			skipWindow = false;
 		}
 
 		if(bSuccess)
 		{
-			Debug.Log(optiManager.getMarkerNum()+" "+optiManager.getRigidBodyNum());
+			//Debug.Log(optiManager.getMarkerNum()+" "+optiManager.getRigidBodyNum());
 			if(optiManager.getMarkerNum() == 2 && optiManager.getRigidBodyNum() >= 1)
 			{
 				thumb.renderer.material = blue;

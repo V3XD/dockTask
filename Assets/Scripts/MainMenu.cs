@@ -10,23 +10,23 @@ public class MainMenu : MonoBehaviour {
 
 	void OnGUI() 
 	{
-		if (GUI.Button(new Rect((UnityEngine.Screen.width)/4,(3*UnityEngine.Screen.height)/4,100,50),"<size=20>Phantom</size>"))
+		if (GUI.Button(new Rect((UnityEngine.Screen.width)/4,(3*UnityEngine.Screen.height)/4,125,80),"<size=26>Phantom</size>"))
 			Application.LoadLevel("phantomGrab");
-		if (GUI.Button(new Rect((UnityEngine.Screen.width)/2,(3*UnityEngine.Screen.height)/4,100,60),"<size=20>Phantom\nPractice</size>"))
+		if (GUI.Button(new Rect((UnityEngine.Screen.width)/2,(3*UnityEngine.Screen.height)/4,125,80),"<size=26>Phantom\nPractice</size>"))
 			Application.LoadLevel("phantomTutorial");
-		if (GUI.Button(new Rect((UnityEngine.Screen.width)/4,(UnityEngine.Screen.height)/4,100,50),"<size=20>Minichair</size>"))
+		if (GUI.Button(new Rect((UnityEngine.Screen.width)/4,(UnityEngine.Screen.height)/4,125,80),"<size=26>Minichair</size>"))
 			Application.LoadLevel("optiChair");
-		if (GUI.Button(new Rect((UnityEngine.Screen.width)/2,(UnityEngine.Screen.height)/4,100,60),"<size=20>Minichair\nPractice</size>"))
+		if (GUI.Button(new Rect((UnityEngine.Screen.width)/2,(UnityEngine.Screen.height)/4,125,80),"<size=26>Minichair\nPractice</size>"))
 			Application.LoadLevel("optiChairTutorial");
-		if (GUI.Button(new Rect(UnityEngine.Screen.width - 100,10,80,50),"<size=20>Quit</size>"))
+		if (GUI.Button(new Rect(UnityEngine.Screen.width - 110,10,100,70),"<size=28>Quit</size>"))
 			Application.Quit();
-		if (GUI.Button(new Rect((UnityEngine.Screen.width)/4,(UnityEngine.Screen.height)/2,100,50),"<size=20>Fingers</size>"))
+		if (GUI.Button(new Rect((UnityEngine.Screen.width)/4,(UnityEngine.Screen.height)/2,125,80),"<size=26>Fingers</size>"))
 			Application.LoadLevel("optiHand");
-		if (GUI.Button(new Rect((UnityEngine.Screen.width)/2,(UnityEngine.Screen.height)/2,100,60),"<size=20>Fingers\nPractice</size>"))
+		if (GUI.Button(new Rect((UnityEngine.Screen.width)/2,(UnityEngine.Screen.height)/2,125,80),"<size=26>Fingers\nPractice</size>"))
 			Application.LoadLevel("optiHandTut");
-		if (GUI.Button(new Rect((UnityEngine.Screen.width)/4,10,100,50),"<size=20>AirPen</size>"))
+		if (GUI.Button(new Rect((UnityEngine.Screen.width)/4,10,125,80),"<size=26>AirPen</size>"))
 			Application.LoadLevel("optiAirPen");
-		if (GUI.Button(new Rect((UnityEngine.Screen.width)/2,10,100,60),"<size=20>AirPen\nPractice</size>"))
+		if (GUI.Button(new Rect((UnityEngine.Screen.width)/2,10,125,80),"<size=26>AirPen\nPractice</size>"))
 			Application.LoadLevel("optiAirPenTutorial");
 			
 

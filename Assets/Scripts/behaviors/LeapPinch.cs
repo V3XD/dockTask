@@ -55,6 +55,7 @@ public class LeapPinch : Game
 		{
 			setNewPositionAndOrientation();
 			prevTotalTime = (int)Time.time;
+			skipWindow = false;
 		}
 
 		if(translate)
@@ -89,6 +90,7 @@ public class LeapPinch : Game
 			indexObj.renderer.enabled = false;
 			thumbObj.renderer.enabled = false;
 			cursor.renderer.enabled = true;
+			targetSphere.renderer.enabled = true;
 			
 		}
 		else
@@ -97,6 +99,7 @@ public class LeapPinch : Game
 			trail.GetComponent<TrailRenderer>().enabled = false;
 			prevPinch = new Vector3 ();
 			pointer.renderer.enabled = false;
+			targetSphere.renderer.enabled = false;
 		}
 		if (mController.IsConnected)
 		{
