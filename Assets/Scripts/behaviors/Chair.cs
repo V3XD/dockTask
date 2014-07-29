@@ -8,7 +8,6 @@ public class Chair: Game
 	OptiTrackManager optiManager;
 	bool bSuccess = false;
 
-	bool action = false;
 	public GameObject trackedObj;
 
 	protected override void atAwake ()

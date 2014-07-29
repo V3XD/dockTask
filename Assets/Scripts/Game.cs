@@ -21,6 +21,7 @@ public class Game : MonoBehaviour
 	public Camera secondCamera;
 	public GameObject dummy;//the target changes orientation
 	public GameObject targetSphere;
+	public GUIText instructionsText;
 
 	protected static float xMax = 15.0f;
 	protected static float yMax = 15.0f;
@@ -43,6 +44,7 @@ public class Game : MonoBehaviour
 	protected bool skipWindow = false;
 	protected Folders folders;
 	protected string nextLevel = "MainMenu";
+	protected bool action = false;
 	float maxTime = 60f;
 	bool updateCam = true;
 
@@ -99,7 +101,14 @@ public class Game : MonoBehaviour
 			else
 				mute = false;
 		}
-		
+
+		if (instructionsText.enabled) 
+		{
+			if(action)
+				instructionsText.enabled = false;
+			prevTotalTime = Time.time;
+		}
+
 		if (pointText.enabled) 
 		{
 			if( (int)(Time.time - prevTotalTime) > 1)
@@ -114,7 +123,7 @@ public class Game : MonoBehaviour
 			gameBehavior ();
 		}
 
-		if((Time.time - prevTotalTime) > maxTime)
+		if((Time.time - prevTotalTime) > maxTime && !window)
 			skipWindow = true;
 
 

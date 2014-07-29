@@ -87,6 +87,7 @@ public class OptiHand: Game
 
 				if( aveDist <= calibration.touchDist)
 				{
+					action = true;
 					info = "grabbed";
 					pointer.renderer.enabled = true;
 					trail.GetComponent<TrailRenderer>().enabled = true;
@@ -106,6 +107,7 @@ public class OptiHand: Game
 				}
 				else
 				{
+					action = false;
 					index.renderer.enabled = true;
 					thumb.renderer.enabled = true;
 					pointer.renderer.enabled = false;

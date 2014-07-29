@@ -7,7 +7,6 @@ using System.IO;
 public class Phantom : Game 
 {
 	Vector3 prevOrient = new Vector3();
-	bool grab = false;
 	bool isConnected = false;
 	static float scale = 0.10f;
 
@@ -124,7 +123,7 @@ public class Phantom : Game
 			
 			if(isButtonADown() || isButtonBDown())
 			{
-				grab = true;
+				action = true;
 				cursor.transform.Translate (transVec, Space.World);
 				//cursor.transform.Rotate(rotVec, Space.World);
 				Vector3 zAxis = j4.transform.TransformDirection(Vector3.forward);
@@ -138,12 +137,12 @@ public class Phantom : Game
 			}
 			else
 			{
-				grab = false;
+				action = false;
 				info = "";
 				j4.renderer.material = yellow;
 			}
 			
-			if(isDocked && !grab)
+			if(isDocked && !action)
 			{
 				newTask();
 				setNewPositionAndOrientation();

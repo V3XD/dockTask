@@ -11,7 +11,6 @@ public class OptiHandTut: Game
 	public GameObject index;
 	public GameObject thumb;
 	public GameObject palm;
-	public GUIText instructionsText;
 	public GameObject trail;
 
 	OptiCalibration calibration;
@@ -102,7 +101,7 @@ public class OptiHandTut: Game
 					
 					if( count > 10)
 					{
-						instructionsText.enabled = false;
+						instructionsText.text = "Ready";
 						isCalibrated = true;
 						
 						calibration.setTouchDist(maxDist);
@@ -113,6 +112,7 @@ public class OptiHandTut: Game
 				}
 				else if( aveDist <= calibration.touchDist)
 				{
+					action = true;
 					info = "grabbed";
 					pointer.renderer.enabled = true;
 					trail.GetComponent<TrailRenderer>().enabled = true;
@@ -132,6 +132,7 @@ public class OptiHandTut: Game
 				}
 				else
 				{
+					action = false;
 					index.renderer.enabled = true;
 					thumb.renderer.enabled = true;
 					pointer.renderer.enabled = false;

@@ -8,7 +8,6 @@ public class OptiAirPen : Game
 	OptiTrackManager optiManager;
 	bool bSuccess;
 
-	bool action = false;
 	Vector3 prevOrient = new Vector3();
 
 	protected override void atAwake ()

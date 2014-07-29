@@ -8,7 +8,6 @@ public class ChairTut: Game
 	OptiTrackManager optiManager;
 	bool bSuccess;
 
-	bool action = false;
 	public GameObject trackedObj;
 
 	protected override void atAwake ()
