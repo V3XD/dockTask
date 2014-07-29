@@ -57,9 +57,9 @@ public class OptiAirPen : Game
 		{
 			if(optiManager.getRigidBodyNum() >= 1)
 			{
-				Vector3 currentPos = optiManager.getPosition(0);
+				Vector3 currentPos = optiManager.getPosition(1);
 				
-				Quaternion currentOrient = optiManager.getOrientation(0);
+				Quaternion currentOrient = optiManager.getOrientation(1);
 				
 				//if(currentPos != Vector3.zero)
 				//{

@@ -59,8 +59,8 @@ public class OptiHand: Game
 				palm.renderer.material = blue;
 				pointer.renderer.material = blue;
 
-				Quaternion currentOrient = optiManager.getOrientation(0);
-				palm.transform.position = optiManager.getPosition(0);
+				Quaternion currentOrient = optiManager.getOrientation(2);
+				palm.transform.position = optiManager.getPosition(2);
 				
 				Vector3 thumbPos = optiManager.getMarkerPosition(0);
 				Vector3 indexPos = optiManager.getMarkerPosition(1);

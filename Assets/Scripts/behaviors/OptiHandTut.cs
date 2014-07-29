@@ -56,7 +56,6 @@ public class OptiHandTut: Game
 
 		if(bSuccess)
 		{
-			//Debug.Log(optiManager.getMarkerNum()+" "+optiManager.getRigidBodyNum());
 			if(optiManager.getMarkerNum() == 2 && optiManager.getRigidBodyNum() >= 1)
 			{
 				thumb.renderer.material = blue;
@@ -64,8 +63,8 @@ public class OptiHandTut: Game
 				palm.renderer.material = blue;
 				pointer.renderer.material = blue;
 
-				Quaternion currentOrient = optiManager.getOrientation(0);
-				palm.transform.position = optiManager.getPosition(0);
+				Quaternion currentOrient = optiManager.getOrientation(2);
+				palm.transform.position = optiManager.getPosition(2);
 				
 				Vector3 thumbPos = optiManager.getMarkerPosition(0);
 				Vector3 indexPos = optiManager.getMarkerPosition(1);

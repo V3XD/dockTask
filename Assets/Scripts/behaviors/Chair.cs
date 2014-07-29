@@ -65,7 +65,7 @@ public class Chair: Game
 				Quaternion currentOrient = optiManager.getOrientation(0);
 
 				Vector3 transVec = currentPos - prevPos;
-				Debug.Log(currentPos);
+				//Debug.Log(currentPos);
 
 				//if(currentPos != Vector3.zero)
 				//{
