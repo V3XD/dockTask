@@ -22,6 +22,7 @@ public class Game : MonoBehaviour
 	public GameObject dummy;//the target changes orientation
 	public GameObject targetSphere;
 	public GUIText instructionsText;
+	public GameObject posCube;
 
 	protected static float xMax = 15.0f;
 	protected static float yMax = 15.0f;
@@ -30,7 +31,7 @@ public class Game : MonoBehaviour
 	protected bool isDocked = false;
 	protected int score = 0;
 	protected string connectionMessage="not connected";
-	protected string message="";
+	protected string message=" ";
 	protected string info="";
 	protected float prevTime=0;
 	protected float prevTotalTime;
@@ -47,12 +48,13 @@ public class Game : MonoBehaviour
 	protected bool action = false;
 	float maxTime = 60f;
 	bool updateCam = true;
+	protected int trialNum = 9;
 
 	void OnGUI ()
 	{
-		GUI.Box (new Rect (0,0,260,130), "<size=36>"+info + "\n" + message + "\n" +difficulty.getLevel () + "</size>");
+		GUI.Box (new Rect (0,0,265,100), "<size=36>"+ message + "\n" +"Level: "+difficulty.getLevel () + "</size>");
 		
-		GUI.Box (new Rect (UnityEngine.Screen.width - 200,0,200,100), "<size=36>Trial: " + score +
+		GUI.Box (new Rect (UnityEngine.Screen.width - 200,0,200,100), "<size=36>Trial: " + score +"/"+trialNum+
 		         "\nTime: " + (int)(Time.time - prevTotalTime)+"</size>");// +"\nPrev: " + ((int)prevTime).ToString()+"</size>");
 		GUI.Box (new Rect (UnityEngine.Screen.width - 150,UnityEngine.Screen.height - 30, 150, 36), "<size=18>"+connectionMessage+"</size>");
 		if (window)
@@ -105,8 +107,10 @@ public class Game : MonoBehaviour
 		if (instructionsText.enabled) 
 		{
 			if(action)
+			{
 				instructionsText.enabled = false;
-			prevTotalTime = Time.time;
+				prevTotalTime = Time.time;
+			}
 		}
 
 		if (pointText.enabled) 
@@ -208,6 +212,7 @@ public class Game : MonoBehaviour
 	
 	protected void setNewPositionAndOrientation()
 	{
+		trialNum = 9;
 		setRotation ();
 		//target.transform.rotation = UnityEngine.Random.rotation;
 		cursor.transform.position = new Vector3 (UnityEngine.Random.Range(-xMax, xMax),
@@ -217,6 +222,7 @@ public class Game : MonoBehaviour
 
 	protected void setNewPositionAndOrientationTut()
 	{
+		trialNum = 5;
 		switch (score)
 		{
 			//learn to translate
@@ -259,7 +265,12 @@ public class Game : MonoBehaviour
 		distance = (targetV - cursorV).magnitude;
 		angle = Quaternion.Angle(cursorQ, targetQ);
 		if(!mute)
-			ambientSource.volume = (1f-(angle / 180f))*0.75f;
+		{
+			if(angle > 40f)
+				ambientSource.volume = 0;
+			else
+				ambientSource.volume = 1f-(angle / 40f);
+		}
 		
 		if ((angle <= difficulty.angle) && (distance < difficulty.distance)) 
 		{	
@@ -271,7 +282,7 @@ public class Game : MonoBehaviour
 		{
 			isDocked=false;
 			roomLight.intensity = 1.0f;
-			message= "";
+			message= " ";
 		}
 		
 		if (angle <= difficulty.angle)
@@ -284,6 +295,15 @@ public class Game : MonoBehaviour
 			cursor.renderer.material = yellow;
 			targetSphere.renderer.material = transYellow;
 		}
+
+		if (distance <= difficulty.distance)
+		{	
+			posCube.renderer.material = transGreen;
+		}
+		else
+		{
+			posCube.renderer.material = transYellow;
+		}
 	}
 
 	protected void newTask()
@@ -292,12 +312,9 @@ public class Game : MonoBehaviour
 		popSource.PlayOneShot(popSound);
 		prevTotalTime = Time.time;
 		pointText.enabled = true;
-		//if(tmpTime < maxTime)
-		//{
-			prevTime = tmpTime;
-			File.AppendAllText(path, prevTime.ToString()+","+distance.ToString()+","+angle.ToString()+ ","+difficulty.getLevel()+Environment.NewLine);//save to file
-			score++;
-		//}
+		prevTime = tmpTime;
+		File.AppendAllText(path, prevTime.ToString()+","+distance.ToString()+","+angle.ToString()+ ","+difficulty.getLevel()+Environment.NewLine);//save to file
+		score++;
 	}
 
 	protected void selectLevel()

@@ -16,22 +16,22 @@ public class Difficulty : Singleton<Difficulty>
 
 	public void setEasy()
 	{
-		angle = 20f;
-		distance = 3f;
+		angle = 15f;
+		distance = 1.5f;
 		level = "easy";
 	} 
 
 	public void setNormal()
 	{
-		angle = 12.5f;
-		distance = 2f;
+		angle = 10f;
+		distance = 1f;
 		level = "medium";
 	}
 
 	public void setHard()
 	{
 		angle = 5f;
-		distance = 1f;
+		distance = 0.5f;
 		level = "hard";
 	}
 

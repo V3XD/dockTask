@@ -13,8 +13,7 @@ public class FingersTut: Game
 	public GameObject ring;
 	public GameObject axis;
 	public GameObject trail;
-	public GUIText instructionsText;
-	
+
 	OptiCalibration calibration;
 	bool translate = false;
 	bool rotate = false;
