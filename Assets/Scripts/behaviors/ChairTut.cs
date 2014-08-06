@@ -16,6 +16,7 @@ public class ChairTut: Game
 		File.AppendAllText(path, "Time,Distance,Angle,Difficulty"+ Environment.NewLine);//save to file
 		optiManager = OptiTrackManager.Instance;
 		difficulty.setEasy ();
+		trialsType.setTutorial ();
 	}
 	
 	protected override void atStart ()
@@ -81,7 +82,7 @@ public class ChairTut: Game
 					{
 						newTask();
 						setNewPositionAndOrientationTut();
-						if(score == 5)
+						if(score == trialsType.getTrialNum())
 							window = true;
 					}
 					

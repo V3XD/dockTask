@@ -17,6 +17,7 @@ public class OptiAirPenTut : Game
 		File.AppendAllText(path, "Time,Distance,Angle,Difficulty"+ Environment.NewLine);//save to file
 		optiManager = OptiTrackManager.Instance;
 		difficulty.setEasy ();
+		trialsType.setTutorial ();
 	}
 	
 	protected override void atStart ()
@@ -56,9 +57,9 @@ public class OptiAirPenTut : Game
 		{
 			if(optiManager.getRigidBodyNum() >= 1)
 			{
-				Vector3 currentPos = optiManager.getPosition(1);
+				Vector3 currentPos = optiManager.getPosition(0);
 				
-				Quaternion currentOrient = optiManager.getOrientation(1);
+				Quaternion currentOrient = optiManager.getOrientation(0);
 				
 				//if(currentPos != Vector3.zero)
 				//{
@@ -95,7 +96,7 @@ public class OptiAirPenTut : Game
 						{
 							newTask();
 							setNewPositionAndOrientationTut();
-							if(score == 5)
+							if(score == trialsType.getTrialNum())
 								window = true;
 						}
 					}

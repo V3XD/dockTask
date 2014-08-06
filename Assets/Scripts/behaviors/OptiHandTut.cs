@@ -25,6 +25,7 @@ public class OptiHandTut: Game
 		File.AppendAllText(path, "Time,Distance,Angle,Difficulty"+ Environment.NewLine);//save to file
 		optiManager = OptiTrackManager.Instance;
 		difficulty.setEasy ();
+		trialsType.setTutorial ();
 	}
 	
 	protected override void atStart ()
@@ -62,8 +63,8 @@ public class OptiHandTut: Game
 				palm.renderer.material = blue;
 				pointer.renderer.material = blue;
 
-				Quaternion currentOrient = optiManager.getOrientation(2);
-				palm.transform.position = optiManager.getPosition(2);
+				Quaternion currentOrient = optiManager.getOrientation(0);
+				palm.transform.position = optiManager.getPosition(0);
 				
 				Vector3 thumbPos = optiManager.getMarkerPosition(0);
 				Vector3 indexPos = optiManager.getMarkerPosition(1);
@@ -143,7 +144,7 @@ public class OptiHandTut: Game
 					{
 						newTask();
 						setNewPositionAndOrientationTut();
-						if(score == 5)
+						if(score == trialsType.getTrialNum())
 							window = true;
 					}
 				}

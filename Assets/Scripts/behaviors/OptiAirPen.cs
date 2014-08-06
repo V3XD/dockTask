@@ -16,6 +16,7 @@ public class OptiAirPen : Game
 		File.AppendAllText(path, "Time,Distance,Angle,Difficulty"+ Environment.NewLine);//save to file
 		optiManager = OptiTrackManager.Instance;
 		selectLevel ();
+		trialsType.setRealThing ();
 	}
 
 	protected override void atStart ()
@@ -29,6 +30,14 @@ public class OptiAirPen : Game
 		{
 			connectionMessage="connected";
 		}
+
+		if (trialsType.currentGroup > trialsType.getRepetition())
+		{
+			nextLevel = "MainMenu";
+			trialsType.currentGroup = 1;
+		}
+		else
+			nextLevel = "optiAirPen";
 	}
 
 	protected override void gameBehavior ()
@@ -56,9 +65,9 @@ public class OptiAirPen : Game
 		{
 			if(optiManager.getRigidBodyNum() >= 1)
 			{
-				Vector3 currentPos = optiManager.getPosition(1);
+				Vector3 currentPos = optiManager.getPosition(0);
 				
-				Quaternion currentOrient = optiManager.getOrientation(1);
+				Quaternion currentOrient = optiManager.getOrientation(0);
 				
 				//if(currentPos != Vector3.zero)
 				//{
@@ -96,8 +105,11 @@ public class OptiAirPen : Game
 							newTask();
 							setNewPositionAndOrientation();
 							selectLevel();
-							if(score == 9)
+							if(score == trialsType.getTrialNum())
+							{
+								trialsType.currentGroup++;
 								window = true;
+							}
 						}
 					}
 					prevPos = currentPos;

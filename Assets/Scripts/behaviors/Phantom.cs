@@ -56,6 +56,7 @@ public class Phantom : Game
 		path = folders.getPath()+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_Phantom.csv";
 		File.AppendAllText(path, "Time,Distance,Angle,Difficulty"+ Environment.NewLine);//save to file
 		selectLevel ();
+		trialsType.setRealThing ();
 	}
 
 	protected override void atStart ()
@@ -76,6 +77,14 @@ public class Phantom : Game
 			                         -(float)gimbalX()* Mathf.Rad2Deg, 
 			                         -(float)gimbalZ()* Mathf.Rad2Deg);
 		}
+
+		if (trialsType.currentGroup > trialsType.getRepetition())
+		{
+			nextLevel = "MainMenu";
+			trialsType.currentGroup = 1;
+		}
+		else
+			nextLevel = "phantomGrab";
 	}
 
 	protected override void gameBehavior ()
@@ -147,8 +156,11 @@ public class Phantom : Game
 				newTask();
 				setNewPositionAndOrientation();
 				selectLevel();
-				if(score == 9)
+				if(score == trialsType.getTrialNum())
+				{
+					trialsType.currentGroup++;
 					window = true;
+				}
 			}
 		}
 		else

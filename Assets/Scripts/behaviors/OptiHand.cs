@@ -23,6 +23,7 @@ public class OptiHand: Game
 		File.AppendAllText(path, "Time,Distance,Angle,Difficulty"+ Environment.NewLine);//save to file
 		optiManager = OptiTrackManager.Instance;
 		selectLevel ();
+		trialsType.setRealThing ();
 	}
 	
 	protected override void atStart ()
@@ -33,7 +34,15 @@ public class OptiHand: Game
 
 		setNewPositionAndOrientation();
 		pointer.renderer.enabled = true;
-		
+
+		if (trialsType.currentGroup > trialsType.getRepetition())
+		{
+			nextLevel = "MainMenu";
+			trialsType.currentGroup = 1;
+		}
+		else
+			nextLevel = "optiHand";
+
 		if (bSuccess) 
 		{
 			connectionMessage="connected";
@@ -59,8 +68,8 @@ public class OptiHand: Game
 				palm.renderer.material = blue;
 				pointer.renderer.material = blue;
 
-				Quaternion currentOrient = optiManager.getOrientation(2);
-				palm.transform.position = optiManager.getPosition(2);
+				Quaternion currentOrient = optiManager.getOrientation(0);
+				palm.transform.position = optiManager.getPosition(0);
 				
 				Vector3 thumbPos = optiManager.getMarkerPosition(0);
 				Vector3 indexPos = optiManager.getMarkerPosition(1);
@@ -119,8 +128,11 @@ public class OptiHand: Game
 						newTask();
 						setNewPositionAndOrientation();
 						selectLevel();
-						if(score == 9)
+						if(score == trialsType.getTrialNum())
+						{
+							trialsType.currentGroup++;
 							window = true;
+						}
 					}
 				}
 				prevPos = currentPos;

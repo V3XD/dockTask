@@ -16,6 +16,7 @@ public class Chair: Game
 		File.AppendAllText(path, "Time,Distance,Angle,Difficulty"+ Environment.NewLine);//save to file
 		optiManager = OptiTrackManager.Instance;
 		selectLevel ();
+		trialsType.setRealThing ();
 	}
 	
 	protected override void atStart ()
@@ -29,6 +30,14 @@ public class Chair: Game
 		{
 			connectionMessage="connected";
 		}
+
+		if (trialsType.currentGroup > trialsType.getRepetition())
+		{
+			nextLevel = "MainMenu";
+			trialsType.currentGroup = 1;
+		}
+		else
+			nextLevel = "optiChair";
 	}
 	
 	protected override void gameBehavior ()
@@ -81,8 +90,11 @@ public class Chair: Game
 						newTask();
 						setNewPositionAndOrientation();
 						selectLevel();
-						if(score == 9)
+						if(score == trialsType.getTrialNum())
+						{
+							trialsType.currentGroup++;
 							window = true;
+						}
 					}
 
 					cursor.transform.rotation = currentOrient;

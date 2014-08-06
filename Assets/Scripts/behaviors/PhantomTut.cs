@@ -56,6 +56,7 @@ public class PhantomTut : Game
 		path = folders.getPath()+@"tutorial/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_PhantomTut.csv";
 		File.AppendAllText(path, "Time,Distance,Angle,Difficulty"+ Environment.NewLine);//save to file
 		difficulty.setEasy ();
+		trialsType.setTutorial ();
 	}
 
 	protected override void atStart ()
@@ -145,7 +146,7 @@ public class PhantomTut : Game
 			{
 				newTask();
 				setNewPositionAndOrientationTut();
-				if(score == 5)
+				if(score == trialsType.getTrialNum())
 					window = true;
 			}
 		}

@@ -38,7 +38,6 @@ public class Game : MonoBehaviour
 	protected string path;
 	protected Difficulty difficulty;
 	protected Vector3 prevPos= new Vector3 ();
-	bool mute = false;
 	protected float distance = 0;
 	protected float angle = 0;
 	protected bool window = false;
@@ -48,13 +47,13 @@ public class Game : MonoBehaviour
 	protected bool action = false;
 	float maxTime = 60f;
 	bool updateCam = true;
-	protected int trialNum = 9;
+	protected Type trialsType;
 
 	void OnGUI ()
 	{
 		GUI.Box (new Rect (0,0,265,100), "<size=36>"+ message + "\n" +"Level: "+difficulty.getLevel () + "</size>");
 		
-		GUI.Box (new Rect (UnityEngine.Screen.width - 200,0,200,100), "<size=36>Trial: " + score +"/"+trialNum+
+		GUI.Box (new Rect (UnityEngine.Screen.width - 200,0,200,100), "<size=36>Trial: " + score +"/"+trialsType.getTrialNum()+
 		         "\nTime: " + (int)(Time.time - prevTotalTime)+"</size>");// +"\nPrev: " + ((int)prevTime).ToString()+"</size>");
 		GUI.Box (new Rect (UnityEngine.Screen.width - 150,UnityEngine.Screen.height - 30, 150, 36), "<size=18>"+connectionMessage+"</size>");
 		if (window)
@@ -67,7 +66,15 @@ public class Game : MonoBehaviour
 	{
 		folders = Folders.Instance;
 		difficulty = Difficulty.Instance;
+		trialsType = Type.Instance;
 		UnityEngine.Screen.showCursor = false;
+
+		if(trialsType.mute)
+		{
+			ambientSource.volume = 0f;
+			pointer.GetComponent<AudioSource>().volume = 0f;
+		}
+
 		atAwake ();
 	}
 	
@@ -94,14 +101,14 @@ public class Game : MonoBehaviour
 
 		if(Input.GetKeyUp (KeyCode.M))
 		{
-			if(!mute)
+			if(!trialsType.mute)
 			{
-				mute = true;
+				trialsType.mute = true;
 				ambientSource.volume = 0f;
 				pointer.GetComponent<AudioSource>().volume = 0f;
 			}
 			else
-				mute = false;
+				trialsType.mute = false;
 		}
 
 		if (instructionsText.enabled) 
@@ -212,7 +219,6 @@ public class Game : MonoBehaviour
 	
 	protected void setNewPositionAndOrientation()
 	{
-		trialNum = 9;
 		setRotation ();
 		//target.transform.rotation = UnityEngine.Random.rotation;
 		cursor.transform.position = new Vector3 (UnityEngine.Random.Range(-xMax, xMax),
@@ -222,7 +228,6 @@ public class Game : MonoBehaviour
 
 	protected void setNewPositionAndOrientationTut()
 	{
-		trialNum = 5;
 		switch (score)
 		{
 			//learn to translate
@@ -264,7 +269,7 @@ public class Game : MonoBehaviour
 		Vector3 cursorV = cursor.transform.position;
 		distance = (targetV - cursorV).magnitude;
 		angle = Quaternion.Angle(cursorQ, targetQ);
-		if(!mute)
+		if(!trialsType.mute)
 		{
 			if(angle > 40f)
 				ambientSource.volume = 0;
