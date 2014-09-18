@@ -392,7 +392,7 @@ public class Game : MonoBehaviour
 		float angle = 0f;
 		do
 		{
-			target.transform.rotation = UnityEngine.Random.rotation;
+			target.transform.rotation = UnityEngine.Random.rotationUniform;
 			angle = Vector3.Angle(target.transform.up, Vector3.down);
 		}while(angle < 60f);
 
