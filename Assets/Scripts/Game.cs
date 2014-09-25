@@ -48,6 +48,7 @@ public class Game : MonoBehaviour
 	float maxTime = 60f;
 	bool updateCam = true;
 	protected Type trialsType;
+	float minDistance = 4f; //min distance between target and cursor
 
 	void OnGUI ()
 	{
@@ -220,10 +221,7 @@ public class Game : MonoBehaviour
 	protected void setNewPositionAndOrientation()
 	{
 		setRotation ();
-		//target.transform.rotation = UnityEngine.Random.rotation;
-		cursor.transform.position = new Vector3 (UnityEngine.Random.Range(-xMax, xMax),
-		                                         UnityEngine.Random.Range(4.0F, yMax),
-		                                         UnityEngine.Random.Range(-zMax+2.5f, zMax));
+		setPosition ();
 	}
 
 	protected void setNewPositionAndOrientationTut()
@@ -252,13 +250,10 @@ public class Game : MonoBehaviour
 			//practise docking
 			default:
 				setRotation ();
-				//target.transform.rotation = UnityEngine.Random.rotation;
 				break;
 		}
 
-		cursor.transform.position = new Vector3 (UnityEngine.Random.Range(-xMax, xMax),
-		                                         UnityEngine.Random.Range(4.0F, yMax),
-		                                         UnityEngine.Random.Range(-zMax+2.5f, zMax));
+		setPosition ();
 	}
 
 	void evaluateDock ()
@@ -360,15 +355,6 @@ public class Game : MonoBehaviour
 	}
 	void DoWindow(int windowID)
 	{
-		/*if (GUI.Button (new Rect (10, 40, 95, 30), "<size=20>Continue</size>"))
-		{
-			window = false;
-			prevTotalTime = Time.time;
-		}
-		else if (GUI.Button(new Rect(110, 40, 95, 30), "<size=20>Next</size>"))
-		{
-			Application.LoadLevel(nextLevel);
-		}*/
 		if(windowID == 0)
 		{
 			if (GUI.Button(new Rect(50, 45, 95, 30), "<size=20>Next</size>"))
@@ -396,6 +382,19 @@ public class Game : MonoBehaviour
 			angle = Vector3.Angle(target.transform.up, Vector3.down);
 		}while(angle < 60f);
 
+	}
+
+	void setPosition ()
+	{ 
+		Vector3 position = new Vector3();
+		do
+		{
+			position = new Vector3 (UnityEngine.Random.Range(-xMax, xMax),
+	                                 UnityEngine.Random.Range(4.0F, yMax),
+	                                 UnityEngine.Random.Range(-zMax+2.5f, zMax));
+		}while(Vector3.Distance(position, target.transform.position) < minDistance);
+		cursor.transform.position = position;
+		
 	}
 
 	protected virtual void gameBehavior ()
