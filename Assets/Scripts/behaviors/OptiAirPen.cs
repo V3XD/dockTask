@@ -12,8 +12,8 @@ public class OptiAirPen : Game
 
 	protected override void atAwake ()
 	{
-		path = folders.getPath()+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_AirPen.csv";
-		File.AppendAllText(path, columns+ Environment.NewLine);//save to file
+		//path = folders.getPath()+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_AirPen.csv";
+		//File.AppendAllText(path, columns+ Environment.NewLine);//save to file
 		optiManager = OptiTrackManager.Instance;
 		selectLevel ();
 		trialsType.setRealThing ();
@@ -25,7 +25,8 @@ public class OptiAirPen : Game
 			
 		setNewPositionAndOrientation();
 		pointer.renderer.enabled = true;
-		
+		interaction = "AirPen";
+
 		if (bSuccess) 
 		{
 			connectionMessage="connected";
@@ -42,13 +43,7 @@ public class OptiAirPen : Game
 
 	protected override void gameBehavior ()
 	{
-		if (Input.GetKeyUp (KeyCode.S))
-		{
-			setNewPositionAndOrientation();
-			prevTotalTime = Time.time;
-			skipWindow = false;
-			skipCount++;
-		}
+
 
 		if (Input.GetKeyUp (KeyCode.LeftControl) || Input.GetKeyUp (KeyCode.RightControl))
 		{
@@ -88,10 +83,13 @@ public class OptiAirPen : Game
 				if(action)
 				{
 					pointer.renderer.material = green; 
-					cursor.transform.Translate (transVec, Space.World);
-					cursor.transform.position = new Vector3 (Mathf.Clamp(cursor.transform.position.x, -xMax, xMax),
-					                                         Mathf.Clamp(cursor.transform.position.y, 3.0f, yMax),
-					                                         Mathf.Clamp(cursor.transform.position.z, -zMax, zMax));
+					if(updateCam)
+					{
+						cursor.transform.Translate (transVec, Space.World);
+						cursor.transform.position = new Vector3 (Mathf.Clamp(cursor.transform.position.x, -xMax, xMax),
+						                                         Mathf.Clamp(cursor.transform.position.y, yMin, yMax),
+						                                         Mathf.Clamp(cursor.transform.position.z, zMin, zMax));
+					}
 					
 					Vector3 zAxis = pointer.transform.TransformDirection(Vector3.forward);
 					cursor.transform.RotateAround(cursor.transform.position, zAxis, rotVec.z);
@@ -106,7 +104,7 @@ public class OptiAirPen : Game
 					if(isDocked)
 					{
 						newTask();
-						setNewPositionAndOrientation();
+						setNewPositionAndOrientation();						
 						selectLevel();
 						if(score == trialsType.getTrialNum())
 						{

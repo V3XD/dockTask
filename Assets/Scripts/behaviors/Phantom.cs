@@ -53,8 +53,8 @@ public class Phantom : Game
 	
 	protected override void atAwake ()
 	{
-		path = folders.getPath()+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_Phantom.csv";
-		File.AppendAllText(path, columns+ Environment.NewLine);//save to file
+		/*path = folders.getPath()+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_Phantom.csv";
+		File.AppendAllText(path, columns+ Environment.NewLine);//save to file*/
 		selectLevel ();
 		trialsType.setRealThing ();
 	}
@@ -64,7 +64,7 @@ public class Phantom : Game
 
 		setNewPositionAndOrientation();
 		pointer.renderer.enabled = true;
-
+		interaction = "Phantom";
 		isConnected = initDevice ();
 		if(isConnected)
 		{
@@ -89,14 +89,6 @@ public class Phantom : Game
 
 	protected override void gameBehavior ()
 	{
-		if (Input.GetKeyUp (KeyCode.S))
-		{
-			setNewPositionAndOrientation();
-			prevTotalTime = Time.time;
-			skipWindow = false;
-			skipCount++;
-		}
-
 		isConnected = getData ();
 		if(isConnected)
 		{
@@ -139,8 +131,14 @@ public class Phantom : Game
 					action = true;
 					info = "grabbed";
 				}
+				if(updateCam)
+				{
+					cursor.transform.Translate (transVec, Space.World);
+					cursor.transform.position = new Vector3 (Mathf.Clamp(cursor.transform.position.x, -xMax, xMax),
+					                                         Mathf.Clamp(cursor.transform.position.y, yMin, yMax),
+					                                         Mathf.Clamp(cursor.transform.position.z, zMin, zMax));
+				}
 
-				cursor.transform.Translate (transVec, Space.World);
 				Vector3 zAxis = j4.transform.TransformDirection(Vector3.forward);
 				cursor.transform.RotateAround(cursor.transform.position, zAxis, rotVec.z);
 				Vector3 xAxis = j4.transform.TransformDirection(Vector3.right);

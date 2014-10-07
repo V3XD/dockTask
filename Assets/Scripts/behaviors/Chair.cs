@@ -12,8 +12,8 @@ public class Chair: Game
 
 	protected override void atAwake ()
 	{
-		path = folders.getPath()+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_Chair.csv";
-		File.AppendAllText(path, columns+ Environment.NewLine);//save to file
+		//path = folders.getPath()+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_Chair.csv";
+		//File.AppendAllText(path, columns+ Environment.NewLine);//save to file
 		optiManager = OptiTrackManager.Instance;
 		selectLevel ();
 		trialsType.setRealThing ();
@@ -25,6 +25,7 @@ public class Chair: Game
 		setNewPositionAndOrientation();
 		pointer.renderer.enabled = true;
 		info = "";
+		interaction = "MiniChair";
 
 		if (bSuccess) 
 		{
@@ -42,14 +43,6 @@ public class Chair: Game
 	
 	protected override void gameBehavior ()
 	{
-		if (Input.GetKeyUp (KeyCode.S))
-		{
-			setNewPositionAndOrientation();
-			prevTotalTime = Time.time;
-			skipWindow = false;
-			skipCount++;
-		}
-
 		if (Input.GetKeyUp (KeyCode.LeftControl) || Input.GetKeyUp (KeyCode.RightControl))
 		{
 			action = false;
@@ -81,8 +74,8 @@ public class Chair: Game
 				{
 					cursor.transform.Translate (transVec, Space.World);
 					cursor.transform.position = new Vector3 (Mathf.Clamp(cursor.transform.position.x, -xMax, xMax),
-					                                         Mathf.Clamp(cursor.transform.position.y, 3.0f, yMax),
-					                                         Mathf.Clamp(cursor.transform.position.z, -zMax, zMax));
+					                                         Mathf.Clamp(cursor.transform.position.y, yMin, yMax),
+					                                         Mathf.Clamp(cursor.transform.position.z, zMin, zMax));
 				}
 				else if(isDocked)
 				{

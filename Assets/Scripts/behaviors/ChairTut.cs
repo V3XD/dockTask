@@ -12,8 +12,8 @@ public class ChairTut: Game
 
 	protected override void atAwake ()
 	{
-		path = folders.getPath()+@"tutorial/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_ChairTut.csv";
-		File.AppendAllText(path, columns+ Environment.NewLine);//save to file
+		/*path = folders.getPath()+@"tutorial/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_ChairTut.csv";
+		File.AppendAllText(path, columns+ Environment.NewLine);//save to file*/
 		optiManager = OptiTrackManager.Instance;
 		difficulty.setEasy ();
 		trialsType.setTutorial ();
@@ -22,7 +22,7 @@ public class ChairTut: Game
 	protected override void atStart ()
 	{
 		bSuccess = optiManager.isConnected ();
-
+		interaction = "MiniChair";
 		setNewPositionAndOrientationTut();
 		pointer.renderer.enabled = true;
 		info = "";
@@ -36,14 +36,6 @@ public class ChairTut: Game
 	
 	protected override void gameBehavior ()
 	{
-		if (Input.GetKeyUp (KeyCode.S))
-		{
-			setNewPositionAndOrientationTut();
-			prevTotalTime = Time.time;
-			skipWindow = false;
-			skipCount++;
-		}
-
 		if (Input.GetKeyUp (KeyCode.LeftControl) || Input.GetKeyUp (KeyCode.RightControl))
 		{
 			action = false;
@@ -78,8 +70,8 @@ public class ChairTut: Game
 				{
 					cursor.transform.Translate (transVec, Space.World);
 					cursor.transform.position = new Vector3 (Mathf.Clamp(cursor.transform.position.x, -xMax, xMax),
-					                                         Mathf.Clamp(cursor.transform.position.y, 3.0f, yMax),
-					                                         Mathf.Clamp(cursor.transform.position.z, -zMax, zMax));
+					                                         Mathf.Clamp(cursor.transform.position.y, yMin, yMax),
+					                                         Mathf.Clamp(cursor.transform.position.z, zMin, zMax));
 				}
 				else if(isDocked)
 				{

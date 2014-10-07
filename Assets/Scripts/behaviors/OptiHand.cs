@@ -19,8 +19,8 @@ public class OptiHand: Game
 
 	protected override void atAwake ()
 	{
-		path = folders.getPath()+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_Hand.csv";
-		File.AppendAllText(path, columns+ Environment.NewLine);//save to file
+		/*path = folders.getPath()+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_Hand.csv";
+		File.AppendAllText(path, columns+ Environment.NewLine);//save to file*/
 		optiManager = OptiTrackManager.Instance;
 		selectLevel ();
 		trialsType.setRealThing ();
@@ -34,6 +34,7 @@ public class OptiHand: Game
 
 		setNewPositionAndOrientation();
 		pointer.renderer.enabled = true;
+		interaction = "Fingers";
 
 		if (trialsType.currentGroup > trialsType.getRepetition())
 		{
@@ -51,14 +52,6 @@ public class OptiHand: Game
 	
 	protected override void gameBehavior ()
 	{
-		if (Input.GetKeyUp (KeyCode.S))
-		{
-			setNewPositionAndOrientation();
-			prevTotalTime = Time.time;
-			skipWindow = false;
-			skipCount++;
-		}
-
 		if(bSuccess)
 		{
 			if(optiManager.getMarkerNum() == 2 && optiManager.getRigidBodyNum() >= 1)
@@ -106,10 +99,14 @@ public class OptiHand: Game
 					trail.GetComponent<TrailRenderer>().enabled = true;
 					index.renderer.enabled = false;
 					thumb.renderer.enabled = false;
-					cursor.transform.Translate (transVec, Space.World);
-					cursor.transform.position = new Vector3 (Mathf.Clamp(cursor.transform.position.x, -xMax, xMax),
-					                                         Mathf.Clamp(cursor.transform.position.y, 3.0f, yMax),
-					                                         Mathf.Clamp(cursor.transform.position.z, -zMax, zMax));
+
+					if(updateCam)
+					{
+						cursor.transform.Translate (transVec, Space.World);
+						cursor.transform.position = new Vector3 (Mathf.Clamp(cursor.transform.position.x, -xMax, xMax),
+						                                         Mathf.Clamp(cursor.transform.position.y, yMin, yMax),
+						                                         Mathf.Clamp(cursor.transform.position.z, zMin, zMax));
+					}
 					
 					Vector3 zAxis = pointer.transform.TransformDirection(Vector3.forward);
 					cursor.transform.RotateAround(cursor.transform.position, zAxis, rotVec.z);

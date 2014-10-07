@@ -27,7 +27,9 @@ public class Game : MonoBehaviour
 	protected static float xMax = 15.0f;
 	protected static float yMax = 15.0f;
 	protected static float zMax = 15.0f;
-	
+	protected static float yMin = 4.0f;
+	protected static float zMin = -12.5f;
+
 	protected bool isDocked = false;
 	protected int score = 0;
 	protected string connectionMessage="not connected";
@@ -37,7 +39,7 @@ public class Game : MonoBehaviour
 	protected float prevTotalTime;
 	protected float clutchTime=0;
 	protected float prevClutchTime=0;
-	protected string path;
+	//protected string path;
 	protected Difficulty difficulty;
 	protected Vector3 prevPos= new Vector3 ();
 	protected float distance = 0;
@@ -47,19 +49,19 @@ public class Game : MonoBehaviour
 	protected Folders folders;
 	protected string nextLevel = "MainMenu";
 	protected bool action = false;
-	float maxTime = 60f;
-	bool updateCam = true;
+	float maxTime = 20f; //max time before the trial is skipped
+	protected bool updateCam = true;
 	protected Type trialsType;
-	float minDistance = 4f; //min distance between target and cursor
-	int autoSkip = 0; //auto Skip Count
-	protected int skipCount = 0; //skip Count
-	protected string columns = "Time,Distance,Angle,Difficulty,autoSkip,skip,initDistance,initAngle,clutchTime";
-	Vector3 initDistance = new Vector3();
-	float initRot = 0;
+	float minDistance = 5f; //min distance between target and cursor
+
+	float initDistance = 0;
+	float initAngle = 0;
+	protected string interaction = "";
+	Quaternion initTarget;
 
 	void OnGUI ()
 	{
-		GUI.Box (new Rect (0,0,265,100), "<size=36>"+ message + "\n" +"Level: "+difficulty.getLevel () + "</size>");
+		GUI.Box (new Rect (0,0,265,100), "<size=36>"+ message + "</size>");//+ "\n" +"Level: "+difficulty.getLevel ()
 		
 		GUI.Box (new Rect (UnityEngine.Screen.width - 200,0,200,100), "<size=36>Trial: " + score +"/"+trialsType.getTrialNum()+
 		         "\nTime: " + (int)(Time.time - prevTotalTime)+"</size>");
@@ -119,13 +121,26 @@ public class Game : MonoBehaviour
 				trialsType.mute = false;
 		}
 
+		if (Input.GetKeyUp (KeyCode.S))
+		{
+			float tmpTime = Time.time - prevTotalTime;
+			prevTotalTime = Time.time;
+			skipWindow = false;
+			File.AppendAllText(folders.getPath()+"Skip.csv", tmpTime.ToString()+","+difficulty.getLevel()+ ","+"0"+","+"1"+
+			                   ","+initDistance.ToString()+","+initAngle.ToString()+","+clutchTime.ToString()+
+			                   ","+initTarget.x+","+initTarget.y+","+initTarget.z+","+initTarget.w+","+interaction+Environment.NewLine);//save to file
+			if(trialsType.getType() == "Trials")
+				setNewPositionAndOrientation();
+			else
+				setNewPositionAndOrientationTut();
+		}
+
 		if (instructionsText.enabled) 
 		{
 			if(action)
 			{
 				instructionsText.enabled = false;
 				prevTotalTime = Time.time;
-				prevClutchTime = Time.time;
 			}
 		}
 
@@ -143,10 +158,17 @@ public class Game : MonoBehaviour
 			gameBehavior ();
 		}
 
-		if((Time.time - prevTotalTime) > maxTime && !window)
+		if((Time.time - prevTotalTime) > maxTime && !window && !instructionsText.enabled)
 		{
-			skipWindow = true;
-			autoSkip++;
+			if(!skipWindow)
+			{
+				float tmpTime = Time.time - prevTotalTime;
+				prevTotalTime = Time.time;
+				File.AppendAllText(folders.getPath()+"Skip.csv", tmpTime.ToString()+","+difficulty.getLevel()+ ","+"1"+","+"0"+
+				                   ","+initDistance.ToString()+","+initAngle.ToString()+","+clutchTime.ToString()+
+				                   ","+initTarget.x+","+initTarget.y+","+initTarget.z+","+initTarget.w+","+interaction+Environment.NewLine);//save to file
+				skipWindow = true;
+			}
 		}
 
 		evaluateDock ();
@@ -232,8 +254,8 @@ public class Game : MonoBehaviour
 	{
 		setRotation ();
 		setPosition ();
-		targetSphere.transform.localScale = Vector3.one;
-		targetSphere.transform.localScale *= difficulty.distance;
+		clutchTime = 0;
+		updateCam = true;
 	}
 
 	protected void setNewPositionAndOrientationTut()
@@ -264,7 +286,8 @@ public class Game : MonoBehaviour
 				setRotation ();
 				break;
 		}
-
+		initTarget = target.transform.rotation;
+		initAngle = Quaternion.Angle(cursor.transform.rotation, initTarget);
 		setPosition ();
 	}
 
@@ -324,8 +347,9 @@ public class Game : MonoBehaviour
 		popSource.PlayOneShot(popSound);
 		prevTotalTime = Time.time;
 		pointText.enabled = true;
-		prevTime = tmpTime;
-		File.AppendAllText(path, prevTime.ToString()+","+distance.ToString()+","+angle.ToString()+ ","+difficulty.getLevel()+ ","+autoSkip.ToString()+","+skipCount.ToString()+","+initDistance.ToString()+","+initRot.ToString()+Environment.NewLine);//save to file
+		File.AppendAllText(folders.getPath()+trialsType.getType()+".csv", tmpTime.ToString()+","+distance.ToString()+","+angle.ToString()+ 
+		                   ","+difficulty.getLevel()+ ","+initDistance.ToString()+","+
+		                   initAngle.ToString()+","+clutchTime.ToString()+","+interaction+Environment.NewLine);//save to file
 		score++;
 	}
 
@@ -364,6 +388,8 @@ public class Game : MonoBehaviour
 				difficulty.setEasy ();
 				break;
 		}
+		targetSphere.transform.localScale = Vector3.one;
+		targetSphere.transform.localScale *= difficulty.distance+0.5f;
 	}
 	void DoWindow(int windowID)
 	{
@@ -380,7 +406,6 @@ public class Game : MonoBehaviour
 			{
 				setNewPositionAndOrientation();
 				skipWindow = false;
-				prevTotalTime = Time.time;
 			}
 		}
 	}
@@ -393,9 +418,8 @@ public class Game : MonoBehaviour
 			target.transform.rotation = UnityEngine.Random.rotationUniform;
 			angle = Vector3.Angle(target.transform.up, Vector3.down);
 		}while(angle < 60f);
-		Quaternion targetQ = target.transform.rotation;
-		Quaternion cursorQ = cursor.transform.rotation;
-		angle = Quaternion.Angle(cursorQ, targetQ);
+		initTarget = target.transform.rotation;
+		initAngle = Quaternion.Angle(cursor.transform.rotation, initTarget);
 	}
 
 	void setPosition ()
@@ -404,11 +428,11 @@ public class Game : MonoBehaviour
 		do
 		{
 			position = new Vector3 (UnityEngine.Random.Range(-xMax, xMax),
-	                                 UnityEngine.Random.Range(4.0F, yMax),
-	                                 UnityEngine.Random.Range(-zMax+2.5f, zMax));
+	                                 UnityEngine.Random.Range(yMin, yMax),
+	                                 UnityEngine.Random.Range(zMin, zMax));
 		}while(Vector3.Distance(position, target.transform.position) < minDistance);
 		cursor.transform.position = position;
-		minDistance = Vector3.Distance (target.transform.position, cursor.transform.position);
+		initDistance = Vector3.Distance (target.transform.position, cursor.transform.position);
 		
 	}
 

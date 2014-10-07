@@ -1,17 +1,23 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
+using System.IO;
 
 public class Folders : Singleton<Folders> 
 {
 	protected Folders () {} 
 
 	string folderPath;
+	string columns = "Time,Distance,Angle,Difficulty,initDistance,initAngle,clutchTime,interaction";
+	string columnsSkip = "Time,Difficulty,autoSkip,skip,initDistance,initAngle,clutchTime,targetX,targetY,targetZ,targetW,interaction";
 
 	void Awake () 
 	{
 		folderPath = @"Log\"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+@"\";
 		System.IO.Directory.CreateDirectory(folderPath);
-		System.IO.Directory.CreateDirectory(folderPath+@"tutorial\");
+		File.AppendAllText(folderPath+"Trials.csv", columns+ Environment.NewLine);
+		File.AppendAllText(folderPath+"Tutorials.csv", columns+ Environment.NewLine);
+		File.AppendAllText(folderPath+"Skip.csv", columnsSkip+ Environment.NewLine);
 	}
 
 	public string getPath ()

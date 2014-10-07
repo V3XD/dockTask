@@ -28,17 +28,6 @@ public class MainMenu : MonoBehaviour {
 			Application.LoadLevel("optiAirPen");
 		if (GUI.Button(new Rect((UnityEngine.Screen.width)/2,10,125,80),"<size=26>AirPen\nPractice</size>"))
 			Application.LoadLevel("optiAirPenTutorial");
-			
-
-		/*GUI.Label(new Rect((3 * UnityEngine.Screen.width) / 4, (UnityEngine.Screen.height) / 2 - 100, 150, 50), "<size=20>Difficulty Level</size>");
-		if (GUI.Toggle (new Rect ((3 * UnityEngine.Screen.width) / 4, (UnityEngine.Screen.height) / 2 + 50, 100, 50), isEasy, "<size=20>Easy</size>"))
-			isEasy = SetMeOnly ();
-
-		if (GUI.Toggle (new Rect ((3 * UnityEngine.Screen.width) / 4, (UnityEngine.Screen.height) / 2, 100, 50), isNormal, "<size=20>Normal</size>"))
-			isNormal = SetMeOnly ();
-
-		if (GUI.Toggle (new Rect ((3 * UnityEngine.Screen.width) / 4, (UnityEngine.Screen.height) / 2 - 50, 150, 50), isHard, "<size=20>Hard</size>"))
-			isHard = SetMeOnly ();*/
 	}
 
 	void Awake()

@@ -53,8 +53,8 @@ public class PhantomTut : Game
 	
 	protected override void atAwake ()
 	{
-		path = folders.getPath()+@"tutorial/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_PhantomTut.csv";
-		File.AppendAllText(path, columns+ Environment.NewLine);//save to file
+		/*path = folders.getPath()+@"tutorial/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_PhantomTut.csv";
+		File.AppendAllText(path, columns+ Environment.NewLine);//save to file*/
 		difficulty.setEasy ();
 		trialsType.setTutorial ();
 	}
@@ -64,6 +64,7 @@ public class PhantomTut : Game
 		nextLevel = "phantomGrab";
 		setNewPositionAndOrientationTut();
 		pointer.renderer.enabled = true;
+		interaction = "Phantom";
 
 		isConnected = initDevice ();
 		if(isConnected)
@@ -81,13 +82,6 @@ public class PhantomTut : Game
 
 	protected override void gameBehavior ()
 	{
-		if (Input.GetKeyUp (KeyCode.S))
-		{
-			setNewPositionAndOrientationTut();
-			prevTotalTime = Time.time;
-			skipWindow = false;
-			skipCount++;
-		}
 
 		isConnected = getData ();
 		if(isConnected)
@@ -131,7 +125,13 @@ public class PhantomTut : Game
 					action = true;
 					info = "grabbed";
 				}
-				cursor.transform.Translate (transVec, Space.World);
+				if(updateCam)
+				{
+					cursor.transform.Translate (transVec, Space.World);
+					cursor.transform.position = new Vector3 (Mathf.Clamp(cursor.transform.position.x, -xMax, xMax),
+					                                         Mathf.Clamp(cursor.transform.position.y, yMin, yMax),
+					                                         Mathf.Clamp(cursor.transform.position.z, zMin, zMax));
+				}
 				Vector3 zAxis = j4.transform.TransformDirection(Vector3.forward);
 				cursor.transform.RotateAround(cursor.transform.position, zAxis, rotVec.z);
 				Vector3 xAxis = j4.transform.TransformDirection(Vector3.right);

@@ -9,6 +9,7 @@ public class Type : Singleton<Type>
 	int repetition;//times to repeat the group of trials
 	public int currentGroup;
 	public bool mute = false;
+	string trialType = "Tutorials";
 
 	void Awake () 
 	{
@@ -20,12 +21,14 @@ public class Type : Singleton<Type>
 	{
 		trialNum = 5;
 		repetition = 1;
+		trialType = "Tutorials";
 	}
 
 	public void setRealThing()
 	{
 		trialNum = 9;
 		repetition = 2;
+		trialType = "Trials";
 	} 
 
 	public int getTrialNum()
@@ -37,5 +40,11 @@ public class Type : Singleton<Type>
 	{
 		return repetition;
 	}
+
+	public string getType()
+	{
+		return trialType;
+	}
+
 
 }
