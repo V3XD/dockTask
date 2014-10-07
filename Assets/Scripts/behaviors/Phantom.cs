@@ -54,7 +54,7 @@ public class Phantom : Game
 	protected override void atAwake ()
 	{
 		path = folders.getPath()+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_Phantom.csv";
-		File.AppendAllText(path, "Time,Distance,Angle,Difficulty"+ Environment.NewLine);//save to file
+		File.AppendAllText(path, columns+ Environment.NewLine);//save to file
 		selectLevel ();
 		trialsType.setRealThing ();
 	}
@@ -94,6 +94,7 @@ public class Phantom : Game
 			setNewPositionAndOrientation();
 			prevTotalTime = Time.time;
 			skipWindow = false;
+			skipCount++;
 		}
 
 		isConnected = getData ();
@@ -132,20 +133,25 @@ public class Phantom : Game
 			
 			if(isButtonADown() || isButtonBDown())
 			{
-				action = true;
+				if(!action)
+				{
+					prevClutchTime = Time.time; 
+					action = true;
+					info = "grabbed";
+				}
+
 				cursor.transform.Translate (transVec, Space.World);
-				//cursor.transform.Rotate(rotVec, Space.World);
 				Vector3 zAxis = j4.transform.TransformDirection(Vector3.forward);
 				cursor.transform.RotateAround(cursor.transform.position, zAxis, rotVec.z);
 				Vector3 xAxis = j4.transform.TransformDirection(Vector3.right);
 				cursor.transform.RotateAround(cursor.transform.position, xAxis, rotVec.x);
 				Vector3 yAxis = j4.transform.TransformDirection(Vector3.up);
 				cursor.transform.RotateAround(cursor.transform.position, yAxis, rotVec.y);
-				info = "grabbed";
 				j4.renderer.material = green;
 			}
-			else
+			else if (action)
 			{
+				clutchTime = clutchTime + Time.time - prevClutchTime; 
 				action = false;
 				info = "";
 				j4.renderer.material = yellow;

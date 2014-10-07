@@ -20,7 +20,7 @@ public class OptiHand: Game
 	protected override void atAwake ()
 	{
 		path = folders.getPath()+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_Hand.csv";
-		File.AppendAllText(path, "Time,Distance,Angle,Difficulty"+ Environment.NewLine);//save to file
+		File.AppendAllText(path, columns+ Environment.NewLine);//save to file
 		optiManager = OptiTrackManager.Instance;
 		selectLevel ();
 		trialsType.setRealThing ();
@@ -56,11 +56,11 @@ public class OptiHand: Game
 			setNewPositionAndOrientation();
 			prevTotalTime = Time.time;
 			skipWindow = false;
+			skipCount++;
 		}
 
 		if(bSuccess)
 		{
-			//Debug.Log(optiManager.getMarkerNum()+" "+optiManager.getRigidBodyNum());
 			if(optiManager.getMarkerNum() == 2 && optiManager.getRigidBodyNum() >= 1)
 			{
 				thumb.renderer.material = blue;
@@ -96,8 +96,12 @@ public class OptiHand: Game
 
 				if( aveDist <= calibration.touchDist)
 				{
-					action = true;
-					info = "grabbed";
+					if(!action)
+					{
+						prevClutchTime = Time.time; 
+						action = true;
+						info = "grabbed";
+					}
 					pointer.renderer.enabled = true;
 					trail.GetComponent<TrailRenderer>().enabled = true;
 					index.renderer.enabled = false;
@@ -116,12 +120,16 @@ public class OptiHand: Game
 				}
 				else
 				{
-					action = false;
-					index.renderer.enabled = true;
-					thumb.renderer.enabled = true;
-					pointer.renderer.enabled = false;
-					trail.GetComponent<TrailRenderer>().enabled = false;
-					info = "";
+					if(action)
+					{
+						action = false;
+						clutchTime = clutchTime + Time.time - prevClutchTime; 
+						index.renderer.enabled = true;
+						thumb.renderer.enabled = true;
+						pointer.renderer.enabled = false;
+						trail.GetComponent<TrailRenderer>().enabled = false;
+						info = "";
+					}
 
 					if(isDocked)
 					{

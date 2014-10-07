@@ -13,7 +13,7 @@ public class Chair: Game
 	protected override void atAwake ()
 	{
 		path = folders.getPath()+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_Chair.csv";
-		File.AppendAllText(path, "Time,Distance,Angle,Difficulty"+ Environment.NewLine);//save to file
+		File.AppendAllText(path, columns+ Environment.NewLine);//save to file
 		optiManager = OptiTrackManager.Instance;
 		selectLevel ();
 		trialsType.setRealThing ();
@@ -47,18 +47,23 @@ public class Chair: Game
 			setNewPositionAndOrientation();
 			prevTotalTime = Time.time;
 			skipWindow = false;
+			skipCount++;
 		}
 
 		if (Input.GetKeyUp (KeyCode.LeftControl) || Input.GetKeyUp (KeyCode.RightControl))
 		{
 			action = false;
 			info = "";
-			
+			clutchTime = clutchTime + Time.time - prevClutchTime; 
 		}
 		else if(Input.GetKeyDown (KeyCode.LeftControl) || Input.GetKeyDown (KeyCode.RightControl))
 		{
-			action = true;
-			info = "translate";
+			if(!action)
+			{
+				prevClutchTime = Time.time; 
+				action = true;
+				info = "translate";
+			}
 		}
 		
 		if(bSuccess)
@@ -66,44 +71,33 @@ public class Chair: Game
 
 			if(optiManager.getRigidBodyNum() >= 1)
 			{
-				//info = "";
-
 				Vector3 currentPos = optiManager.getPosition(0);
 
 				Quaternion currentOrient = optiManager.getOrientation(0);
 
 				Vector3 transVec = currentPos - prevPos;
-				//Debug.Log(currentPos);
-
-				//if(currentPos != Vector3.zero)
-				//{
-					trackedObj.renderer.enabled = false;
-					if(action)
-					{
-						cursor.transform.Translate (transVec, Space.World);
-						cursor.transform.position = new Vector3 (Mathf.Clamp(cursor.transform.position.x, -xMax, xMax),
-						                                         Mathf.Clamp(cursor.transform.position.y, 3.0f, yMax),
-						                                         Mathf.Clamp(cursor.transform.position.z, -zMax, zMax));
-					}
-					else if(isDocked)
-					{
-						newTask();
-						setNewPositionAndOrientation();
-						selectLevel();
-						if(score == trialsType.getTrialNum())
-						{
-							trialsType.currentGroup++;
-							window = true;
-						}
-					}
-
-					cursor.transform.rotation = currentOrient;
-					prevPos = currentPos;
-				/*}
-				else
+				trackedObj.renderer.enabled = false;
+				if(action)
 				{
-					trackedObj.renderer.enabled = true;
-				}*/
+					cursor.transform.Translate (transVec, Space.World);
+					cursor.transform.position = new Vector3 (Mathf.Clamp(cursor.transform.position.x, -xMax, xMax),
+					                                         Mathf.Clamp(cursor.transform.position.y, 3.0f, yMax),
+					                                         Mathf.Clamp(cursor.transform.position.z, -zMax, zMax));
+				}
+				else if(isDocked)
+				{
+					newTask();
+					setNewPositionAndOrientation();
+					selectLevel();
+					if(score == trialsType.getTrialNum())
+					{
+						trialsType.currentGroup++;
+						window = true;
+					}
+				}
+
+				cursor.transform.rotation = currentOrient;
+				prevPos = currentPos;
 			}
 			else
 			{

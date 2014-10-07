@@ -35,6 +35,8 @@ public class Game : MonoBehaviour
 	protected string info="";
 	protected float prevTime=0;
 	protected float prevTotalTime;
+	protected float clutchTime=0;
+	protected float prevClutchTime=0;
 	protected string path;
 	protected Difficulty difficulty;
 	protected Vector3 prevPos= new Vector3 ();
@@ -49,13 +51,18 @@ public class Game : MonoBehaviour
 	bool updateCam = true;
 	protected Type trialsType;
 	float minDistance = 4f; //min distance between target and cursor
+	int autoSkip = 0; //auto Skip Count
+	protected int skipCount = 0; //skip Count
+	protected string columns = "Time,Distance,Angle,Difficulty,autoSkip,skip,initDistance,initAngle,clutchTime";
+	Vector3 initDistance = new Vector3();
+	float initRot = 0;
 
 	void OnGUI ()
 	{
 		GUI.Box (new Rect (0,0,265,100), "<size=36>"+ message + "\n" +"Level: "+difficulty.getLevel () + "</size>");
 		
 		GUI.Box (new Rect (UnityEngine.Screen.width - 200,0,200,100), "<size=36>Trial: " + score +"/"+trialsType.getTrialNum()+
-		         "\nTime: " + (int)(Time.time - prevTotalTime)+"</size>");// +"\nPrev: " + ((int)prevTime).ToString()+"</size>");
+		         "\nTime: " + (int)(Time.time - prevTotalTime)+"</size>");
 		GUI.Box (new Rect (UnityEngine.Screen.width - 150,UnityEngine.Screen.height - 30, 150, 36), "<size=18>"+connectionMessage+"</size>");
 		if (window)
 			GUI.Window(0, new Rect((UnityEngine.Screen.width*0.5f)-105, (UnityEngine.Screen.height*0.5f)-50, 210, 100), DoWindow, "<size=28>Complete</size>");
@@ -118,6 +125,7 @@ public class Game : MonoBehaviour
 			{
 				instructionsText.enabled = false;
 				prevTotalTime = Time.time;
+				prevClutchTime = Time.time;
 			}
 		}
 
@@ -136,8 +144,10 @@ public class Game : MonoBehaviour
 		}
 
 		if((Time.time - prevTotalTime) > maxTime && !window)
+		{
 			skipWindow = true;
-
+			autoSkip++;
+		}
 
 		evaluateDock ();
 	}
@@ -222,6 +232,8 @@ public class Game : MonoBehaviour
 	{
 		setRotation ();
 		setPosition ();
+		targetSphere.transform.localScale = Vector3.one;
+		targetSphere.transform.localScale *= difficulty.distance;
 	}
 
 	protected void setNewPositionAndOrientationTut()
@@ -262,7 +274,7 @@ public class Game : MonoBehaviour
 		Quaternion cursorQ = cursor.transform.rotation;
 		Vector3 targetV = target.transform.position;
 		Vector3 cursorV = cursor.transform.position;
-		distance = (targetV - cursorV).magnitude;
+		distance = Vector3.Distance (targetV, cursorV);
 		angle = Quaternion.Angle(cursorQ, targetQ);
 		if(!trialsType.mute)
 		{
@@ -313,7 +325,7 @@ public class Game : MonoBehaviour
 		prevTotalTime = Time.time;
 		pointText.enabled = true;
 		prevTime = tmpTime;
-		File.AppendAllText(path, prevTime.ToString()+","+distance.ToString()+","+angle.ToString()+ ","+difficulty.getLevel()+Environment.NewLine);//save to file
+		File.AppendAllText(path, prevTime.ToString()+","+distance.ToString()+","+angle.ToString()+ ","+difficulty.getLevel()+ ","+autoSkip.ToString()+","+skipCount.ToString()+","+initDistance.ToString()+","+initRot.ToString()+Environment.NewLine);//save to file
 		score++;
 	}
 
@@ -381,7 +393,9 @@ public class Game : MonoBehaviour
 			target.transform.rotation = UnityEngine.Random.rotationUniform;
 			angle = Vector3.Angle(target.transform.up, Vector3.down);
 		}while(angle < 60f);
-
+		Quaternion targetQ = target.transform.rotation;
+		Quaternion cursorQ = cursor.transform.rotation;
+		angle = Quaternion.Angle(cursorQ, targetQ);
 	}
 
 	void setPosition ()
@@ -394,6 +408,7 @@ public class Game : MonoBehaviour
 	                                 UnityEngine.Random.Range(-zMax+2.5f, zMax));
 		}while(Vector3.Distance(position, target.transform.position) < minDistance);
 		cursor.transform.position = position;
+		minDistance = Vector3.Distance (target.transform.position, cursor.transform.position);
 		
 	}
 
