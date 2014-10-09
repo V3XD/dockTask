@@ -48,6 +48,7 @@ public class Chair: Game
 			action = false;
 			info = "";
 			clutchTime = clutchTime + Time.time - prevClutchTime; 
+			clutchCn++;
 		}
 		else if(Input.GetKeyDown (KeyCode.LeftControl) || Input.GetKeyDown (KeyCode.RightControl))
 		{

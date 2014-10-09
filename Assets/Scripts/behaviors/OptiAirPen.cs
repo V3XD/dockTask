@@ -50,6 +50,7 @@ public class OptiAirPen : Game
 			action = false;
 			info = "hold";
 			clutchTime = clutchTime + Time.time - prevClutchTime; 
+			clutchCn++;
 		}
 		else if(Input.GetKeyDown (KeyCode.LeftControl) || Input.GetKeyDown (KeyCode.RightControl))
 		{

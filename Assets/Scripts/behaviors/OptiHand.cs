@@ -120,6 +120,7 @@ public class OptiHand: Game
 					if(action)
 					{
 						action = false;
+						clutchCn++;
 						clutchTime = clutchTime + Time.time - prevClutchTime; 
 						index.renderer.enabled = true;
 						thumb.renderer.enabled = true;

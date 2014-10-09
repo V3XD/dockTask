@@ -39,7 +39,6 @@ public class Game : MonoBehaviour
 	protected float prevTotalTime;
 	protected float clutchTime=0;
 	protected float prevClutchTime=0;
-	//protected string path;
 	protected Difficulty difficulty;
 	protected Vector3 prevPos= new Vector3 ();
 	protected float distance = 0;
@@ -53,7 +52,7 @@ public class Game : MonoBehaviour
 	protected bool updateCam = true;
 	protected Type trialsType;
 	float minDistance = 5f; //min distance between target and cursor
-
+	protected int clutchCn=0;
 	float initDistance = 0;
 	float initAngle = 0;
 	protected string interaction = "";
@@ -127,7 +126,7 @@ public class Game : MonoBehaviour
 			prevTotalTime = Time.time;
 			skipWindow = false;
 			File.AppendAllText(folders.getPath()+"Skip.csv", tmpTime.ToString()+","+difficulty.getLevel()+ ","+"0"+","+"1"+
-			                   ","+initDistance.ToString()+","+initAngle.ToString()+","+clutchTime.ToString()+
+			                   ","+initDistance.ToString()+","+initAngle.ToString()+","+clutchTime.ToString()+","+clutchCn.ToString()+
 			                   ","+initTarget.x+","+initTarget.y+","+initTarget.z+","+initTarget.w+","+interaction+Environment.NewLine);//save to file
 			if(trialsType.getType() == "Trials")
 				setNewPositionAndOrientation();
@@ -165,7 +164,7 @@ public class Game : MonoBehaviour
 				float tmpTime = Time.time - prevTotalTime;
 				prevTotalTime = Time.time;
 				File.AppendAllText(folders.getPath()+"Skip.csv", tmpTime.ToString()+","+difficulty.getLevel()+ ","+"1"+","+"0"+
-				                   ","+initDistance.ToString()+","+initAngle.ToString()+","+clutchTime.ToString()+
+				                   ","+initDistance.ToString()+","+initAngle.ToString()+","+clutchTime.ToString()+","+clutchCn.ToString()+
 				                   ","+initTarget.x+","+initTarget.y+","+initTarget.z+","+initTarget.w+","+interaction+Environment.NewLine);//save to file
 				skipWindow = true;
 			}
@@ -255,6 +254,7 @@ public class Game : MonoBehaviour
 		setRotation ();
 		setPosition ();
 		clutchTime = 0;
+		clutchCn = 0;
 		updateCam = true;
 	}
 
@@ -348,8 +348,8 @@ public class Game : MonoBehaviour
 		prevTotalTime = Time.time;
 		pointText.enabled = true;
 		File.AppendAllText(folders.getPath()+trialsType.getType()+".csv", tmpTime.ToString()+","+distance.ToString()+","+angle.ToString()+ 
-		                   ","+difficulty.getLevel()+ ","+initDistance.ToString()+","+
-		                   initAngle.ToString()+","+clutchTime.ToString()+","+interaction+Environment.NewLine);//save to file
+		                   ","+difficulty.getLevel()+ ","+initDistance.ToString()+","+initAngle.ToString()+","+clutchTime.ToString()
+		                   +","+clutchCn.ToString()+","+interaction+Environment.NewLine);//save to file
 		score++;
 	}
 

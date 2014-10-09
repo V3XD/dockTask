@@ -41,7 +41,7 @@ public class ChairTut: Game
 			action = false;
 			clutchTime = clutchTime + Time.time - prevClutchTime; 
 			info = "";
-			
+			clutchCn++;
 		}
 		else if(Input.GetKeyDown (KeyCode.LeftControl) || Input.GetKeyDown (KeyCode.RightControl))
 		{

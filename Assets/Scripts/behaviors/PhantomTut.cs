@@ -144,6 +144,7 @@ public class PhantomTut : Game
 			{
 				clutchTime = clutchTime + Time.time - prevClutchTime; 
 				action = false;
+				clutchCn++;
 				info = "";
 				j4.renderer.material = yellow;
 			}
