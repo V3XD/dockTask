@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System;
 using System.Collections;
 using System.IO;
@@ -57,14 +57,18 @@ public class Game : MonoBehaviour
 	float initAngle = 0;
 	protected string interaction = "";
 	Quaternion initTarget;
-
+	Vector3 camPosL = new Vector3(-15f,8.5f,0f);
+	Vector3 camPosR = new Vector3(15f,8.5f,0f);
+	int cntTab=0;
+	protected int [] rotCntI = new int[3];
+	
 	void OnGUI ()
 	{
 		GUI.Box (new Rect (0,0,265,100), "<size=36>"+ message + "</size>");//+ "\n" +"Level: "+difficulty.getLevel ()
 		
 		GUI.Box (new Rect (UnityEngine.Screen.width - 200,0,200,100), "<size=36>Trial: " + score +"/"+trialsType.getTrialNum()+
 		         "\nTime: " + (int)(Time.time - prevTotalTime)+"</size>");
-		GUI.Box (new Rect (UnityEngine.Screen.width - 150,UnityEngine.Screen.height - 30, 150, 36), "<size=18>"+connectionMessage+"</size>");
+		//GUI.Box (new Rect (UnityEngine.Screen.width - 150,UnityEngine.Screen.height - 30, 150, 36), "<size=18>"+connectionMessage+"</size>");
 		if (window)
 			GUI.Window(0, new Rect((UnityEngine.Screen.width*0.5f)-105, (UnityEngine.Screen.height*0.5f)-50, 210, 100), DoWindow, "<size=28>Complete</size>");
 		if (skipWindow)
@@ -103,9 +107,15 @@ public class Game : MonoBehaviour
 			Application.CaptureScreenshot(folders.getPath()+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_Screenshot.png");
 		}
 
-		if(Input.GetKeyUp (KeyCode.F))
+		/*if(Input.GetKeyUp (KeyCode.F))
 		{
 			updateCam = !updateCam;
+		}*/
+
+		if(Input.GetKeyUp (KeyCode.Tab))
+		{
+			updateCam = !updateCam;
+			cntTab++;
 		}
 
 		if(Input.GetKeyUp (KeyCode.M))
@@ -175,7 +185,19 @@ public class Game : MonoBehaviour
 
 	void LateUpdate()
 	{
-		if (updateCam)
+		if (updateCam) 
+		{
+			secondCamera.transform.position = camPosR;
+			secondCamera.rect = new Rect (0.75f, 0, 0.25f, 0.25f);
+		}
+		else
+		{
+			secondCamera.transform.position = camPosL;
+			secondCamera.rect = new Rect (0, 0, 0.25f, 0.25f);
+		}
+		secondCamera.transform.LookAt(target.transform.position);
+
+		/*if (updateCam)
 		{
 			Vector3 camPos = new Vector3();
 			Vector3 axisVec = dummy.transform.TransformDirection (Vector3.forward);
@@ -241,7 +263,7 @@ public class Game : MonoBehaviour
 
 			secondCamera.transform.position = camPos;
 			secondCamera.transform.LookAt(target.transform.position);
-		}
+		}*/
 	}
 
 	void OnDestroy () 
@@ -255,7 +277,9 @@ public class Game : MonoBehaviour
 		setPosition ();
 		clutchTime = 0;
 		clutchCn = 0;
+		cntTab = 0;
 		updateCam = true;
+		rotCntI = new int[3];
 	}
 
 	protected void setNewPositionAndOrientationTut()
@@ -349,7 +373,8 @@ public class Game : MonoBehaviour
 		pointText.enabled = true;
 		File.AppendAllText(folders.getPath()+trialsType.getType()+".csv", tmpTime.ToString()+","+distance.ToString()+","+angle.ToString()+ 
 		                   ","+difficulty.getLevel()+ ","+initDistance.ToString()+","+initAngle.ToString()+","+clutchTime.ToString()
-		                   +","+clutchCn.ToString()+","+interaction+Environment.NewLine);//save to file
+		                   +","+clutchCn.ToString()+","+cntTab.ToString()+","+rotCntI[0].ToString()+","+rotCntI[1].ToString()+","+rotCntI[2].ToString()+
+		                   ","+interaction+Environment.NewLine);//save to file
 		score++;
 	}
 
@@ -454,6 +479,16 @@ public class Game : MonoBehaviour
 	protected virtual void atEnd ()
 	{
 		
+	}
+
+	protected void dominantAxis(Vector3 rotAngles, int [] counter)
+	{
+		if (rotAngles.x > rotAngles.y && rotAngles.x > rotAngles.z)
+			counter[0]++;
+		else if(rotAngles.y > rotAngles.z)
+			counter[1]++;
+		else
+			counter[2]++;
 	}
 }
 

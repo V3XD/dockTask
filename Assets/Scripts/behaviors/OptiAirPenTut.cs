@@ -76,13 +76,12 @@ public class OptiAirPenTut : Game
 				if(action)
 				{
 					pointer.renderer.material = green; 
-					if(updateCam)
-					{
-						cursor.transform.Translate (transVec, Space.World);
-						cursor.transform.position = new Vector3 (Mathf.Clamp(cursor.transform.position.x, -xMax, xMax),
-						                                         Mathf.Clamp(cursor.transform.position.y, yMin, yMax),
-						                                         Mathf.Clamp(cursor.transform.position.z, zMin, zMax));
-					}
+
+					cursor.transform.Translate (transVec, Space.World);
+					cursor.transform.position = new Vector3 (Mathf.Clamp(cursor.transform.position.x, -xMax, xMax),
+					                                         Mathf.Clamp(cursor.transform.position.y, yMin, yMax),
+					                                         Mathf.Clamp(cursor.transform.position.z, zMin, zMax));
+
 					
 					Vector3 zAxis = pointer.transform.TransformDirection(Vector3.forward);
 					cursor.transform.RotateAround(cursor.transform.position, zAxis, rotVec.z);
@@ -90,6 +89,7 @@ public class OptiAirPenTut : Game
 					cursor.transform.RotateAround(cursor.transform.position, xAxis, rotVec.x);
 					Vector3 yAxis = pointer.transform.TransformDirection(Vector3.up); 
 					cursor.transform.RotateAround(cursor.transform.position, yAxis, rotVec.y);
+					dominantAxis(rotVec, rotCntI);
 				}
 				else
 				{

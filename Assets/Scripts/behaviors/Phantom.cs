@@ -27,14 +27,6 @@ public class Phantom : Game
 	[DllImport("phantomDll")]
 	private static extern double getPosZ();
 	[DllImport("phantomDll")]
-	private static extern double getQuatX();
-	[DllImport("phantomDll")]
-	private static extern double getQuatY();
-	[DllImport("phantomDll")]
-	private static extern double getQuatZ();
-	[DllImport("phantomDll")]
-	private static extern double getQuatW();
-	[DllImport("phantomDll")]
 	private static extern bool isButtonADown();
 	[DllImport("phantomDll")]
 	private static extern bool isButtonBDown();
@@ -131,13 +123,11 @@ public class Phantom : Game
 					action = true;
 					info = "grabbed";
 				}
-				if(updateCam)
-				{
-					cursor.transform.Translate (transVec, Space.World);
-					cursor.transform.position = new Vector3 (Mathf.Clamp(cursor.transform.position.x, -xMax, xMax),
-					                                         Mathf.Clamp(cursor.transform.position.y, yMin, yMax),
-					                                         Mathf.Clamp(cursor.transform.position.z, zMin, zMax));
-				}
+
+				cursor.transform.Translate (transVec, Space.World);
+				cursor.transform.position = new Vector3 (Mathf.Clamp(cursor.transform.position.x, -xMax, xMax),
+				                                         Mathf.Clamp(cursor.transform.position.y, yMin, yMax),
+				                                         Mathf.Clamp(cursor.transform.position.z, zMin, zMax));
 
 				Vector3 zAxis = j4.transform.TransformDirection(Vector3.forward);
 				cursor.transform.RotateAround(cursor.transform.position, zAxis, rotVec.z);
@@ -146,6 +136,7 @@ public class Phantom : Game
 				Vector3 yAxis = j4.transform.TransformDirection(Vector3.up);
 				cursor.transform.RotateAround(cursor.transform.position, yAxis, rotVec.y);
 				j4.renderer.material = green;
+				dominantAxis(rotVec, rotCntI);
 			}
 			else if (action)
 			{

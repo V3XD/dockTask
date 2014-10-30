@@ -7,6 +7,7 @@ public class ChairTut: Game
 {
 	OptiTrackManager optiManager;
 	bool bSuccess;
+	Vector3 prevOrient = new Vector3();
 
 	public GameObject trackedObj;
 
@@ -66,6 +67,12 @@ public class ChairTut: Game
 				Vector3 transVec = currentPos - prevPos;
 
 				trackedObj.renderer.enabled = false;
+
+				Vector3 penOrient = currentOrient.eulerAngles;
+				Vector3 rotVec = penOrient - prevOrient;
+				prevOrient = penOrient;
+				dominantAxis(rotVec, rotCntI);
+
 				if(action)
 				{
 					cursor.transform.Translate (transVec, Space.World);
