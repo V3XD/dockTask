@@ -7,6 +7,7 @@ using System.IO;
 public class Phantom : Game 
 {
 	Vector3 prevOrient = new Vector3();
+	Vector3 prevOrientTarget = new Vector3();
 	bool isConnected = false;
 	static float scale = 0.10f;
 
@@ -137,6 +138,9 @@ public class Phantom : Game
 				cursor.transform.RotateAround(cursor.transform.position, yAxis, rotVec.y);
 				j4.renderer.material = green;
 				dominantAxis(rotVec, rotCntI);
+				Vector3 rotVecTarget = cursor.transform.eulerAngles - prevOrientTarget;
+				prevOrientTarget = rotVecTarget;
+				dominantAxis(rotVecTarget, rotCntChair);
 			}
 			else if (action)
 			{

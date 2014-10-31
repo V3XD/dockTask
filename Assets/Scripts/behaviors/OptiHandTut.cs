@@ -18,6 +18,7 @@ public class OptiHandTut: Game
 	Vector3 prevOrient = new Vector3();
 	bool isCalibrated = false;
 	float maxDist = 0;
+	Vector3 prevOrientTarget = new Vector3();
 
 	protected override void atAwake ()
 	{
@@ -131,6 +132,9 @@ public class OptiHandTut: Game
 					Vector3 yAxis = pointer.transform.TransformDirection(Vector3.up); 
 					cursor.transform.RotateAround(cursor.transform.position, yAxis, rotVec.y);
 					dominantAxis(rotVec, rotCntI);
+					Vector3 rotVecTarget = cursor.transform.eulerAngles - prevOrientTarget;
+					prevOrientTarget = rotVecTarget;
+					dominantAxis(rotVecTarget, rotCntChair);
 				}
 				else
 				{

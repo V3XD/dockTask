@@ -8,7 +8,7 @@ public class Folders : Singleton<Folders>
 	protected Folders () {} 
 
 	string folderPath;
-	string columns = "Time,Distance,Angle,Difficulty,initDistance,initAngle,clutchTime,clutchCount,tab,xRotI,yRotI,zRotI,interaction";
+	string columns = "Time,Distance,Angle,Difficulty,initDistance,initAngle,clutchTime,clutchCount,tab,xRotI,yRotI,zRotI,xRotChair,yRotChair,zRotChair,interaction";
 	string columnsSkip = "Time,Difficulty,autoSkip,skip,initDistance,initAngle,clutchTime,clutchCount,targetX,targetY,targetZ,targetW,interaction";
 
 	void Awake () 

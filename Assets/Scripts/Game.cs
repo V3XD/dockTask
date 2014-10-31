@@ -57,10 +57,12 @@ public class Game : MonoBehaviour
 	float initAngle = 0;
 	protected string interaction = "";
 	Quaternion initTarget;
-	Vector3 camPosL = new Vector3(-15f,8.5f,0f);
+	Vector3 camPosL 
+		= new Vector3(-15f,8.5f,0f);
 	Vector3 camPosR = new Vector3(15f,8.5f,0f);
 	int cntTab=0;
 	protected int [] rotCntI = new int[3];
+	protected int [] rotCntChair = new int[3];
 	
 	void OnGUI ()
 	{
@@ -280,6 +282,7 @@ public class Game : MonoBehaviour
 		cntTab = 0;
 		updateCam = true;
 		rotCntI = new int[3];
+		rotCntChair = new int[3];
 	}
 
 	protected void setNewPositionAndOrientationTut()
@@ -374,6 +377,7 @@ public class Game : MonoBehaviour
 		File.AppendAllText(folders.getPath()+trialsType.getType()+".csv", tmpTime.ToString()+","+distance.ToString()+","+angle.ToString()+ 
 		                   ","+difficulty.getLevel()+ ","+initDistance.ToString()+","+initAngle.ToString()+","+clutchTime.ToString()
 		                   +","+clutchCn.ToString()+","+cntTab.ToString()+","+rotCntI[0].ToString()+","+rotCntI[1].ToString()+","+rotCntI[2].ToString()+
+		                   ","+rotCntChair[0].ToString()+","+rotCntChair[1].ToString()+","+rotCntChair[2].ToString()+
 		                   ","+interaction+Environment.NewLine);//save to file
 		score++;
 	}

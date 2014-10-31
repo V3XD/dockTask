@@ -9,6 +9,7 @@ public class PhantomTut : Game
 	Vector3 prevOrient = new Vector3();
 	bool isConnected = false;
 	static float scale = 0.10f;
+	Vector3 prevOrientTarget = new Vector3();
 
 	public GameObject j2;
 	public GameObject j3;
@@ -131,6 +132,9 @@ public class PhantomTut : Game
 				cursor.transform.RotateAround(cursor.transform.position, yAxis, rotVec.y);
 				j4.renderer.material = green;
 				dominantAxis(rotVec, rotCntI);
+				Vector3 rotVecTarget = cursor.transform.eulerAngles - prevOrientTarget;
+				prevOrientTarget = rotVecTarget;
+				dominantAxis(rotVecTarget, rotCntChair);
 			}
 			else if (action)
 			{

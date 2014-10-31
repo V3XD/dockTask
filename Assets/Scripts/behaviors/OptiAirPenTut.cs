@@ -10,6 +10,7 @@ public class OptiAirPenTut : Game
 	bool bSuccess;
 
 	Vector3 prevOrient = new Vector3();
+	Vector3 prevOrientTarget = new Vector3();
 
 	protected override void atAwake ()
 	{
@@ -90,6 +91,9 @@ public class OptiAirPenTut : Game
 					Vector3 yAxis = pointer.transform.TransformDirection(Vector3.up); 
 					cursor.transform.RotateAround(cursor.transform.position, yAxis, rotVec.y);
 					dominantAxis(rotVec, rotCntI);
+					Vector3 rotVecTarget = cursor.transform.eulerAngles - prevOrientTarget;
+					prevOrientTarget = rotVecTarget;
+					dominantAxis(rotVecTarget, rotCntChair);
 				}
 				else
 				{

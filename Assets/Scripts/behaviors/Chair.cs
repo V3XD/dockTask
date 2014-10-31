@@ -8,6 +8,7 @@ public class Chair: Game
 	OptiTrackManager optiManager;
 	bool bSuccess = false;
 	Vector3 prevOrient = new Vector3();
+	Vector3 prevOrientTarget = new Vector3();
 
 	public GameObject trackedObj;
 
@@ -77,6 +78,9 @@ public class Chair: Game
 				Vector3 rotVec = penOrient - prevOrient;
 				prevOrient = penOrient;
 				dominantAxis(rotVec, rotCntI);
+				Vector3 rotVecTarget = cursor.transform.eulerAngles - prevOrientTarget;
+				prevOrientTarget = rotVecTarget;
+				dominantAxis(rotVecTarget, rotCntChair);
 
 				if(action)
 				{
