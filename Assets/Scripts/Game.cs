@@ -49,7 +49,7 @@ public class Game : MonoBehaviour
 	protected string nextLevel = "MainMenu";
 	protected bool action = false;
 	float maxTime = 20f; //max time before the trial is skipped
-	protected bool updateCam = true;
+	//protected bool updateCam = true;
 	protected Type trialsType;
 	float minDistance = 5f; //min distance between target and cursor
 	protected int clutchCn=0;
@@ -116,7 +116,7 @@ public class Game : MonoBehaviour
 
 		if(Input.GetKeyUp (KeyCode.Tab))
 		{
-			updateCam = !updateCam;
+			trialsType.updateCam = !trialsType.updateCam;
 			cntTab++;
 		}
 
@@ -187,7 +187,7 @@ public class Game : MonoBehaviour
 
 	void LateUpdate()
 	{
-		if (updateCam) 
+		if (trialsType.updateCam) 
 		{
 			secondCamera.transform.position = camPosR;
 			secondCamera.rect = new Rect (0.75f, 0, 0.25f, 0.25f);
@@ -280,7 +280,6 @@ public class Game : MonoBehaviour
 		clutchTime = 0;
 		clutchCn = 0;
 		cntTab = 0;
-		updateCam = true;
 		rotCntI = new int[3];
 		rotCntChair = new int[3];
 	}

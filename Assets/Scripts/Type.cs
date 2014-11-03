@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public class Type : Singleton<Type>
@@ -10,6 +10,7 @@ public class Type : Singleton<Type>
 	public int currentGroup;
 	public bool mute = false;
 	string trialType = "Tutorials";
+	public bool updateCam = true;
 
 	void Awake () 
 	{
