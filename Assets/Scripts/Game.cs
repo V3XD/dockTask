@@ -48,7 +48,7 @@ public class Game : MonoBehaviour
 	protected Folders folders;
 	protected string nextLevel = "MainMenu";
 	protected bool action = false;
-	float maxTime = 20f; //max time before the trial is skipped
+	float maxTime = 60f; //max time before the trial is skipped
 	//protected bool updateCam = true;
 	protected Type trialsType;
 	float minDistance = 5f; //min distance between target and cursor
@@ -101,18 +101,28 @@ public class Game : MonoBehaviour
 	
 	void Update () 
 	{
-		if (Input.GetKeyUp(KeyCode.Escape))
-			Application.LoadLevel("MainMenu");
+		if (Input.GetKeyUp (KeyCode.Escape))
+				Application.LoadLevel ("MainMenu");
 
-		if(Input.GetKeyUp (KeyCode.P))
+		if (Input.GetKeyUp (KeyCode.P)) 
 		{
-			Application.CaptureScreenshot(folders.getPath()+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_Screenshot.png");
+				Application.CaptureScreenshot (folders.getPath () + System.DateTime.Now.ToString ("MM-dd-yy_hh-mm-ss") + "_Screenshot.png");
 		}
 
-		/*if(Input.GetKeyUp (KeyCode.F))
+				/*if(Input.GetKeyUp (KeyCode.F))
 		{
 			updateCam = !updateCam;
 		}*/
+
+		if (window && (Input.GetKeyUp (KeyCode.Return) || Input.GetKeyUp (KeyCode.KeypadEnter)) )
+			Application.LoadLevel (nextLevel);
+		if (skipWindow && (Input.GetKeyUp (KeyCode.Return) || Input.GetKeyUp (KeyCode.KeypadEnter)) ) 
+		{
+			setNewPositionAndOrientation();
+			skipWindow = false;
+			prevTotalTime = Time.time;
+		}
+
 
 		if(Input.GetKeyUp (KeyCode.Tab))
 		{
@@ -434,6 +444,7 @@ public class Game : MonoBehaviour
 			{
 				setNewPositionAndOrientation();
 				skipWindow = false;
+				prevTotalTime = Time.time;
 			}
 		}
 	}
@@ -445,7 +456,7 @@ public class Game : MonoBehaviour
 		{
 			target.transform.rotation = UnityEngine.Random.rotationUniform;
 			angle = Vector3.Angle(target.transform.up, Vector3.down);
-		}while(angle < 60f);
+		}while(angle < 75f);
 		initTarget = target.transform.rotation;
 		initAngle = Quaternion.Angle(cursor.transform.rotation, initTarget);
 	}
