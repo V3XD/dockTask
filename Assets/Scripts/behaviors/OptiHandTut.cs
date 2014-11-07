@@ -151,7 +151,7 @@ public class OptiHandTut: Game
 					}
 
 
-					if(isDocked)
+					if(isDocked && confirm)
 					{
 						newTask();
 						setNewPositionAndOrientationTut();

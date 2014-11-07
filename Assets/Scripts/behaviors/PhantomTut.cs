@@ -110,7 +110,7 @@ public class PhantomTut : Game
 			Vector3 rotVec = penOrient - prevOrient;
 			prevOrient = penOrient;
 			
-			if(isButtonADown() || isButtonBDown())
+			if(isButtonBDown())
 			{
 				if(!action)
 				{
@@ -145,12 +145,17 @@ public class PhantomTut : Game
 				j4.renderer.material = yellow;
 			}
 			
-			if(isDocked && !action)
+			if(isDocked)
 			{
-				newTask();
-				setNewPositionAndOrientationTut();
-				if(score == trialsType.getTrialNum())
-					window = true;
+				if(isButtonADown())
+					confirm = true;
+				if(!action && confirm)
+				{
+					newTask();
+					setNewPositionAndOrientationTut();
+					if(score == trialsType.getTrialNum())
+						window = true;
+				}
 			}
 		}
 		else

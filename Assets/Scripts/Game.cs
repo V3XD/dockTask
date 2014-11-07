@@ -17,7 +17,8 @@ public class Game : MonoBehaviour
 	public GUIText pointText;
 	public AudioClip popSound;
 	public AudioSource popSource;
-	public AudioSource ambientSource;
+	public AudioSource bassSource;
+	public AudioSource drumsSource;
 	public Camera secondCamera;
 	public GameObject dummy;//the target changes orientation
 	public GameObject targetSphere;
@@ -49,7 +50,6 @@ public class Game : MonoBehaviour
 	protected string nextLevel = "MainMenu";
 	protected bool action = false;
 	float maxTime = 60f; //max time before the trial is skipped
-	//protected bool updateCam = true;
 	protected Type trialsType;
 	float minDistance = 5f; //min distance between target and cursor
 	protected int clutchCn=0;
@@ -63,14 +63,16 @@ public class Game : MonoBehaviour
 	int cntTab=0;
 	protected int [] rotCntI = new int[3];
 	protected int [] rotCntChair = new int[3];
-	
+	float soundAngle = 25f;
+	float soundDistance = 3f;
+	protected bool confirm = false;
+
 	void OnGUI ()
 	{
 		GUI.Box (new Rect (0,0,265,100), "<size=36>"+ message + "</size>");//+ "\n" +"Level: "+difficulty.getLevel ()
 		
 		GUI.Box (new Rect (UnityEngine.Screen.width - 200,0,200,100), "<size=36>Trial: " + score +"/"+trialsType.getTrialNum()+
 		         "\nTime: " + (int)(Time.time - prevTotalTime)+"</size>");
-		//GUI.Box (new Rect (UnityEngine.Screen.width - 150,UnityEngine.Screen.height - 30, 150, 36), "<size=18>"+connectionMessage+"</size>");
 		if (window)
 			GUI.Window(0, new Rect((UnityEngine.Screen.width*0.5f)-105, (UnityEngine.Screen.height*0.5f)-50, 210, 100), DoWindow, "<size=28>Complete</size>");
 		if (skipWindow)
@@ -86,7 +88,7 @@ public class Game : MonoBehaviour
 
 		if(trialsType.mute)
 		{
-			ambientSource.volume = 0f;
+			bassSource.volume = 0f;
 			pointer.GetComponent<AudioSource>().volume = 0f;
 		}
 
@@ -109,11 +111,6 @@ public class Game : MonoBehaviour
 				Application.CaptureScreenshot (folders.getPath () + System.DateTime.Now.ToString ("MM-dd-yy_hh-mm-ss") + "_Screenshot.png");
 		}
 
-				/*if(Input.GetKeyUp (KeyCode.F))
-		{
-			updateCam = !updateCam;
-		}*/
-
 		if (window && (Input.GetKeyUp (KeyCode.Return) || Input.GetKeyUp (KeyCode.KeypadEnter)) )
 			Application.LoadLevel (nextLevel);
 		if (skipWindow && (Input.GetKeyUp (KeyCode.Return) || Input.GetKeyUp (KeyCode.KeypadEnter)) ) 
@@ -135,8 +132,8 @@ public class Game : MonoBehaviour
 			if(!trialsType.mute)
 			{
 				trialsType.mute = true;
-				ambientSource.volume = 0f;
-				pointer.GetComponent<AudioSource>().volume = 0f;
+				bassSource.volume = 0f;
+				drumsSource.volume = 0f;
 			}
 			else
 				trialsType.mute = false;
@@ -154,6 +151,11 @@ public class Game : MonoBehaviour
 				setNewPositionAndOrientation();
 			else
 				setNewPositionAndOrientationTut();
+		}
+
+		if( (Input.GetKeyUp (KeyCode.Z) || Input.GetKeyUp (KeyCode.Slash) || Input.GetKeyUp (KeyCode.Space)) && isDocked)
+		{
+			confirm = true;
 		}
 
 		if (instructionsText.enabled) 
@@ -208,74 +210,6 @@ public class Game : MonoBehaviour
 			secondCamera.rect = new Rect (0, 0, 0.25f, 0.25f);
 		}
 		secondCamera.transform.LookAt(target.transform.position);
-
-		/*if (updateCam)
-		{
-			Vector3 camPos = new Vector3();
-			Vector3 axisVec = dummy.transform.TransformDirection (Vector3.forward);
-			Vector3 pointerDir = target.transform.position - pointer.transform.position;
-			pointerDir.Normalize();
-			float angle = Vector3.Angle(axisVec, pointerDir);
-
-			if(angle <= 45f)
-			{
-				camPos = Vector3.forward;
-				camPos = camPos*-15f;
-				camPos.y = 10f;
-			}
-			else
-			{
-				axisVec = dummy.transform.TransformDirection (Vector3.right);
-				angle = Vector3.Angle(axisVec, pointerDir);
-				if(angle <= 45f)
-				{
-					camPos = Vector3.right;
-					camPos = camPos*-15f;
-					camPos.y = 10f;
-				}
-				else
-				{
-					axisVec = dummy.transform.TransformDirection (Vector3.left);
-					angle = Vector3.Angle(axisVec, pointerDir);
-					if(angle <= 45f)
-					{
-						camPos = Vector3.left;
-						camPos = camPos*-15f;
-						camPos.y = 10f;
-					}
-					else
-					{
-						axisVec = dummy.transform.TransformDirection (Vector3.back);
-						angle = Vector3.Angle(axisVec, pointerDir);
-						if(angle <= 45f)
-						{
-							camPos = Vector3.back;
-							camPos = camPos*-15f;
-							camPos.y = 10f;
-						}
-						else
-						{
-							axisVec = dummy.transform.TransformDirection (Vector3.down);
-							angle = Vector3.Angle(axisVec, pointerDir);
-							if(angle <= 45f)
-							{
-								camPos = Vector3.down;
-								camPos = camPos*-15f;
-							}
-							else
-							{
-								axisVec = dummy.transform.TransformDirection (Vector3.up);
-								angle = Vector3.Angle(axisVec, pointerDir);
-								camPos = Vector3.up;
-							}
-						}
-					}
-				}
-			}
-
-			secondCamera.transform.position = camPos;
-			secondCamera.transform.LookAt(target.transform.position);
-		}*/
 	}
 
 	void OnDestroy () 
@@ -292,6 +226,7 @@ public class Game : MonoBehaviour
 		cntTab = 0;
 		rotCntI = new int[3];
 		rotCntChair = new int[3];
+		confirm = false;
 	}
 
 	protected void setNewPositionAndOrientationTut()
@@ -335,12 +270,17 @@ public class Game : MonoBehaviour
 		Vector3 cursorV = cursor.transform.position;
 		distance = Vector3.Distance (targetV, cursorV);
 		angle = Quaternion.Angle(cursorQ, targetQ);
+
 		if(!trialsType.mute)
 		{
-			if(angle > 40f)
-				ambientSource.volume = 0;
+			if(angle > soundAngle)
+				bassSource.volume = 0;
 			else
-				ambientSource.volume = 1f-(angle / 40f);
+				bassSource.volume = 1f-(angle / soundAngle);
+			if(distance > soundDistance)
+				drumsSource.volume = 0;
+			else
+				drumsSource.volume = 1f-(distance / soundDistance);
 		}
 		
 		if ((angle <= difficulty.angle) && (distance < difficulty.distance)) 
@@ -426,8 +366,6 @@ public class Game : MonoBehaviour
 				difficulty.setEasy ();
 				break;
 		}
-		targetSphere.transform.localScale = Vector3.one;
-		targetSphere.transform.localScale *= difficulty.distance+0.5f;
 	}
 	void DoWindow(int windowID)
 	{

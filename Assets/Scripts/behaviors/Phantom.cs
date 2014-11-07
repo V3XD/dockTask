@@ -115,14 +115,13 @@ public class Phantom : Game
 			
 			Vector3 rotVec = penOrient - prevOrient;
 			prevOrient = penOrient;
-			
-			if(isButtonADown() || isButtonBDown())
+
+			if(isButtonBDown())
 			{
 				if(!action)
 				{
 					prevClutchTime = Time.time; 
 					action = true;
-					info = "grabbed";
 				}
 
 				cursor.transform.Translate (transVec, Space.World);
@@ -147,19 +146,23 @@ public class Phantom : Game
 				clutchTime = clutchTime + Time.time - prevClutchTime; 
 				action = false;
 				clutchCn++;
-				info = "";
 				j4.renderer.material = yellow;
 			}
 			
-			if(isDocked && !action)
+			if(isDocked)
 			{
-				newTask();
-				setNewPositionAndOrientation();
-				selectLevel();
-				if(score == trialsType.getTrialNum())
+				if(isButtonADown())
+					confirm = true;
+				if(!action && confirm)
 				{
-					trialsType.currentGroup++;
-					window = true;
+					newTask();
+					setNewPositionAndOrientation();
+					selectLevel();
+					if(score == trialsType.getTrialNum())
+					{
+						trialsType.currentGroup++;
+						window = true;
+					}
 				}
 			}
 		}

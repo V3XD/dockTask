@@ -45,21 +45,18 @@ public class OptiAirPen : Game
 	protected override void gameBehavior ()
 	{
 
-
-		if (Input.GetKeyUp (KeyCode.LeftControl) || Input.GetKeyUp (KeyCode.RightControl))
+		if (Input.GetKeyUp (KeyCode.LeftShift) || Input.GetKeyUp (KeyCode.RightShift))
 		{
 			action = false;
-			info = "hold";
 			clutchTime = clutchTime + Time.time - prevClutchTime; 
 			clutchCn++;
 		}
-		else if(Input.GetKeyDown (KeyCode.LeftControl) || Input.GetKeyDown (KeyCode.RightControl))
+		else if(Input.GetKeyDown (KeyCode.LeftShift) || Input.GetKeyDown (KeyCode.RightShift))
 		{
 			if(!action)
 			{
 				prevClutchTime = Time.time; 
 				action = true;
-				info = "free";
 			}
 		}
 
@@ -105,7 +102,7 @@ public class OptiAirPen : Game
 				else
 				{
 					pointer.renderer.material = yellow;
-					if(isDocked)
+					if(isDocked && confirm)
 					{
 						newTask();
 						setNewPositionAndOrientation();						

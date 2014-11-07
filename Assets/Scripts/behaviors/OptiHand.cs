@@ -132,7 +132,7 @@ public class OptiHand: Game
 						info = "";
 					}
 
-					if(isDocked)
+					if(isDocked && confirm)
 					{
 						newTask();
 						setNewPositionAndOrientation();

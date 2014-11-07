@@ -9,3 +9,6 @@ vanessa.vuibert@mail.mcgill.ca
 You need Phantom Omni and Optitrack
 
 PhantomLib is a wrapper to use the Phantom Omni in Unity
+
+Sound:
+http://www.openculture.com/2013/10/deconstructing-led-zeppelins-classic-song-ramble-on-track-by-track.html
