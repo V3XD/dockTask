@@ -217,6 +217,8 @@ public class Game : MonoBehaviour
 
 	void OnDestroy () 
 	{
+		transGreen.color = new Vector4(0, 1f, 0, 1f);
+		green.color = new Vector4(0, 1f, 0, 1f);
 		atEnd ();
 	}
 	
