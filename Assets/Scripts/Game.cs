@@ -85,6 +85,8 @@ public class Game : MonoBehaviour
 		difficulty = Difficulty.Instance;
 		trialsType = Type.Instance;
 		UnityEngine.Screen.showCursor = false;
+		soundAngle = difficulty.angle;
+		soundDistance = difficulty.distance;
 
 		if(trialsType.mute)
 		{
@@ -270,6 +272,8 @@ public class Game : MonoBehaviour
 		Vector3 cursorV = cursor.transform.position;
 		distance = Vector3.Distance (targetV, cursorV);
 		angle = Quaternion.Angle(cursorQ, targetQ);
+		float distRatio = 1f - distance / difficulty.distance;
+		float angleRatio = 1f - angle/difficulty.angle;
 
 		if(!trialsType.mute)
 		{
@@ -286,7 +290,9 @@ public class Game : MonoBehaviour
 		if ((angle <= difficulty.angle) && (distance < difficulty.distance)) 
 		{	
 			isDocked = true;
-			roomLight.intensity = 4.0f;
+			float intense = (distRatio*0.5f + angleRatio*0.5f)*4f+1f;
+			roomLight.intensity = intense;//4.0f;
+			//Debug.Log(intense + " "+distRatio+ " "+angleRatio);
 			message= "Target docked!";
 		}
 		else
@@ -295,11 +301,13 @@ public class Game : MonoBehaviour
 			roomLight.intensity = 1.0f;
 			message= " ";
 		}
-		
+
+
 		if (angle <= difficulty.angle)
 		{	
+			green.color = new Vector4(0, angleRatio, 0, 1);
 			cursor.renderer.material = green;
-			targetSphere.renderer.material = transGreen;
+			targetSphere.renderer.material = green;
 		}
 		else
 		{
@@ -309,6 +317,7 @@ public class Game : MonoBehaviour
 
 		if (distance <= difficulty.distance)
 		{	
+			transGreen.color = new Vector4(0, distRatio, 0, 1);
 			posCube.renderer.material = transGreen;
 		}
 		else
@@ -335,7 +344,7 @@ public class Game : MonoBehaviour
 	{
 		switch (score)
 		{
-			case 0:
+			/*case 0:
 				difficulty.setEasy ();
 				break;
 			case 1:
@@ -361,7 +370,7 @@ public class Game : MonoBehaviour
 				break;
 			case 8:
 				difficulty.setEasy ();
-				break;
+				break;*/
 			default:
 				difficulty.setEasy ();
 				break;
