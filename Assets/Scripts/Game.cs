@@ -66,6 +66,7 @@ public class Game : MonoBehaviour
 	float soundAngle = 25f;
 	float soundDistance = 3f;
 	protected bool confirm = false;
+	float[] accuracyTimes = new float[3];
 
 	void OnGUI ()
 	{
@@ -229,6 +230,7 @@ public class Game : MonoBehaviour
 		rotCntI = new int[3];
 		rotCntChair = new int[3];
 		confirm = false;
+		accuracyTimes = new float[3];
 	}
 
 	protected void setNewPositionAndOrientationTut()
@@ -324,6 +326,30 @@ public class Game : MonoBehaviour
 		{
 			posCube.renderer.material = transYellow;
 		}
+
+		if ( (angle > difficulty.angles [0]) || (distance > difficulty.distances[0]) )
+		{
+			accuracyTimes = new float[3];
+		}
+		else
+		{
+			if(accuracyTimes[0] == 0)
+				accuracyTimes[0] = Time.time - prevTotalTime;
+			if( (angle < difficulty.angles [2]) && (distance < difficulty.distances[2]))
+			{
+				if(accuracyTimes[2] == 0)
+					accuracyTimes[2] = Time.time - prevTotalTime;
+			}
+			else if ( (angle < difficulty.angles [1]) && (distance < difficulty.distances[1]) )
+			{
+				accuracyTimes[2] = 0;
+				if(accuracyTimes[1] == 0)
+					accuracyTimes[1] = Time.time - prevTotalTime;
+			}
+			else
+				accuracyTimes[1] = 0;
+
+		}
 	}
 
 	protected void newTask()
@@ -336,6 +362,7 @@ public class Game : MonoBehaviour
 		                   ","+difficulty.getLevel()+ ","+initDistance.ToString()+","+initAngle.ToString()+","+clutchTime.ToString()
 		                   +","+clutchCn.ToString()+","+cntTab.ToString()+","+rotCntI[0].ToString()+","+rotCntI[1].ToString()+","+rotCntI[2].ToString()+
 		                   ","+rotCntChair[0].ToString()+","+rotCntChair[1].ToString()+","+rotCntChair[2].ToString()+
+		                   ","+accuracyTimes[0].ToString()+","+accuracyTimes[1].ToString()+","+accuracyTimes[2].ToString()+
 		                   ","+interaction+Environment.NewLine);//save to file
 		score++;
 	}
