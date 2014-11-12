@@ -24,6 +24,7 @@ public class Game : MonoBehaviour
 	public GameObject targetSphere;
 	public GUIText instructionsText;
 	public GameObject posCube;
+	public Material trueGreen;
 
 	protected static float xMax = 15.0f;
 	protected static float yMax = 15.0f;
@@ -142,9 +143,10 @@ public class Game : MonoBehaviour
 				trialsType.mute = false;
 		}
 
+		float tmpTime = Time.time - prevTotalTime;
 		if (Input.GetKeyUp (KeyCode.S))
 		{
-			float tmpTime = Time.time - prevTotalTime;
+
 			prevTotalTime = Time.time;
 			skipWindow = false;
 			File.AppendAllText(folders.getPath()+"Skip.csv", tmpTime.ToString()+","+difficulty.getLevel()+ ","+"0"+","+"1"+
@@ -184,11 +186,11 @@ public class Game : MonoBehaviour
 			gameBehavior ();
 		}
 
-		if((Time.time - prevTotalTime) > maxTime && !window && !instructionsText.enabled)
+		tmpTime = Time.time - prevTotalTime;
+		if(tmpTime > maxTime && !window && !instructionsText.enabled)
 		{
 			if(!skipWindow)
 			{
-				float tmpTime = Time.time - prevTotalTime;
 				prevTotalTime = Time.time;
 				File.AppendAllText(folders.getPath()+"Skip.csv", tmpTime.ToString()+","+difficulty.getLevel()+ ","+"1"+","+"0"+
 				                   ","+initDistance.ToString()+","+initAngle.ToString()+","+clutchTime.ToString()+","+clutchCn.ToString()+
@@ -198,6 +200,13 @@ public class Game : MonoBehaviour
 		}
 
 		evaluateDock ();
+
+		//"Time,Distance,Angle,Difficulty,trialNum, group, type,interaction";
+		if(action || interaction=="MiniChair")
+			File.AppendAllText(folders.getPath()+"Raw"+".csv", tmpTime.ToString()+","+distance.ToString()+","+angle.ToString()+ 
+		                   ","+difficulty.getLevel()+ ","+score.ToString()+","+trialsType.currentGroup.ToString()+
+			                   ","+trialsType.getType()+","+action.ToString()+","+interaction+Environment.NewLine);//save to file
+
 	}
 
 	void LateUpdate()
@@ -217,8 +226,8 @@ public class Game : MonoBehaviour
 
 	void OnDestroy () 
 	{
-		transGreen.color = new Vector4(0, 1f, 0, 1f);
-		green.color = new Vector4(0, 1f, 0, 1f);
+		transGreen.color = trueGreen.color;
+		green.color = trueGreen.color;
 		atEnd ();
 	}
 	
@@ -226,13 +235,7 @@ public class Game : MonoBehaviour
 	{
 		setRotation ();
 		setPosition ();
-		clutchTime = 0;
-		clutchCn = 0;
-		cntTab = 0;
-		rotCntI = new int[3];
-		rotCntChair = new int[3];
-		confirm = false;
-		accuracyTimes = new float[3];
+		resetVariables ();
 	}
 
 	protected void setNewPositionAndOrientationTut()
@@ -266,6 +269,7 @@ public class Game : MonoBehaviour
 		initTarget = target.transform.rotation;
 		initAngle = Quaternion.Angle(cursor.transform.rotation, initTarget);
 		setPosition ();
+		resetVariables ();
 	}
 
 	void evaluateDock ()
@@ -479,6 +483,17 @@ public class Game : MonoBehaviour
 			counter[1]++;
 		else
 			counter[2]++;
+	}
+
+	void resetVariables()
+	{
+		clutchTime = 0;
+		clutchCn = 0;
+		cntTab = 0;
+		rotCntI = new int[3];
+		rotCntChair = new int[3];
+		confirm = false;
+		accuracyTimes = new float[3];		
 	}
 }
 

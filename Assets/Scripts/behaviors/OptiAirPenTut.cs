@@ -74,7 +74,7 @@ public class OptiAirPenTut : Game
 				
 				if(action)
 				{
-					pointer.renderer.material = green; 
+					pointer.renderer.material = trueGreen; 
 
 					cursor.transform.Translate (transVec, Space.World);
 					cursor.transform.position = new Vector3 (Mathf.Clamp(cursor.transform.position.x, -xMax, xMax),

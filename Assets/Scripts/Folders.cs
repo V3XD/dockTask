@@ -11,6 +11,7 @@ public class Folders : Singleton<Folders>
 	string columns = "Time,Distance,Angle,Difficulty,initDistance,initAngle,clutchTime,clutchCount,tab,xRotI,yRotI,zRotI," +
 					"xRotChair,yRotChair,zRotChair,easyTime,mediumTime,hardTime,interaction";
 	string columnsSkip = "Time,Difficulty,autoSkip,skip,initDistance,initAngle,clutchTime,clutchCount,targetX,targetY,targetZ,targetW,interaction";
+	string columnsRaw = "Time,Distance,Angle,Difficulty,trialNum, group, trialType,action,interaction";
 
 	void Awake () 
 	{
@@ -19,6 +20,7 @@ public class Folders : Singleton<Folders>
 		File.AppendAllText(folderPath+"Trials.csv", columns+ Environment.NewLine);
 		File.AppendAllText(folderPath+"Tutorials.csv", columns+ Environment.NewLine);
 		File.AppendAllText(folderPath+"Skip.csv", columnsSkip+ Environment.NewLine);
+		File.AppendAllText(folderPath+"Raw.csv", columnsRaw+ Environment.NewLine);
 	}
 
 	public string getPath ()
