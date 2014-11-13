@@ -45,13 +45,13 @@ public class Chair: Game
 	
 	protected override void gameBehavior ()
 	{
-		if (Input.GetKeyUp (KeyCode.LeftShift) || Input.GetKeyUp (KeyCode.RightShift))
+		if (Input.GetKeyUp (KeyCode.Q) || Input.GetKeyUp (KeyCode.P))
 		{
 			action = false;
 			clutchTime = clutchTime + Time.time - prevClutchTime; 
 			clutchCn++;
 		}
-		else if(Input.GetKeyDown (KeyCode.LeftShift) || Input.GetKeyDown (KeyCode.RightShift))
+		else if(Input.GetKeyDown (KeyCode.Q) || Input.GetKeyDown (KeyCode.P))
 		{
 			if(!action)
 			{

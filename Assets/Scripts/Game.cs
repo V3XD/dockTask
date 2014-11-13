@@ -50,7 +50,7 @@ public class Game : MonoBehaviour
 	protected Folders folders;
 	protected string nextLevel = "MainMenu";
 	protected bool action = false;
-	float maxTime = 60f; //max time before the trial is skipped
+	float maxTime = 30f; //max time before the trial is skipped
 	protected Type trialsType;
 	float minDistance = 5f; //min distance between target and cursor
 	protected int clutchCn=0;
@@ -93,7 +93,7 @@ public class Game : MonoBehaviour
 		if(trialsType.mute)
 		{
 			bassSource.volume = 0f;
-			pointer.GetComponent<AudioSource>().volume = 0f;
+			drumsSource.volume = 0f;
 		}
 
 		atAwake ();
@@ -158,7 +158,7 @@ public class Game : MonoBehaviour
 				setNewPositionAndOrientationTut();
 		}
 
-		if( (Input.GetKeyUp (KeyCode.Z) || Input.GetKeyUp (KeyCode.Slash) || Input.GetKeyUp (KeyCode.Space)) && isDocked)
+		if( (Input.GetKeyUp (KeyCode.W) || Input.GetKeyUp (KeyCode.O) || Input.GetKeyUp (KeyCode.Space)) && isDocked)
 		{
 			confirm = true;
 		}
@@ -202,10 +202,13 @@ public class Game : MonoBehaviour
 		evaluateDock ();
 
 		//"Time,Distance,Angle,Difficulty,trialNum, group, type,interaction";
-		if(action || interaction=="MiniChair")
-			File.AppendAllText(folders.getPath()+"Raw"+".csv", tmpTime.ToString()+","+distance.ToString()+","+angle.ToString()+ 
-		                   ","+difficulty.getLevel()+ ","+score.ToString()+","+trialsType.currentGroup.ToString()+
-			                   ","+trialsType.getType()+","+action.ToString()+","+interaction+Environment.NewLine);//save to file
+		if(!window && !skipWindow && !instructionsText.enabled)
+		{
+			if( action || interaction=="MiniChair")
+				File.AppendAllText(folders.getPath()+"Raw"+".csv", tmpTime.ToString()+","+distance.ToString()+","+angle.ToString()+ 
+			                   ","+difficulty.getLevel()+ ","+score.ToString()+","+trialsType.currentGroup.ToString()+
+				                   ","+trialsType.getType()+","+action.ToString()+","+interaction+Environment.NewLine);//save to file
+		}
 
 	}
 
@@ -493,7 +496,8 @@ public class Game : MonoBehaviour
 		rotCntI = new int[3];
 		rotCntChair = new int[3];
 		confirm = false;
-		accuracyTimes = new float[3];		
+		accuracyTimes = new float[3];	
+		action = false;
 	}
 }
 
