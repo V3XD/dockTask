@@ -37,7 +37,6 @@ public class Game : MonoBehaviour
 	protected string connectionMessage="not connected";
 	protected string message=" ";
 	protected string info="";
-	protected float prevTime=0;
 	protected float prevTotalTime;
 	protected float clutchTime=0;
 	protected float prevClutchTime=0;
@@ -50,7 +49,7 @@ public class Game : MonoBehaviour
 	protected Folders folders;
 	protected string nextLevel = "MainMenu";
 	protected bool action = false;
-	float maxTime = 30f; //max time before the trial is skipped
+	float maxTime = 25f; //max time before the trial is skipped
 	protected Type trialsType;
 	float minDistance = 5f; //min distance between target and cursor
 	protected int clutchCn=0;
@@ -68,6 +67,8 @@ public class Game : MonoBehaviour
 	float soundDistance = 3f;
 	protected bool confirm = false;
 	float[] accuracyTimes = new float[3];
+	static float logTime = 0.025f;
+	float prevLog=0;
 
 	void OnGUI ()
 	{
@@ -202,14 +203,19 @@ public class Game : MonoBehaviour
 		evaluateDock ();
 
 		//"Time,Distance,Angle,Difficulty,trialNum, group, type,interaction";
-		if(!window && !skipWindow && !instructionsText.enabled)
+		if(Time.time >= prevLog+logTime)
 		{
-			if( action || interaction=="MiniChair")
-				File.AppendAllText(folders.getPath()+"Raw"+".csv", tmpTime.ToString()+","+distance.ToString()+","+angle.ToString()+ 
-			                   ","+difficulty.getLevel()+ ","+score.ToString()+","+trialsType.currentGroup.ToString()+
-				                   ","+trialsType.getType()+","+action.ToString()+","+interaction+Environment.NewLine);//save to file
+			prevLog = Time.time;
+			if(!window && !skipWindow && !instructionsText.enabled)
+			{
+				if( action || interaction=="MiniChair")
+				{
+					File.AppendAllText(folders.getPath()+"Raw"+".csv", tmpTime.ToString()+","+distance.ToString()+","+angle.ToString()+ 
+				                   ","+difficulty.getLevel()+ ","+score.ToString()+","+trialsType.currentGroup.ToString()+
+					                   ","+trialsType.getType()+","+action.ToString()+","+interaction+Environment.NewLine);//save to file
+				}
+			}
 		}
-
 	}
 
 	void LateUpdate()
@@ -498,6 +504,8 @@ public class Game : MonoBehaviour
 		confirm = false;
 		accuracyTimes = new float[3];	
 		action = false;
+		prevTotalTime = Time.time;
+		prevLog = Time.time;
 	}
 }
 
