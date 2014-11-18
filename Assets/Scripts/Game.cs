@@ -49,7 +49,7 @@ public class Game : MonoBehaviour
 	protected Folders folders;
 	protected string nextLevel = "MainMenu";
 	protected bool action = false;
-	float maxTime = 25f; //max time before the trial is skipped
+	float maxTime = 40f; //max time before the trial is skipped
 	protected Type trialsType;
 	float minDistance = 5f; //min distance between target and cursor
 	protected int clutchCn=0;
@@ -69,13 +69,14 @@ public class Game : MonoBehaviour
 	float[] accuracyTimes = new float[3];
 	static float logTime = 0.03f;
 	float prevLog=0;
+	string color ="white";
 
 	void OnGUI ()
 	{
 		GUI.Box (new Rect (0,0,265,100), "<size=36>"+ message + "</size>");//+ "\n" +"Level: "+difficulty.getLevel ()
 		
 		GUI.Box (new Rect (UnityEngine.Screen.width - 200,0,200,100), "<size=36>Trial: " + score +"/"+trialsType.getTrialNum()+
-		         "\nTime: " + (int)(Time.time - prevTotalTime)+"</size>");
+		         "\n<color="+color+">Time: " + (int)(Time.time - prevTotalTime)+"</color> </size>");
 		if (window)
 			GUI.Window(0, new Rect((UnityEngine.Screen.width*0.5f)-105, (UnityEngine.Screen.height*0.5f)-50, 210, 100), DoWindow, "<size=28>Complete</size>");
 		if (skipWindow)
@@ -170,6 +171,7 @@ public class Game : MonoBehaviour
 			{
 				instructionsText.enabled = false;
 				prevTotalTime = Time.time;
+				color = "white";
 			}
 		}
 
@@ -188,11 +190,12 @@ public class Game : MonoBehaviour
 		}
 
 		tmpTime = Time.time - prevTotalTime;
+		if(tmpTime > maxTime-10f)
+			color = "red";
 		if(tmpTime > maxTime && !window && !instructionsText.enabled)
 		{
 			if(!skipWindow)
 			{
-				prevTotalTime = Time.time;
 				File.AppendAllText(folders.getPath()+"Skip.csv", tmpTime.ToString()+","+difficulty.getLevel()+ ","+"1"+","+"0"+
 				                   ","+initDistance.ToString()+","+initAngle.ToString()+","+clutchTime.ToString()+","+clutchCn.ToString()+
 				                   ","+initTarget.x+","+initTarget.y+","+initTarget.z+","+initTarget.w+","+interaction+Environment.NewLine);//save to file
@@ -506,6 +509,7 @@ public class Game : MonoBehaviour
 		action = false;
 		prevTotalTime = Time.time;
 		prevLog = Time.time;
+		color = "white";
 	}
 }
 
