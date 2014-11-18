@@ -67,7 +67,7 @@ public class Game : MonoBehaviour
 	float soundDistance = 3f;
 	protected bool confirm = false;
 	float[] accuracyTimes = new float[3];
-	static float logTime = 0.025f;
+	static float logTime = 0.03f;
 	float prevLog=0;
 
 	void OnGUI ()
