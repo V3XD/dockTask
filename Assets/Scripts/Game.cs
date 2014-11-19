@@ -121,7 +121,10 @@ public class Game : MonoBehaviour
 			Application.LoadLevel (nextLevel);
 		if (skipWindow && (Input.GetKeyUp (KeyCode.Return) || Input.GetKeyUp (KeyCode.KeypadEnter)) ) 
 		{
-			setNewPositionAndOrientation();
+			if(trialsType.getType() == "Trials")
+				setNewPositionAndOrientation();
+			else
+				setNewPositionAndOrientationTut();
 			skipWindow = false;
 			prevTotalTime = Time.time;
 		}
