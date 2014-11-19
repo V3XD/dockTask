@@ -156,7 +156,7 @@ public class Game : MonoBehaviour
 			skipWindow = false;
 			File.AppendAllText(folders.getPath()+"Skip.csv", tmpTime.ToString()+","+difficulty.getLevel()+ ","+"0"+","+"1"+
 			                   ","+initDistance.ToString()+","+initAngle.ToString()+","+clutchTime.ToString()+","+clutchCn.ToString()+
-			                   ","+initTarget.x+","+initTarget.y+","+initTarget.z+","+initTarget.w+","+interaction+Environment.NewLine);//save to file
+			                   ","+initTarget.x+","+initTarget.y+","+initTarget.z+","+initTarget.w+","+interaction+","+trialsType.getType()+Environment.NewLine);//save to file
 			if(trialsType.getType() == "Trials")
 				setNewPositionAndOrientation();
 			else
@@ -201,7 +201,7 @@ public class Game : MonoBehaviour
 			{
 				File.AppendAllText(folders.getPath()+"Skip.csv", tmpTime.ToString()+","+difficulty.getLevel()+ ","+"1"+","+"0"+
 				                   ","+initDistance.ToString()+","+initAngle.ToString()+","+clutchTime.ToString()+","+clutchCn.ToString()+
-				                   ","+initTarget.x+","+initTarget.y+","+initTarget.z+","+initTarget.w+","+interaction+Environment.NewLine);//save to file
+				                   ","+initTarget.x+","+initTarget.y+","+initTarget.z+","+initTarget.w+","+interaction+","+trialsType.getType()+Environment.NewLine);//save to file
 				skipWindow = true;
 			}
 		}
