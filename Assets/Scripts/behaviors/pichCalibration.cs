@@ -45,7 +45,7 @@ public class pichCalibration : Game {
 		
 		if(bSuccess)
 		{
-			if(optiManager.getMarkerNum() == 2 && optiManager.getRigidBodyNum() >= 1)
+			if(optiManager.getMarkerNum() == 2)
 			{
 				thumb.renderer.material = blue;
 				index.renderer.material = blue;
@@ -119,6 +119,10 @@ public class pichCalibration : Game {
 						thumb.renderer.enabled = true;
 						pointer.renderer.enabled = false;
 						trail.GetComponent<TrailRenderer>().enabled = false;
+
+						tapTime = Time.time - prevClutchTime;
+						if(tapTime <= maxTapTime && isDocked)
+							confirm = true;
 					}
 					
 					
