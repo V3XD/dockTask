@@ -36,7 +36,6 @@ public class Game : MonoBehaviour
 	protected int score = 0;
 	protected string connectionMessage="not connected";
 	protected string message=" ";
-	protected string info="";
 	protected float prevTotalTime;
 	protected float clutchTime=0;
 	protected float prevClutchTime=0;
@@ -57,8 +56,7 @@ public class Game : MonoBehaviour
 	float initAngle = 0;
 	protected string interaction = "";
 	Quaternion initTarget;
-	Vector3 camPosL 
-		= new Vector3(-15f,8.5f,0f);
+	Vector3 camPosL = new Vector3(-15f,8.5f,0f);
 	Vector3 camPosR = new Vector3(15f,8.5f,0f);
 	int cntTab=0;
 	protected int [] rotCntI = new int[3];
@@ -70,10 +68,12 @@ public class Game : MonoBehaviour
 	static float logTime = 0.03f;
 	float prevLog=0;
 	string color ="white";
+	protected static float maxTapTime = 0.3f;
+	protected float tapTime = 50f;
 
 	void OnGUI ()
 	{
-		GUI.Box (new Rect (0,0,265,100), "<size=36>"+ message + "</size>");//+ "\n" +"Level: "+difficulty.getLevel ()
+		GUI.Box (new Rect (0,0,265,100), "<size=36>"+ message + "</size>");
 		
 		GUI.Box (new Rect (UnityEngine.Screen.width - 200,0,200,100), "<size=36>Trial: " + score +"/"+trialsType.getTrialNum()+
 		         "\n<color="+color+">Time: " + (int)(Time.time - prevTotalTime)+"</color> </size>");
@@ -163,7 +163,7 @@ public class Game : MonoBehaviour
 				setNewPositionAndOrientationTut();
 		}
 
-		if( (Input.GetKeyUp (KeyCode.W) || Input.GetKeyUp (KeyCode.O) || Input.GetKeyUp (KeyCode.Space)) && isDocked)
+		if( Input.GetKeyUp (KeyCode.Space) && isDocked)
 		{
 			confirm = true;
 		}

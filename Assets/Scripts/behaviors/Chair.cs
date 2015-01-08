@@ -11,11 +11,11 @@ public class Chair: Game
 	Vector3 prevOrientTarget = new Vector3();
 
 	public GameObject trackedObj;
+	
+	OptiCalibration calibration;
 
 	protected override void atAwake ()
 	{
-		//path = folders.getPath()+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_Chair.csv";
-		//File.AppendAllText(path, columns+ Environment.NewLine);//save to file
 		optiManager = OptiTrackManager.Instance;
 		selectLevel ();
 		trialsType.setRealThing ();
@@ -24,9 +24,9 @@ public class Chair: Game
 	protected override void atStart ()
 	{
 		bSuccess = optiManager.isConnected ();
+		calibration = OptiCalibration.Instance;
 		setNewPositionAndOrientation();
 		pointer.renderer.enabled = true;
-		info = "";
 		interaction = "MiniChair";
 
 		if (bSuccess) 
@@ -45,29 +45,20 @@ public class Chair: Game
 	
 	protected override void gameBehavior ()
 	{
-		if (Input.GetKeyUp (KeyCode.Q) || Input.GetKeyUp (KeyCode.P))
-		{
-			action = false;
-			clutchTime = clutchTime + Time.time - prevClutchTime; 
-			clutchCn++;
-		}
-		else if(Input.GetKeyDown (KeyCode.Q) || Input.GetKeyDown (KeyCode.P))
-		{
-			if(!action)
-			{
-				prevClutchTime = Time.time; 
-				action = true;
-			}
-		}
-		
 		if(bSuccess)
 		{
 
-			if(optiManager.getRigidBodyNum() >= 1)
+			if(optiManager.getMarkerNum() == 2 && optiManager.getRigidBodyNum() >= 1)
 			{
 				Vector3 currentPos = optiManager.getPosition(0);
 
 				Quaternion currentOrient = optiManager.getOrientation(0);
+
+				Vector3 thumbPos = optiManager.getMarkerPosition(0);
+				Vector3 indexPos = optiManager.getMarkerPosition(1);
+				
+				float thumbToIndex = Vector3.Distance(thumbPos, 
+				                                      indexPos);
 
 				Vector3 transVec = currentPos - prevPos;
 				trackedObj.renderer.enabled = false;
@@ -80,22 +71,40 @@ public class Chair: Game
 				prevOrientTarget = rotVecTarget;
 				dominantAxis(rotVecTarget, rotCntChair);
 
-				if(action)
+				if(thumbToIndex <= calibration.touchDist)
 				{
+					if(!action)
+					{
+						prevClutchTime = Time.time; 
+						action = true;
+					}
 					cursor.transform.Translate (transVec, Space.World);
 					cursor.transform.position = new Vector3 (Mathf.Clamp(cursor.transform.position.x, -xMax, xMax),
 					                                         Mathf.Clamp(cursor.transform.position.y, yMin, yMax),
 					                                         Mathf.Clamp(cursor.transform.position.z, zMin, zMax));
 				}
-				else if(isDocked && confirm)
+				else 
 				{
-					newTask();
-					setNewPositionAndOrientation();
-					selectLevel();
-					if(score == trialsType.getTrialNum())
+					if(action)
 					{
-						trialsType.currentGroup++;
-						window = true;
+						action = false;
+						clutchCn++;
+						clutchTime = clutchTime + Time.time - prevClutchTime; 
+
+						tapTime = Time.time - prevClutchTime;
+						if(tapTime <= maxTapTime && isDocked)
+							confirm = true;
+					}
+					if(isDocked && confirm)
+					{
+						newTask();
+						setNewPositionAndOrientation();
+						selectLevel();
+						if(score == trialsType.getTrialNum())
+						{
+							trialsType.currentGroup++;
+							window = true;
+						}
 					}
 				}
 

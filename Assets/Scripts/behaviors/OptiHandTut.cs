@@ -16,14 +16,10 @@ public class OptiHandTut: Game
 	OptiCalibration calibration;
 	public Material blue;
 	Vector3 prevOrient = new Vector3();
-	bool isCalibrated = false;
-	float maxDist = 0;
 	Vector3 prevOrientTarget = new Vector3();
 
 	protected override void atAwake ()
 	{
-		/*path = folders.getPath()+@"tutorial/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_HandTut.csv";
-		File.AppendAllText(path, columns+ Environment.NewLine);//save to file*/
 		optiManager = OptiTrackManager.Instance;
 		difficulty.setEasy ();
 		trialsType.setTutorial ();
@@ -83,36 +79,13 @@ public class OptiHandTut: Game
 				
 				Vector3 rotVec = penOrient - prevOrient;
 				prevOrient = penOrient;
-				if(!isCalibrated)
-				{
-					int count = (int)(Time.time - prevTotalTime);
 
-					instructionsText.text = "Pinch "+ (10-count).ToString();
-					if( count > 7)
-					{
-						instructionsText.material.color = Color.white;
-						if(thumbToIndex > maxDist)
-							maxDist = thumbToIndex;
-					}
-					
-					if( count > 10)
-					{
-						instructionsText.text = "Ready";
-						isCalibrated = true;
-						
-						calibration.setTouchDist(maxDist);
-						prevTotalTime = Time.time;
-					}
-
-					
-				}
-				else if( aveDist <= calibration.touchDist)
+				if( aveDist <= calibration.touchDist)
 				{
 					if(!action)
 					{
 						prevClutchTime = Time.time; 
 						action = true;
-						info = "grabbed";
 					}
 					pointer.renderer.enabled = true;
 					trail.GetComponent<TrailRenderer>().enabled = true;
@@ -147,7 +120,10 @@ public class OptiHandTut: Game
 						thumb.renderer.enabled = true;
 						pointer.renderer.enabled = false;
 						trail.GetComponent<TrailRenderer>().enabled = false;
-						info = "";
+
+						tapTime = Time.time - prevClutchTime;
+						if(tapTime <= maxTapTime && isDocked)
+							confirm = true;
 					}
 
 

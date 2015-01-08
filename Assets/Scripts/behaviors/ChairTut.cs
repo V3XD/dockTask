@@ -11,11 +11,11 @@ public class ChairTut: Game
 	Vector3 prevOrientTarget = new Vector3();
 
 	public GameObject trackedObj;
+	
+	OptiCalibration calibration;
 
 	protected override void atAwake ()
 	{
-		/*path = folders.getPath()+@"tutorial/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_ChairTut.csv";
-		File.AppendAllText(path, columns+ Environment.NewLine);//save to file*/
 		optiManager = OptiTrackManager.Instance;
 		difficulty.setEasy ();
 		trialsType.setTutorial ();
@@ -24,10 +24,10 @@ public class ChairTut: Game
 	protected override void atStart ()
 	{
 		bSuccess = optiManager.isConnected ();
+		calibration = OptiCalibration.Instance;
 		interaction = "MiniChair";
 		setNewPositionAndOrientationTut();
 		pointer.renderer.enabled = true;
-		info = "";
 		nextLevel = "optiChair";
 
 		if (bSuccess) 
@@ -38,30 +38,20 @@ public class ChairTut: Game
 	
 	protected override void gameBehavior ()
 	{
-		if (Input.GetKeyUp (KeyCode.Q) || Input.GetKeyUp (KeyCode.P))
-		{
-			action = false;
-			clutchTime = clutchTime + Time.time - prevClutchTime; 
-			clutchCn++;
-		}
-		else if(Input.GetKeyDown (KeyCode.Q) || Input.GetKeyDown (KeyCode.P))
-		{
-			if(!action)
-			{
-				prevClutchTime = Time.time; 
-				action = true;
-			}
-		}
-
-
 		if(bSuccess)
 		{
-			if(optiManager.getRigidBodyNum() >= 1)
+			if(optiManager.getMarkerNum() == 2 && optiManager.getRigidBodyNum() >= 1)
 			{
 
 				Vector3 currentPos = optiManager.getPosition(0);
 				
 				Quaternion currentOrient = optiManager.getOrientation(0);
+
+				Vector3 thumbPos = optiManager.getMarkerPosition(0);
+				Vector3 indexPos = optiManager.getMarkerPosition(1);
+				
+				float thumbToIndex = Vector3.Distance(thumbPos, 
+				                                      indexPos);
 				
 				Vector3 transVec = currentPos - prevPos;
 
@@ -75,19 +65,37 @@ public class ChairTut: Game
 				prevOrientTarget = rotVecTarget;
 				dominantAxis(rotVecTarget, rotCntChair);
 
-				if(action)
+				if(thumbToIndex <= calibration.touchDist)
 				{
+					if(!action)
+					{
+						prevClutchTime = Time.time; 
+						action = true;
+					}
 					cursor.transform.Translate (transVec, Space.World);
 					cursor.transform.position = new Vector3 (Mathf.Clamp(cursor.transform.position.x, -xMax, xMax),
 					                                         Mathf.Clamp(cursor.transform.position.y, yMin, yMax),
 					                                         Mathf.Clamp(cursor.transform.position.z, zMin, zMax));
 				}
-				else if(isDocked && confirm)
+				else 
 				{
-					newTask();
-					setNewPositionAndOrientationTut();
-					if(score == trialsType.getTrialNum())
-						window = true;
+					if(action)
+					{
+						action = false;
+						clutchCn++;
+						clutchTime = clutchTime + Time.time - prevClutchTime; 
+
+						tapTime = Time.time - prevClutchTime;
+						if(tapTime <= maxTapTime && isDocked)
+							confirm = true;
+					}
+					if(isDocked && confirm)
+					{
+						newTask();
+						setNewPositionAndOrientationTut();
+						if(score == trialsType.getTrialNum())
+							window = true;
+					}
 				}
 				
 				cursor.transform.rotation = currentOrient;

@@ -28,6 +28,8 @@ public class MainMenu : MonoBehaviour {
 			Application.LoadLevel("optiAirPen");
 		if (GUI.Button(new Rect((UnityEngine.Screen.width)/2,10,125,80),"<size=26>AirPen\nPractice</size>"))
 			Application.LoadLevel("optiAirPenTutorial");
+		if (GUI.Button(new Rect((3*UnityEngine.Screen.width)/4,(UnityEngine.Screen.height)/2,125,80),"<size=26>Calibrate</size>"))
+			Application.LoadLevel("pinch");
 	}
 
 	void Awake()

@@ -116,7 +116,6 @@ public class PhantomTut : Game
 				{
 					prevClutchTime = Time.time; 
 					action = true;
-					info = "grabbed";
 				}
 
 				cursor.transform.Translate (transVec, Space.World);
@@ -141,7 +140,6 @@ public class PhantomTut : Game
 				clutchTime = clutchTime + Time.time - prevClutchTime; 
 				action = false;
 				clutchCn++;
-				info = "";
 				j4.renderer.material = yellow;
 			}
 			

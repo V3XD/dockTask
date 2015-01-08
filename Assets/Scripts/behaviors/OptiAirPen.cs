@@ -8,13 +8,13 @@ public class OptiAirPen : Game
 	OptiTrackManager optiManager;
 	bool bSuccess;
 
+	OptiCalibration calibration;
+
 	Vector3 prevOrient = new Vector3();
 	Vector3 prevOrientTarget = new Vector3();
 
 	protected override void atAwake ()
 	{
-		//path = folders.getPath()+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_AirPen.csv";
-		//File.AppendAllText(path, columns+ Environment.NewLine);//save to file
 		optiManager = OptiTrackManager.Instance;
 		selectLevel ();
 		trialsType.setRealThing ();
@@ -23,6 +23,7 @@ public class OptiAirPen : Game
 	protected override void atStart ()
 	{
 		bSuccess = optiManager.isConnected ();
+		calibration = OptiCalibration.Instance;
 			
 		setNewPositionAndOrientation();
 		pointer.renderer.enabled = true;
@@ -44,29 +45,18 @@ public class OptiAirPen : Game
 
 	protected override void gameBehavior ()
 	{
-
-		if (Input.GetKeyUp (KeyCode.Q) || Input.GetKeyUp (KeyCode.P))
-		{
-			action = false;
-			clutchTime = clutchTime + Time.time - prevClutchTime; 
-			clutchCn++;
-		}
-		else if(Input.GetKeyDown (KeyCode.Q) || Input.GetKeyDown (KeyCode.P))
-		{
-			if(!action)
-			{
-				prevClutchTime = Time.time; 
-				action = true;
-			}
-		}
-
 		if(bSuccess)
 		{
-			if(optiManager.getRigidBodyNum() >= 1)
+			if(optiManager.getMarkerNum() == 2 && optiManager.getRigidBodyNum() >= 1)
 			{
 				Vector3 currentPos = optiManager.getPosition(0);
-				
 				Quaternion currentOrient = optiManager.getOrientation(0);
+
+				Vector3 thumbPos = optiManager.getMarkerPosition(0);
+				Vector3 indexPos = optiManager.getMarkerPosition(1);
+				
+				float thumbToIndex = Vector3.Distance(thumbPos, 
+				                                      indexPos);
 
 				Vector3 transVec = currentPos - prevPos;
 				
@@ -79,8 +69,14 @@ public class OptiAirPen : Game
 				Vector3 rotVec = penOrient - prevOrient;
 				prevOrient = penOrient;
 				
-				if(action)
+				if(thumbToIndex <= calibration.touchDist)
 				{
+					if(!action)
+					{
+						prevClutchTime = Time.time; 
+						action = true;
+
+					}
 					pointer.renderer.material = trueGreen; 
 
 					cursor.transform.Translate (transVec, Space.World);
@@ -101,6 +97,16 @@ public class OptiAirPen : Game
 				}
 				else
 				{
+					if(action)
+					{
+						action = false;
+						clutchCn++;
+						clutchTime = clutchTime + Time.time - prevClutchTime; 
+
+						tapTime = Time.time - prevClutchTime;
+						if(tapTime <= maxTapTime && isDocked)
+							confirm = true;
+					}
 					pointer.renderer.material = yellow;
 					if(isDocked && confirm)
 					{
