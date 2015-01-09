@@ -20,14 +20,14 @@ public class Type : Singleton<Type>
 	
 	public void setTutorial()
 	{
-		trialNum = 5;
+		trialNum = 4;
 		repetition = 1;
 		trialType = "Tutorials";
 	}
 
 	public void setRealThing()
 	{
-		trialNum = 9;
+		trialNum = 6;
 		repetition = 2;
 		trialType = "Trials";
 	} 

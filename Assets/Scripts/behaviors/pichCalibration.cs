@@ -16,8 +16,6 @@ public class pichCalibration : Game {
 
 	protected override void atAwake ()
 	{
-		/*path = folders.getPath()+@"tutorial/"+System.DateTime.Now.ToString("MM-dd-yy_hh-mm-ss")+"_HandTut.csv";
-		File.AppendAllText(path, columns+ Environment.NewLine);//save to file*/
 		optiManager = OptiTrackManager.Instance;
 		difficulty.setEasy ();
 		trialsType.setTutorial ();
@@ -102,7 +100,7 @@ public class pichCalibration : Game {
 					trail.GetComponent<TrailRenderer>().enabled = true;
 					index.renderer.enabled = false;
 					thumb.renderer.enabled = false;
-					
+
 					cursor.transform.Translate (transVec, Space.World);
 					cursor.transform.position = new Vector3 (Mathf.Clamp(cursor.transform.position.x, -xMax, xMax),
 					                                         Mathf.Clamp(cursor.transform.position.y, yMin, yMax),

@@ -97,7 +97,6 @@ public class OptiHandTut: Game
 					                                         Mathf.Clamp(cursor.transform.position.y, yMin, yMax),
 					                                         Mathf.Clamp(cursor.transform.position.z, zMin, zMax));
 
-					
 					Vector3 zAxis = pointer.transform.TransformDirection(Vector3.forward);
 					cursor.transform.RotateAround(cursor.transform.position, zAxis, rotVec.z);
 					Vector3 xAxis = pointer.transform.TransformDirection(Vector3.right);

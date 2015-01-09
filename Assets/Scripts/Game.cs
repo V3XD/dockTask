@@ -73,10 +73,13 @@ public class Game : MonoBehaviour
 
 	void OnGUI ()
 	{
+		int timer = 0;
+		if (!window && !skipWindow && !instructionsText.enabled)
+			timer = (int)(Time.time - prevTotalTime);
 		GUI.Box (new Rect (0,0,265,100), "<size=36>"+ message + "</size>");
 		
 		GUI.Box (new Rect (UnityEngine.Screen.width - 200,0,200,100), "<size=36>Trial: " + score +"/"+trialsType.getTrialNum()+
-		         "\n<color="+color+">Time: " + (int)(Time.time - prevTotalTime)+"</color> </size>");
+		         "\n<color="+color+">Time: " + timer +"</color> </size>");
 		if (window)
 			GUI.Window(0, new Rect((UnityEngine.Screen.width*0.5f)-105, (UnityEngine.Screen.height*0.5f)-50, 210, 100), DoWindow, "<size=28>Complete</size>");
 		if (skipWindow)
@@ -97,6 +100,10 @@ public class Game : MonoBehaviour
 			bassSource.volume = 0f;
 			drumsSource.volume = 0f;
 		}
+
+		secondCamera.transform.position = camPosR;
+		secondCamera.rect = new Rect (0.75f, 0, 0.25f, 0.25f);
+		secondCamera.transform.LookAt(target.transform.position);
 
 		atAwake ();
 	}
@@ -148,21 +155,6 @@ public class Game : MonoBehaviour
 				trialsType.mute = false;
 		}
 
-		float tmpTime = Time.time - prevTotalTime;
-		if (Input.GetKeyUp (KeyCode.S))
-		{
-
-			prevTotalTime = Time.time;
-			skipWindow = false;
-			File.AppendAllText(folders.getPath()+"Skip.csv", tmpTime.ToString()+","+difficulty.getLevel()+ ","+"0"+","+"1"+
-			                   ","+initDistance.ToString()+","+initAngle.ToString()+","+clutchTime.ToString()+","+clutchCn.ToString()+
-			                   ","+initTarget.x+","+initTarget.y+","+initTarget.z+","+initTarget.w+","+interaction+","+trialsType.getType()+Environment.NewLine);//save to file
-			if(trialsType.getType() == "Trials")
-				setNewPositionAndOrientation();
-			else
-				setNewPositionAndOrientationTut();
-		}
-
 		if( Input.GetKeyUp (KeyCode.Space) && isDocked)
 		{
 			confirm = true;
@@ -192,14 +184,14 @@ public class Game : MonoBehaviour
 			gameBehavior ();
 		}
 
-		tmpTime = Time.time - prevTotalTime;
+		float tmpTime = Time.time - prevTotalTime;
 		if(tmpTime > maxTime-10f)
 			color = "red";
 		if(tmpTime > maxTime && !window && !instructionsText.enabled)
 		{
 			if(!skipWindow)
 			{
-				File.AppendAllText(folders.getPath()+"Skip.csv", tmpTime.ToString()+","+difficulty.getLevel()+ ","+"1"+","+"0"+
+				File.AppendAllText(folders.getPath()+"Skip.csv", tmpTime.ToString()+
 				                   ","+initDistance.ToString()+","+initAngle.ToString()+","+clutchTime.ToString()+","+clutchCn.ToString()+
 				                   ","+initTarget.x+","+initTarget.y+","+initTarget.z+","+initTarget.w+","+interaction+","+trialsType.getType()+Environment.NewLine);//save to file
 				skipWindow = true;
@@ -208,7 +200,6 @@ public class Game : MonoBehaviour
 
 		evaluateDock ();
 
-		//"Time,Distance,Angle,Difficulty,trialNum, group, type,interaction";
 		if(Time.time >= prevLog+logTime)
 		{
 			prevLog = Time.time;
@@ -217,7 +208,7 @@ public class Game : MonoBehaviour
 				if( action || interaction=="MiniChair")
 				{
 					File.AppendAllText(folders.getPath()+"Raw"+".csv", tmpTime.ToString()+","+distance.ToString()+","+angle.ToString()+ 
-				                   ","+difficulty.getLevel()+ ","+score.ToString()+","+trialsType.currentGroup.ToString()+
+				                   ","+score.ToString()+","+trialsType.currentGroup.ToString()+
 					                   ","+trialsType.getType()+","+action.ToString()+","+interaction+Environment.NewLine);//save to file
 				}
 			}
@@ -226,7 +217,7 @@ public class Game : MonoBehaviour
 
 	void LateUpdate()
 	{
-		if (trialsType.updateCam) 
+		/*if (trialsType.updateCam) 
 		{
 			secondCamera.transform.position = camPosR;
 			secondCamera.rect = new Rect (0.75f, 0, 0.25f, 0.25f);
@@ -236,7 +227,7 @@ public class Game : MonoBehaviour
 			secondCamera.transform.position = camPosL;
 			secondCamera.rect = new Rect (0, 0, 0.25f, 0.25f);
 		}
-		secondCamera.transform.LookAt(target.transform.position);
+		secondCamera.transform.LookAt(target.transform.position);*/
 	}
 
 	void OnDestroy () 
@@ -314,8 +305,7 @@ public class Game : MonoBehaviour
 		{	
 			isDocked = true;
 			float intense = (distRatio*0.5f + angleRatio*0.5f)*4f+1f;
-			roomLight.intensity = intense;//4.0f;
-			//Debug.Log(intense + " "+distRatio+ " "+angleRatio);
+			roomLight.intensity = intense;
 			message= "Target docked!";
 		}
 		else
@@ -380,8 +370,8 @@ public class Game : MonoBehaviour
 		prevTotalTime = Time.time;
 		pointText.enabled = true;
 		File.AppendAllText(folders.getPath()+trialsType.getType()+".csv", tmpTime.ToString()+","+distance.ToString()+","+angle.ToString()+ 
-		                   ","+difficulty.getLevel()+ ","+initDistance.ToString()+","+initAngle.ToString()+","+clutchTime.ToString()
-		                   +","+clutchCn.ToString()+","+cntTab.ToString()+","+rotCntI[0].ToString()+","+rotCntI[1].ToString()+","+rotCntI[2].ToString()+
+		                   ","+initDistance.ToString()+","+initAngle.ToString()+","+clutchTime.ToString()
+		                   +","+clutchCn.ToString()+","+rotCntI[0].ToString()+","+rotCntI[1].ToString()+","+rotCntI[2].ToString()+
 		                   ","+rotCntChair[0].ToString()+","+rotCntChair[1].ToString()+","+rotCntChair[2].ToString()+
 		                   ","+accuracyTimes[0].ToString()+","+accuracyTimes[1].ToString()+","+accuracyTimes[2].ToString()+
 		                   ","+interaction+Environment.NewLine);//save to file
