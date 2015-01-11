@@ -58,8 +58,6 @@ public class OptiAirPen : Game
 				float thumbToIndex = Vector3.Distance(thumbPos, 
 				                                      indexPos);
 
-				Vector3 transVec = currentPos - prevPos;
-				
 				Vector3 penOrient = currentOrient.eulerAngles;
 				Vector3 fakeOrient = new Vector3 (penOrient.x, penOrient.y, 0f);
 
@@ -71,29 +69,34 @@ public class OptiAirPen : Game
 				
 				if(thumbToIndex <= calibration.touchDist)
 				{
+					pointer.renderer.material = trueGreen; 
+
 					if(!action)
 					{
 						prevClutchTime = Time.time; 
 						action = true;
-
+						
 					}
-					pointer.renderer.material = trueGreen; 
+					else
+					{
+						Vector3 transVec = currentPos - prevPos;
+						cursor.transform.Translate (transVec, Space.World);
+						cursor.transform.position = new Vector3 (Mathf.Clamp(cursor.transform.position.x, -xMax, xMax),
+						                                         Mathf.Clamp(cursor.transform.position.y, yMin, yMax),
+						                                         Mathf.Clamp(cursor.transform.position.z, zMin, zMax));
 
-					cursor.transform.Translate (transVec, Space.World);
-					cursor.transform.position = new Vector3 (Mathf.Clamp(cursor.transform.position.x, -xMax, xMax),
-					                                         Mathf.Clamp(cursor.transform.position.y, yMin, yMax),
-					                                         Mathf.Clamp(cursor.transform.position.z, zMin, zMax));
-
-					Vector3 zAxis = pointer.transform.TransformDirection(Vector3.forward);
-					cursor.transform.RotateAround(cursor.transform.position, zAxis, rotVec.z);
-					Vector3 xAxis = pointer.transform.TransformDirection(Vector3.right);
-					cursor.transform.RotateAround(cursor.transform.position, xAxis, rotVec.x);
-					Vector3 yAxis = pointer.transform.TransformDirection(Vector3.up); 
-					cursor.transform.RotateAround(cursor.transform.position, yAxis, rotVec.y);
-					dominantAxis(rotVec, rotCntI);
-					Vector3 rotVecTarget = cursor.transform.eulerAngles - prevOrientTarget;
-					prevOrientTarget = rotVecTarget;
-					dominantAxis(rotVecTarget, rotCntChair);
+						Vector3 zAxis = pointer.transform.TransformDirection(Vector3.forward);
+						cursor.transform.RotateAround(cursor.transform.position, zAxis, rotVec.z);
+						Vector3 xAxis = pointer.transform.TransformDirection(Vector3.right);
+						cursor.transform.RotateAround(cursor.transform.position, xAxis, rotVec.x);
+						Vector3 yAxis = pointer.transform.TransformDirection(Vector3.up); 
+						cursor.transform.RotateAround(cursor.transform.position, yAxis, rotVec.y);
+						dominantAxis(rotVec, rotCntI);
+						Vector3 rotVecTarget = cursor.transform.eulerAngles - prevOrientTarget;
+						prevOrientTarget = rotVecTarget;
+						dominantAxis(rotVecTarget, rotCntChair);
+					}
+					prevPos = currentPos;
 				}
 				else
 				{
@@ -120,7 +123,6 @@ public class OptiAirPen : Game
 						}
 					}
 				}
-				prevPos = currentPos;
 			}
 		}
 	}

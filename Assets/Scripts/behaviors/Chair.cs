@@ -60,7 +60,6 @@ public class Chair: Game
 				float thumbToIndex = Vector3.Distance(thumbPos, 
 				                                      indexPos);
 
-				Vector3 transVec = currentPos - prevPos;
 				trackedObj.renderer.enabled = false;
 
 				Vector3 penOrient = currentOrient.eulerAngles;
@@ -78,10 +77,15 @@ public class Chair: Game
 						prevClutchTime = Time.time; 
 						action = true;
 					}
-					cursor.transform.Translate (transVec, Space.World);
-					cursor.transform.position = new Vector3 (Mathf.Clamp(cursor.transform.position.x, -xMax, xMax),
-					                                         Mathf.Clamp(cursor.transform.position.y, yMin, yMax),
-					                                         Mathf.Clamp(cursor.transform.position.z, zMin, zMax));
+					else
+					{
+						Vector3 transVec = currentPos - prevPos;
+						cursor.transform.Translate (transVec, Space.World);
+						cursor.transform.position = new Vector3 (Mathf.Clamp(cursor.transform.position.x, -xMax, xMax),
+						                                         Mathf.Clamp(cursor.transform.position.y, yMin, yMax),
+						                                         Mathf.Clamp(cursor.transform.position.z, zMin, zMax));
+					}
+					prevPos = currentPos;
 				}
 				else 
 				{
@@ -109,7 +113,6 @@ public class Chair: Game
 				}
 
 				cursor.transform.rotation = currentOrient;
-				prevPos = currentPos;
 			}
 			else
 			{

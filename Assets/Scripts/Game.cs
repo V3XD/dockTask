@@ -441,7 +441,7 @@ public class Game : MonoBehaviour
 		{
 			target.transform.rotation = UnityEngine.Random.rotationUniform;
 			angle = Vector3.Angle(target.transform.up, Vector3.down);
-		}while(angle < 75f);
+		}while(angle < 80f);
 		initTarget = target.transform.rotation;
 		initAngle = Quaternion.Angle(cursor.transform.rotation, initTarget);
 	}

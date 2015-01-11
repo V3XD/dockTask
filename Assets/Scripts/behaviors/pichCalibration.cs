@@ -13,6 +13,7 @@ public class pichCalibration : Game {
 	public Material blue;
 	bool isCalibrated = false;
 	float maxDist = 0;
+	static int startNum = 6;
 
 	protected override void atAwake ()
 	{
@@ -56,8 +57,7 @@ public class pichCalibration : Game {
 				                                      indexPos);
 				
 				Vector3 currentPos = (thumbPos + indexPos)*0.5f;
-				Vector3 transVec = currentPos - prevPos;
-				
+
 				thumb.transform.position = thumbPos; 
 				index.transform.position = indexPos; 
 				
@@ -70,15 +70,15 @@ public class pichCalibration : Game {
 				{
 					int count = (int)(Time.time - prevTotalTime);
 					
-					instructionsText.text = "Pinch "+ (10-count).ToString();
-					if( count > 7)
+					instructionsText.text = "Pinch "+ (startNum-count).ToString();
+					if( count > startNum-3)
 					{
 						instructionsText.material.color = Color.white;
 						if(thumbToIndex > maxDist)
 							maxDist = thumbToIndex;
 					}
 					
-					if( count > 10)
+					if( count > startNum)
 					{
 						instructionsText.text = "Ready";
 						isCalibrated = true;
@@ -91,20 +91,24 @@ public class pichCalibration : Game {
 				}
 				else if( aveDist <= calibration.touchDist)
 				{
+					pointer.renderer.enabled = true;
+					trail.GetComponent<TrailRenderer>().enabled = true;
+					index.renderer.enabled = false;
+					thumb.renderer.enabled = false;
 					if(!action)
 					{
 						prevClutchTime = Time.time; 
 						action = true;
 					}
-					pointer.renderer.enabled = true;
-					trail.GetComponent<TrailRenderer>().enabled = true;
-					index.renderer.enabled = false;
-					thumb.renderer.enabled = false;
-
-					cursor.transform.Translate (transVec, Space.World);
-					cursor.transform.position = new Vector3 (Mathf.Clamp(cursor.transform.position.x, -xMax, xMax),
-					                                         Mathf.Clamp(cursor.transform.position.y, yMin, yMax),
-					                                         Mathf.Clamp(cursor.transform.position.z, zMin, zMax));
+					else
+					{
+						Vector3 transVec = currentPos - prevPos;
+						cursor.transform.Translate (transVec, Space.World);
+						cursor.transform.position = new Vector3 (Mathf.Clamp(cursor.transform.position.x, -xMax, xMax),
+						                                         Mathf.Clamp(cursor.transform.position.y, yMin, yMax),
+						                                         Mathf.Clamp(cursor.transform.position.z, zMin, zMax));
+					}
+					prevPos = currentPos;
 				}
 				else
 				{
@@ -129,7 +133,6 @@ public class pichCalibration : Game {
 						window = true;
 					}
 				}
-				prevPos = currentPos;
 			}
 			else
 			{

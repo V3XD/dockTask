@@ -17,6 +17,7 @@ public class OptiHandTut: Game
 	public Material blue;
 	Vector3 prevOrient = new Vector3();
 	Vector3 prevOrientTarget = new Vector3();
+	Vector3 prevTrans = new Vector3();
 
 	protected override void atAwake ()
 	{
@@ -64,7 +65,7 @@ public class OptiHandTut: Game
 				                                      indexPos);
 
 				Vector3 currentPos = (thumbPos + indexPos)*0.5f;
-				Vector3 transVec = currentPos - prevPos;
+				Vector3 currentPosPalm = optiManager.getPosition(0);
 
 				thumb.transform.position = thumbPos; 
 				index.transform.position = indexPos; 
@@ -76,37 +77,42 @@ public class OptiHandTut: Game
 				
 				pointer.transform.position = currentPos;
 				pointer.transform.rotation = Quaternion.Euler(fakeOrient);//currentOrient;
-				
-				Vector3 rotVec = penOrient - prevOrient;
-				prevOrient = penOrient;
 
 				if( aveDist <= calibration.touchDist)
 				{
-					if(!action)
-					{
-						prevClutchTime = Time.time; 
-						action = true;
-					}
 					pointer.renderer.enabled = true;
 					trail.GetComponent<TrailRenderer>().enabled = true;
 					index.renderer.enabled = false;
 					thumb.renderer.enabled = false;
 
-					cursor.transform.Translate (transVec, Space.World);
-					cursor.transform.position = new Vector3 (Mathf.Clamp(cursor.transform.position.x, -xMax, xMax),
-					                                         Mathf.Clamp(cursor.transform.position.y, yMin, yMax),
-					                                         Mathf.Clamp(cursor.transform.position.z, zMin, zMax));
+					if(!action)
+					{
+						prevClutchTime = Time.time; 
+						action = true;
+					}
+					else
+					{
+						Vector3 transVec = currentPos - prevPos;
+						Vector3 rotVec = penOrient - prevOrient;
+						cursor.transform.Translate (transVec, Space.World);
+						cursor.transform.position = new Vector3 (Mathf.Clamp(cursor.transform.position.x, -xMax, xMax),
+						                                         Mathf.Clamp(cursor.transform.position.y, yMin, yMax),
+						                                         Mathf.Clamp(cursor.transform.position.z, zMin, zMax));
+						prevTrans = transVec;
 
-					Vector3 zAxis = pointer.transform.TransformDirection(Vector3.forward);
-					cursor.transform.RotateAround(cursor.transform.position, zAxis, rotVec.z);
-					Vector3 xAxis = pointer.transform.TransformDirection(Vector3.right);
-					cursor.transform.RotateAround(cursor.transform.position, xAxis, rotVec.x);
-					Vector3 yAxis = pointer.transform.TransformDirection(Vector3.up); 
-					cursor.transform.RotateAround(cursor.transform.position, yAxis, rotVec.y);
-					dominantAxis(rotVec, rotCntI);
-					Vector3 rotVecTarget = cursor.transform.eulerAngles - prevOrientTarget;
-					prevOrientTarget = rotVecTarget;
-					dominantAxis(rotVecTarget, rotCntChair);
+						Vector3 zAxis = pointer.transform.TransformDirection(Vector3.forward);
+						cursor.transform.RotateAround(cursor.transform.position, zAxis, rotVec.z);
+						Vector3 xAxis = pointer.transform.TransformDirection(Vector3.right);
+						cursor.transform.RotateAround(cursor.transform.position, xAxis, rotVec.x);
+						Vector3 yAxis = pointer.transform.TransformDirection(Vector3.up); 
+						cursor.transform.RotateAround(cursor.transform.position, yAxis, rotVec.y);
+						dominantAxis(rotVec, rotCntI);
+						Vector3 rotVecTarget = cursor.transform.eulerAngles - prevOrientTarget;
+						prevOrientTarget = rotVecTarget;
+						dominantAxis(rotVecTarget, rotCntChair);
+					}
+					prevPos = currentPos;
+					prevOrient = penOrient;
 				}
 				else
 				{
@@ -122,7 +128,10 @@ public class OptiHandTut: Game
 
 						tapTime = Time.time - prevClutchTime;
 						if(tapTime <= maxTapTime && isDocked)
+						{
+							//cursor.transform.Translate (-prevTrans, Space.World);
 							confirm = true;
+						}
 					}
 
 
@@ -134,7 +143,6 @@ public class OptiHandTut: Game
 							window = true;
 					}
 				}
-				prevPos = currentPos;
 			}
 			else
 			{

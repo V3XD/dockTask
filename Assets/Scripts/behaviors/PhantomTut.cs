@@ -117,23 +117,25 @@ public class PhantomTut : Game
 					prevClutchTime = Time.time; 
 					action = true;
 				}
+				else
+				{
+					cursor.transform.Translate (transVec, Space.World);
+					cursor.transform.position = new Vector3 (Mathf.Clamp(cursor.transform.position.x, -xMax, xMax),
+					                                         Mathf.Clamp(cursor.transform.position.y, yMin, yMax),
+					                                         Mathf.Clamp(cursor.transform.position.z, zMin, zMax));
 
-				cursor.transform.Translate (transVec, Space.World);
-				cursor.transform.position = new Vector3 (Mathf.Clamp(cursor.transform.position.x, -xMax, xMax),
-				                                         Mathf.Clamp(cursor.transform.position.y, yMin, yMax),
-				                                         Mathf.Clamp(cursor.transform.position.z, zMin, zMax));
-
-				Vector3 zAxis = j4.transform.TransformDirection(Vector3.forward);
-				cursor.transform.RotateAround(cursor.transform.position, zAxis, rotVec.z);
-				Vector3 xAxis = j4.transform.TransformDirection(Vector3.right);
-				cursor.transform.RotateAround(cursor.transform.position, xAxis, rotVec.x);
-				Vector3 yAxis = j4.transform.TransformDirection(Vector3.up);
-				cursor.transform.RotateAround(cursor.transform.position, yAxis, rotVec.y);
-				j4.renderer.material = trueGreen;
-				dominantAxis(rotVec, rotCntI);
-				Vector3 rotVecTarget = cursor.transform.eulerAngles - prevOrientTarget;
-				prevOrientTarget = rotVecTarget;
-				dominantAxis(rotVecTarget, rotCntChair);
+					Vector3 zAxis = j4.transform.TransformDirection(Vector3.forward);
+					cursor.transform.RotateAround(cursor.transform.position, zAxis, rotVec.z);
+					Vector3 xAxis = j4.transform.TransformDirection(Vector3.right);
+					cursor.transform.RotateAround(cursor.transform.position, xAxis, rotVec.x);
+					Vector3 yAxis = j4.transform.TransformDirection(Vector3.up);
+					cursor.transform.RotateAround(cursor.transform.position, yAxis, rotVec.y);
+					j4.renderer.material = trueGreen;
+					dominantAxis(rotVec, rotCntI);
+					Vector3 rotVecTarget = cursor.transform.eulerAngles - prevOrientTarget;
+					prevOrientTarget = rotVecTarget;
+					dominantAxis(rotVecTarget, rotCntChair);
+				}
 			}
 			else if (action)
 			{
