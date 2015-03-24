@@ -111,6 +111,7 @@ public class Game : MonoBehaviour
 	void Start () 
 	{
 		prevTotalTime = Time.time;
+		prevLog = Time.time;
 		atStart ();
 	}
 	
@@ -134,6 +135,7 @@ public class Game : MonoBehaviour
 				setNewPositionAndOrientationTut();
 			skipWindow = false;
 			prevTotalTime = Time.time;
+			prevLog = Time.time;
 		}
 
 
@@ -215,21 +217,6 @@ public class Game : MonoBehaviour
 				}
 			}
 		}
-	}
-
-	void LateUpdate()
-	{
-		/*if (trialsType.updateCam) 
-		{
-			secondCamera.transform.position = camPosR;
-			secondCamera.rect = new Rect (0.75f, 0, 0.25f, 0.25f);
-		}
-		else
-		{
-			secondCamera.transform.position = camPosL;
-			secondCamera.rect = new Rect (0, 0, 0.25f, 0.25f);
-		}
-		secondCamera.transform.LookAt(target.transform.position);*/
 	}
 
 	void OnDestroy () 
@@ -370,6 +357,7 @@ public class Game : MonoBehaviour
 		float tmpTime = Time.time - prevTotalTime;
 		popSource.PlayOneShot(popSound);
 		prevTotalTime = Time.time;
+		prevLog = Time.time;
 		pointText.enabled = true;
 		File.AppendAllText(folders.getPath()+trialsType.getType()+".csv", tmpTime.ToString()+","+distance.ToString()+","+angle.ToString()+ 
 		                   ","+initDistance.ToString()+","+initAngle.ToString()+","+clutchTime.ToString()
