@@ -56,7 +56,7 @@ public class Phantom : Game
 	{
 
 		setNewPositionAndOrientation();
-		pointer.renderer.enabled = true;
+		pointer.GetComponent<Renderer>().enabled = true;
 		interaction = "Phantom";
 		isConnected = initDevice ();
 		if(isConnected)
@@ -136,7 +136,7 @@ public class Phantom : Game
 					cursor.transform.RotateAround(cursor.transform.position, xAxis, rotVec.x);
 					Vector3 yAxis = j4.transform.TransformDirection(Vector3.up);
 					cursor.transform.RotateAround(cursor.transform.position, yAxis, rotVec.y);
-					j4.renderer.material = trueGreen;
+					j4.GetComponent<Renderer>().material = trueGreen;
 					dominantAxis(rotVec, rotCntI);
 					Vector3 rotVecTarget = cursor.transform.eulerAngles - prevOrientTarget;
 					prevOrientTarget = rotVecTarget;
@@ -148,7 +148,7 @@ public class Phantom : Game
 				clutchTime = clutchTime + Time.time - prevClutchTime; 
 				action = false;
 				clutchCn++;
-				j4.renderer.material = yellow;
+				j4.GetComponent<Renderer>().material = yellow;
 			}
 			
 			if(isDocked)

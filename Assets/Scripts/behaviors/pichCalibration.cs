@@ -29,7 +29,7 @@ public class pichCalibration : Game {
 		calibration = OptiCalibration.Instance;
 		interaction = "pinch";
 		setNewPositionAndOrientationTut();
-		pointer.renderer.enabled = false;
+		pointer.GetComponent<Renderer>().enabled = false;
 		nextLevel = "MainMenu";
 		instructionsText.material.color = Color.gray;
 		
@@ -46,9 +46,9 @@ public class pichCalibration : Game {
 		{
 			if(optiManager.getMarkerNum() == 2)
 			{
-				thumb.renderer.material = blue;
-				index.renderer.material = blue;
-				pointer.renderer.material = blue;
+				thumb.GetComponent<Renderer>().material = blue;
+				index.GetComponent<Renderer>().material = blue;
+				pointer.GetComponent<Renderer>().material = blue;
 
 				Vector3 thumbPos = optiManager.getMarkerPosition(0);
 				Vector3 indexPos = optiManager.getMarkerPosition(1);
@@ -91,10 +91,10 @@ public class pichCalibration : Game {
 				}
 				else if( aveDist <= calibration.touchDist)
 				{
-					pointer.renderer.enabled = true;
+					pointer.GetComponent<Renderer>().enabled = true;
 					trail.GetComponent<TrailRenderer>().enabled = true;
-					index.renderer.enabled = false;
-					thumb.renderer.enabled = false;
+					index.GetComponent<Renderer>().enabled = false;
+					thumb.GetComponent<Renderer>().enabled = false;
 					if(!action)
 					{
 						prevClutchTime = Time.time; 
@@ -117,9 +117,9 @@ public class pichCalibration : Game {
 						action = false;
 						clutchCn++;
 						clutchTime = clutchTime + Time.time - prevClutchTime; 
-						index.renderer.enabled = true;
-						thumb.renderer.enabled = true;
-						pointer.renderer.enabled = false;
+						index.GetComponent<Renderer>().enabled = true;
+						thumb.GetComponent<Renderer>().enabled = true;
+						pointer.GetComponent<Renderer>().enabled = false;
 						trail.GetComponent<TrailRenderer>().enabled = false;
 
 						tapTime = Time.time - prevClutchTime;
@@ -136,9 +136,9 @@ public class pichCalibration : Game {
 			}
 			else
 			{
-				thumb.renderer.material = red;
-				index.renderer.material = red;
-				pointer.renderer.material = red;
+				thumb.GetComponent<Renderer>().material = red;
+				index.GetComponent<Renderer>().material = red;
+				pointer.GetComponent<Renderer>().material = red;
 				trail.GetComponent<TrailRenderer>().enabled = false;
 			}
 			

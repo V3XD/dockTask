@@ -10,7 +10,7 @@ public class Folders : Singleton<Folders>
 	string folderPath;
 	string columns = "Time,Distance,Angle,initDistance,initAngle,clutchTime,clutchCount,xRotI,yRotI,zRotI," +
 					"xRotChair,yRotChair,zRotChair,easyTime,mediumTime,hardTime,interaction";
-	string columnsSkip = "Time,initDistance,initAngle,clutchTime,clutchCount,targetX,targetY,targetZ,targetW,interaction,type";
+	string columnsSkip = "Time,initDistance,initAngle,clutchTime,clutchCount,targetX,targetY,targetZ,targetW,interaction,type,trialNum, group";
 	string columnsRaw = "Time,Distance,Angle,trialNum, group, trialType,action,interaction";
 
 	void Awake () 

@@ -33,7 +33,7 @@ public class OptiHandTut: Game
 		calibration = OptiCalibration.Instance;
 		interaction = "Fingers";
 		setNewPositionAndOrientationTut();
-		pointer.renderer.enabled = false;
+		pointer.GetComponent<Renderer>().enabled = false;
 		nextLevel = "optiHand";
 		instructionsText.material.color = Color.gray;
 
@@ -50,10 +50,10 @@ public class OptiHandTut: Game
 		{
 			if(optiManager.getMarkerNum() == 2 && optiManager.getRigidBodyNum() >= 1)
 			{
-				thumb.renderer.material = blue;
-				index.renderer.material = blue;
-				palm.renderer.material = blue;
-				pointer.renderer.material = blue;
+				thumb.GetComponent<Renderer>().material = blue;
+				index.GetComponent<Renderer>().material = blue;
+				palm.GetComponent<Renderer>().material = blue;
+				pointer.GetComponent<Renderer>().material = blue;
 
 				Quaternion currentOrient = optiManager.getOrientation(0);
 				palm.transform.position = optiManager.getPosition(0);
@@ -80,10 +80,10 @@ public class OptiHandTut: Game
 
 				if( aveDist <= calibration.touchDist)
 				{
-					pointer.renderer.enabled = true;
+					pointer.GetComponent<Renderer>().enabled = true;
 					trail.GetComponent<TrailRenderer>().enabled = true;
-					index.renderer.enabled = false;
-					thumb.renderer.enabled = false;
+					index.GetComponent<Renderer>().enabled = false;
+					thumb.GetComponent<Renderer>().enabled = false;
 
 					if(!action)
 					{
@@ -121,9 +121,9 @@ public class OptiHandTut: Game
 						action = false;
 						clutchCn++;
 						clutchTime = clutchTime + Time.time - prevClutchTime; 
-						index.renderer.enabled = true;
-						thumb.renderer.enabled = true;
-						pointer.renderer.enabled = false;
+						index.GetComponent<Renderer>().enabled = true;
+						thumb.GetComponent<Renderer>().enabled = true;
+						pointer.GetComponent<Renderer>().enabled = false;
 						trail.GetComponent<TrailRenderer>().enabled = false;
 
 						tapTime = Time.time - prevClutchTime;
@@ -146,10 +146,10 @@ public class OptiHandTut: Game
 			}
 			else
 			{
-				thumb.renderer.material = red;
-				index.renderer.material = red;
-				palm.renderer.material = red;
-				pointer.renderer.material = red;
+				thumb.GetComponent<Renderer>().material = red;
+				index.GetComponent<Renderer>().material = red;
+				palm.GetComponent<Renderer>().material = red;
+				pointer.GetComponent<Renderer>().material = red;
 				trail.GetComponent<TrailRenderer>().enabled = false;
 			}
 			

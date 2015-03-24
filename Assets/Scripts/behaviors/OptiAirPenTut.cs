@@ -26,7 +26,7 @@ public class OptiAirPenTut : Game
 		calibration = OptiCalibration.Instance;
 		nextLevel = "optiAirPen";
 		setNewPositionAndOrientationTut();
-		pointer.renderer.enabled = true;
+		pointer.GetComponent<Renderer>().enabled = true;
 		interaction = "AirPen";
 		
 		if (bSuccess) 
@@ -64,7 +64,7 @@ public class OptiAirPenTut : Game
 				
 				if(thumbToIndex <= calibration.touchDist)
 				{
-					pointer.renderer.material = trueGreen; 
+					pointer.GetComponent<Renderer>().material = trueGreen; 
 
 					if(!action)
 					{
@@ -104,7 +104,7 @@ public class OptiAirPenTut : Game
 						if(tapTime <= maxTapTime && isDocked)
 							confirm = true;
 					}
-					pointer.renderer.material = yellow;
+					pointer.GetComponent<Renderer>().material = yellow;
 					if(isDocked && confirm)
 					{
 						newTask();

@@ -49,7 +49,7 @@ public class MainMenu : MonoBehaviour {
 
 	void Start()
 	{
-		UnityEngine.Screen.showCursor = true; 
+		Cursor.visible = true; 
 	}
 
 	// Update is called once per frame

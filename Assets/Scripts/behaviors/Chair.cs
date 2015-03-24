@@ -26,7 +26,7 @@ public class Chair: Game
 		bSuccess = optiManager.isConnected ();
 		calibration = OptiCalibration.Instance;
 		setNewPositionAndOrientation();
-		pointer.renderer.enabled = true;
+		pointer.GetComponent<Renderer>().enabled = true;
 		interaction = "MiniChair";
 
 		if (bSuccess) 
@@ -60,7 +60,7 @@ public class Chair: Game
 				float thumbToIndex = Vector3.Distance(thumbPos, 
 				                                      indexPos);
 
-				trackedObj.renderer.enabled = false;
+				trackedObj.GetComponent<Renderer>().enabled = false;
 
 				Vector3 penOrient = currentOrient.eulerAngles;
 				Vector3 rotVec = penOrient - prevOrient;
@@ -116,7 +116,7 @@ public class Chair: Game
 			}
 			else
 			{
-				trackedObj.renderer.enabled = true;
+				trackedObj.GetComponent<Renderer>().enabled = true;
 			}
 			
 			

@@ -91,7 +91,7 @@ public class Game : MonoBehaviour
 		folders = Folders.Instance;
 		difficulty = Difficulty.Instance;
 		trialsType = Type.Instance;
-		UnityEngine.Screen.showCursor = false;
+		Cursor.visible = false;
 		soundAngle = difficulty.angle;
 		soundDistance = difficulty.distance;
 
@@ -166,6 +166,7 @@ public class Game : MonoBehaviour
 			{
 				instructionsText.enabled = false;
 				prevTotalTime = Time.time;
+				prevLog = Time.time;
 				color = "white";
 			}
 		}
@@ -177,10 +178,10 @@ public class Game : MonoBehaviour
 		}
 
 		if (window || skipWindow)
-			UnityEngine.Screen.showCursor = true;
+			Cursor.visible = true;
 		else
 		{
-			UnityEngine.Screen.showCursor = false;
+			Cursor.visible = false;
 			gameBehavior ();
 		}
 
@@ -193,7 +194,8 @@ public class Game : MonoBehaviour
 			{
 				File.AppendAllText(folders.getPath()+"Skip.csv", tmpTime.ToString()+
 				                   ","+initDistance.ToString()+","+initAngle.ToString()+","+clutchTime.ToString()+","+clutchCn.ToString()+
-				                   ","+initTarget.x+","+initTarget.y+","+initTarget.z+","+initTarget.w+","+interaction+","+trialsType.getType()+Environment.NewLine);//save to file
+				                   ","+initTarget.x+","+initTarget.y+","+initTarget.z+","+initTarget.w+","+interaction+","+trialsType.getType()+
+				                   ","+score.ToString()+","+trialsType.currentGroup.ToString()+Environment.NewLine);//save to file
 				skipWindow = true;
 			}
 		}
@@ -319,23 +321,23 @@ public class Game : MonoBehaviour
 		if (angle <= difficulty.angle)
 		{	
 			green.color = new Vector4(0, angleRatio, 0, 1);
-			cursor.renderer.material = green;
-			targetSphere.renderer.material = green;
+			cursor.GetComponent<Renderer>().material = green;
+			targetSphere.GetComponent<Renderer>().material = green;
 		}
 		else
 		{
-			cursor.renderer.material = yellow;
-			targetSphere.renderer.material = transYellow;
+			cursor.GetComponent<Renderer>().material = yellow;
+			targetSphere.GetComponent<Renderer>().material = transYellow;
 		}
 
 		if (distance <= difficulty.distance)
 		{	
 			transGreen.color = new Vector4(0, distRatio, 0, 1);
-			posCube.renderer.material = transGreen;
+			posCube.GetComponent<Renderer>().material = transGreen;
 		}
 		else
 		{
-			posCube.renderer.material = transYellow;
+			posCube.GetComponent<Renderer>().material = transYellow;
 		}
 
 		if ( (angle > difficulty.angles [0]) || (distance > difficulty.distances[0]) )
