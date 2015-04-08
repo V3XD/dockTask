@@ -25,6 +25,8 @@ public class Game : MonoBehaviour
 	public GUIText instructionsText;
 	public GameObject posCube;
 	public Material trueGreen;
+	WebCamTexture webcamTexture;
+	public GUITexture webcam;
 
 	protected static float xMax = 15.0f;
 	protected static float yMax = 15.0f;
@@ -70,6 +72,7 @@ public class Game : MonoBehaviour
 	string color ="white";
 	protected static float maxTapTime = 0.3f;
 	protected float tapTime = 50f;
+	Quaternion baseRotation;
 
 	void OnGUI ()
 	{
@@ -84,6 +87,7 @@ public class Game : MonoBehaviour
 			GUI.Window(0, new Rect((UnityEngine.Screen.width*0.5f)-105, (UnityEngine.Screen.height*0.5f)-50, 210, 100), DoWindow, "<size=28>Complete</size>");
 		if (skipWindow)
 			GUI.Window(1, new Rect((UnityEngine.Screen.width*0.5f)-105, (UnityEngine.Screen.height*0.5f)-50, 210, 100), DoWindow, "<size=28>Skip this trial</size>");
+
 	}
 	
 	void Awake ()
@@ -112,11 +116,26 @@ public class Game : MonoBehaviour
 	{
 		prevTotalTime = Time.time;
 		prevLog = Time.time;
+
+		WebCamDevice[] devices = WebCamTexture.devices;
+		
+		if (devices.Length > 0)
+		{
+			webcamTexture = new WebCamTexture ();
+			webcamTexture.deviceName = devices[0].name;
+			//Debug.Log(webcamTexture.deviceName);
+			webcam.texture = webcamTexture;
+			baseRotation = webcam.transform.rotation;
+			webcamTexture.Play();
+		}
+
 		atStart ();
 	}
 	
 	void Update () 
 	{
+		if (webcamTexture!= null)
+			webcam.transform.rotation = baseRotation * Quaternion.AngleAxis(webcamTexture.videoRotationAngle, Vector3.up);
 		if (Input.GetKeyUp (KeyCode.Escape))
 				Application.LoadLevel ("MainMenu");
 
@@ -223,6 +242,7 @@ public class Game : MonoBehaviour
 	{
 		transGreen.color = trueGreen.color;
 		green.color = trueGreen.color;
+		webcamTexture.Stop();
 		atEnd ();
 	}
 	
